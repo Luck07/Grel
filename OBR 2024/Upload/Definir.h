@@ -51,8 +51,9 @@ int m_dir = 0;
 //* Valores com Millis
 long int millis_ant = 0;
 #define time_log 2000
-#define time_branco 2000 // tempo suficiente para achar o gap, mas nao se perder tanto na linha
-#define time_branco_while 2500 // tempo para ele voltar para linha
+#define time_branco 1500 // tempo suficiente para achar o gap, mas nao se perder tanto na linha
+#define time_branco_while 2000 // tempo para ele voltar para linha
+// 1500 2000 /
 
 //* Valores para encoders
 Encoder enc(3, 2);       // Encoder do motor da esquerda
@@ -153,6 +154,14 @@ void vel_re(int velo_esq = vel_esq, int velo_dir = vel_dir)
   analogWrite(mot_in3, 0);
   analogWrite(mot_in2, 0);
   analogWrite(mot_in1, velo_dir);
+}
+void vel_parar(int velo_esq = mot_par)
+{
+  analogWrite(mot_in4, 0);
+  analogWrite(mot_in3, 0);
+  analogWrite(mot_in2, 0);
+  analogWrite(mot_in1, 0);
+  delay(velo_esq);
 }
 
 void enc_frente(int enc_valor = enc_passo, int velo_esq = vel_esq, int velo_dir = vel_dir)
