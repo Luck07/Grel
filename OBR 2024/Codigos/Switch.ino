@@ -59,7 +59,7 @@ void loop()
         {
             display.print("0000 / Tras");
             display.display();
-            enc_re(enc_pas_outro);
+            enc_re(vel_esq, vel_dir, enc_pas_outro);
             ver = false;
             millis_ant = millis();
         }
@@ -77,7 +77,7 @@ void loop()
         {
             display.print("0110 / Tras");
             display.display();
-            enc_re(enc_pas_outro);
+            enc_re(vel_esq, vel_dir, enc_pas_outro);
             ver = false;
         }
         millis_ant = millis();
@@ -118,7 +118,8 @@ void loop()
         break;
     case 0b1000:
     case 0b1100:
-    case 0b1110: //! Casos de fazer o esquerda 90  
+    case 0b1110:
+    case 0b1010: //! Casos de fazer o esquerda 90  
         if (ver == false)
         {
             display.print("1000 / parar");
@@ -137,12 +138,15 @@ void loop()
         break;
     case 0b0001:
     case 0b0011:
-    case 0b0111: //! Casos de fazer o direita 90
+    case 0b0111:
+    case 0b0101: //! Casos de fazer o direita 90
         if (ver == false)
         {
             display.print("0001 / parar");
             display.display();
-            vel_parar();
+            mot1_par();
+            mot2_par();
+            delay(mot_par);
             ver = true;
         }
         else
@@ -155,16 +159,17 @@ void loop()
         millis_ant = millis();
         break;
     case 0b1111: //! Caso de encruzilhada
+        millis_ant = millis();
         if (ver == false)
         {
-            display.print("1111 / frente");
+            display.print("111 / frente");
             display.display();
             // vel_frente();
             enc_frente(enc_fre);
         }
         else
         {
-            display.print("1111 / re");
+            display.print("111 / re");
             display.display();
             enc_re(enc_pas_outro);
             ver = false;
