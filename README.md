@@ -7,3 +7,4 @@
 - [Sugestão de Ladrilhas](https://obr.robocup.org.br/wp-content/uploads/2024/03/Robotica-de-Resgate-Sugestoes-de-Ladrilhos.pdf)
 - [Time do EasyEDA](https://u.easyeda.com/bee_keepers)
 - [Regional Paraíba](https://www.obr.org.br/PB/)
+- [Base do Robo](https://www.tinkercad.com/things/kZGNkaMYkYZ-treino-de-base-para-robo/edit?returnTo=%2Fdashboard%2Fdesigns%2F3d)
