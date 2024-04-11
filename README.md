@@ -2,7 +2,9 @@
 
 ## 2024
 
-### OBR
-- [Regras da OBR](https://www.obr.org.br/manuais/OBR2023_MP_ManualRegrasRegionalEstadual.pdf)
-- [Projeto do EasyEDA](https://easyeda.com/editor#project_id=d3cd51bfbece4384a1c6c82716b6cf47)
+### [OBR](https://obr.robocup.org.br/)
+- [Regras da OBR](https://obr.robocup.org.br/wp-content/uploads/2024/03/2024-Manual-de-Regras-e-Instrucoes-Regional_Estadual-Resgate.pdf)
+- [Sugestão de Ladrilhas](https://obr.robocup.org.br/wp-content/uploads/2024/03/Robotica-de-Resgate-Sugestoes-de-Ladrilhos.pdf)
+- [Time do EasyEDA](https://u.easyeda.com/bee_keepers)
 - [Regional Paraíba](https://www.obr.org.br/PB/)
+- [Base do Robo](https://www.tinkercad.com/things/kZGNkaMYkYZ-treino-de-base-para-robo/edit?returnTo=%2Fdashboard%2Fdesigns%2F3d)
