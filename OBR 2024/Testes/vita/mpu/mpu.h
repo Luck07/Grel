@@ -47,16 +47,6 @@ namespace MPU {
         Serial.println(acc_offset[2]);
       //acc_offset[2] += mpu.getAccZ();
 
-      if(print) {
-        Serial.print(i); Serial.print("\t");
-        Serial.print(gyro_offset[0]); Serial.print("\t");
-        Serial.print(gyro_offset[1]); Serial.print("\t");
-        Serial.print(gyro_offset[2]); Serial.print("\t");
-        Serial.print(acc_offset[0]); Serial.print("\t");
-        Serial.print(acc_offset[1]); Serial.println("\t");
-        //Serial.println(acc_offset[2]);
-      }
-
       delay(1);
     }
     gyro_offset[0] /= t;
