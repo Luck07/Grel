@@ -36,13 +36,6 @@ bool ver = false;      // O Verifica para os switchs
 #define mot_in3 11 // vermelho, esquerda, frente
 #define mot_in4 12 // verde, esquerda, tras
 
-//* Definindo portas para o sensor de cor
-#define led_g 29 // Led verde para o sensor de cor
-#define esq A0   // Sensor que fica na esq
-#define dir A1   // Sensor que fica na dir
-int m_esq = 0;   // Declarando variavel que contem o map e constrain do sensor
-int m_dir = 0;
-
 //* Definindo velocidades
 #define vel_esq 180 // PWM usado para a velocidade, min == 0 e max == 255
 #define vel_dir 170 //
@@ -53,7 +46,6 @@ long int millis_ant = 0;
 #define time_log 2000
 #define time_branco 1500 // tempo suficiente para achar o gap, mas nao se perder tanto na linha
 #define time_branco_while 2000 // tempo para ele voltar para linha
-// 1500 2000 /
 
 //* Valores para encoders
 Encoder enc(3, 2);       // Encoder do motor da esquerda
@@ -208,12 +200,6 @@ void enc_re(int enc_valor = enc_passo, int velo_esq = vel_esq, int velo_dir = ve
   }
 }
 
-void sensi()
-{
-  m_esq = map(constrain(analogRead(esq), 561, 795), 561, 795, 0, 1023);
-  m_dir = map(constrain(analogRead(dir), 405, 629), 405, 629, 0, 1023);
-}
-
 /**
  *! false = direita
  *! true = esquerda
@@ -244,7 +230,7 @@ delay(mot_par);*/
     debug("Virando esquerda (se ajustar na linha): ");
     debugln(enc.read());
   }
-#else //! Direita
+#else                                         //! Direita
   enc_direita(enc_90, velo_esq, velo_dir);    //* Girando para direita
   enc_frente(frente_1, velo_esq, velo_dir);   //* Se distanciando do obstaculo
   enc_esquerda(enc_90_2, velo_esq, velo_dir); //* Virando para esquerda, com valor variado para nao girar demais

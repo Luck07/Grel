@@ -39,9 +39,6 @@ void loop()
         leitura |= digitalRead(pinos[i]) << i; // Colocando as entrada da tabela da verdade usando um bitshift automatico, o valor do i depende dos sensores
     leitura = (~leitura) & (0b00001111);       // Colocando um inversor para que funcione com a tabela da verdade, pq o sensor dectectar no branco, AND uma mascara para ir so os bits que eu quero
 
-    // vel_esq = 120; // valor normal dos motores
-    // vel_dir = 110; //
-
     // Condições que usa a melhor situação dos sensores, o bit mais da direita é o s_leste e o bit mais na esquerda é o s_oeste
     // Alguns nao tem break; porque faz a mesma coisa
     switch (leitura)
