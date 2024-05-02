@@ -19,7 +19,7 @@ const unsigned char aeiapeqena[] PROGMEM = {
     0x79, 0x88, 0x7b, 0x90, 0x7b, 0x98, 0x3f, 0x98, 0x17, 0x10, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00};
 
 // Usando array para colocar todos os pinos, coloquei os sensores invertido por causa do BitSwift em baixo
-const int pinos[] = { s_oeste, s_noroeste, s_norte, s_nordeste, s_leste, esq, dir, led_g, mot_in1, mot_in2, mot_in3, mot_in4 };
+const int pinos[] = { s_oeste, s_noroeste, s_norte, s_nordeste, s_leste, mot_in1, mot_in2, mot_in3, mot_in4 };
 
 float tensaoA0;
 
@@ -31,9 +31,9 @@ void setup()
   display.setTextColor(WHITE);
   display.setCursor(0, 0);
   Serial.begin(9600);
-  for (int i = 0; i < 7; i++)
+  for (int i = 0; i < 5; i++)
     pinMode(pinos[i], INPUT);
-  for (int i = 7; i < 12; i++)
+  for (int i = 7; i < 9; i++)
     pinMode(pinos[i], OUTPUT);
   //serv_robo.attach(serv_robo_pin);
   //serv_garra.attach(serv_garra_pin);
@@ -66,7 +66,7 @@ void loop()
   leitura = (~leitura) & 0b00011111;
   tensaoA0 = (div(A0) * 5) / 1024.0;
   tensaoA0 *= 8.4;
-  sensi();
+  //sensi();
 
 
   display.setCursor(0, lh * 2);
@@ -85,7 +85,7 @@ void loop()
   display.setCursor(0, lh * 3);
   display.print("Tensao: ");
   display.print(tensaoA0);
-  display.print(" V");*/
+  display.print(" V");
 
   display.setCursor(0, lh * 4);
   display.print("Olho: ");
@@ -117,7 +117,7 @@ void loop()
   n = (n < 360) ? n + 36 : 0;
 
   display.display();
-
+  */
   Serial.print("Leitura: ");
   Serial.print(leitura, BIN);
   Serial.print("Bits / Esq: ");
@@ -127,13 +127,13 @@ void loop()
   Serial.print(" / Olho: ");
   Serial.print(ult_meio.read());
   Serial.print("cm / LDR_Esq: ");
-  Serial.print(m_esq);
+  //Serial.print(m_esq);
   Serial.print("(");
-  Serial.print(analogRead(esq));
+  //Serial.print(analogRead(esq));
   Serial.print(") / LDR_Dir: ");
-  Serial.print(m_dir);
+  //Serial.print(m_dir);
   Serial.print("(");
-  Serial.print(analogRead(dir));
+  //Serial.print(analogRead(dir));
   Serial.print(") / Enc: ");
   Serial.println(enc.read());
 

@@ -18,11 +18,11 @@
 #define T90 0 // Se tiver 90 com T colocar 1, caso nao deixar 0
 
 //* Definindo as portas dos sensores
-#define s_oeste 22     //
-#define s_noroeste A15 //
-#define s_norte 32     //
-#define s_nordeste A14 //
-#define s_leste 26     //
+#define s_oeste 13     //
+#define s_noroeste 12 //
+#define s_norte 11     //
+#define s_nordeste 10 //
+#define s_leste 9     //
 #define analog_esq 501 // Valor que serve o quanto ele ver o cinza no micro ajuste
 #define analog_dir 501 //
 bool ver = false;      // O Verifica para os switchs
