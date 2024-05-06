@@ -123,10 +123,10 @@ void loop()
   Serial.print("Bits / Esq: ");
   Serial.print(analogRead(s_nordeste));
   Serial.print(" / Dir: ");
-  Serial.print(analogRead(s_noroeste));
-  Serial.print(" / Olho: ");
+  Serial.println(analogRead(s_noroeste));
+  /*Serial.print(" / Olho: ");
   Serial.print(ult_meio.read());
-  Serial.print("cm / LDR_Esq: ");
+   Serial.print("cm / LDR_Esq: ");
   //Serial.print(m_esq);
   Serial.print("(");
   //Serial.print(analogRead(esq));
@@ -136,7 +136,7 @@ void loop()
   //Serial.print(analogRead(dir));
   Serial.print(") / Enc: ");
   Serial.println(enc.read());
-
+  */
 }
 
 float div(uint8_t A0)
