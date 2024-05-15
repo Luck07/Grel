@@ -1,6 +1,6 @@
 // Switch
 #include "Definir.h" // Dando include nas variaveis e funções
-#include "Oled.h"    // Dando include no arquivo que tem as bibliotecas e criando o objeto do display oled
+#include "Oled.h"    // Dando include no arquivo que tem as bibliotecas e criando o objeto do display oled s
 
 // Usando array para colocar todos os pinos, coloquei os sensores em uma certa posição por causa do BitSwift em baixo
 const int pinos[] = {s_oeste, s_noroeste, s_nordeste, s_leste, s_norte, esq, dir, led_g, mot_in1, mot_in2, mot_in3, mot_in4};
