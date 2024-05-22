@@ -18,11 +18,11 @@
 #define T90 0 // Se tiver 90 com T colocar 1, caso nao deixar 0
 
 //* Definindo as portas dos sensores
-#define s_oeste 9     //
-#define s_noroeste A0 //
-#define s_norte 8     //
-#define s_nordeste A1 //
-#define s_leste 10     //
+#define s_oeste A3     //
+#define s_noroeste A1 //
+#define s_norte A4     //
+#define s_nordeste A0 //
+#define s_leste A2     //
 #define analog_esq 501 // Valor que serve o quanto ele ver o cinza no micro ajuste
 #define analog_dir 501 //
 bool ver = false;      // O Verifica para os switchs
@@ -66,7 +66,7 @@ long int enc_ant = 0;    // Valor do encoder anterior
 #define enc_90_2 enc_90 + 40 // Seguunda vez que ele executa o 90 / 70
 #define enc_90_3 enc_90 + 27 // E a terceira / 140
 
-//* Valores para servo
+// Valores para servo
 Servo serv_vertical;
 #define serv_vertical_pin 7
 #define serv_vertical_min 12
