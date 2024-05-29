@@ -1,8 +1,17 @@
 #ifndef _FUNCOES_VARIAVEIS_H
 #define _FUNCOES_VARIAVEIS_H
+
+#include <SoftwareWire.h>
+#include <Wire.h>
+#include <Adafruit_TCS34725_SWwire.h>
+
+SoftwareWire sWire(52, 53);
+
+Adafruit_TCS34725_SWwire tcs_real = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIONTIME_499MS, TCS34725_GAIN_4X);
+Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIONTIME_499MS, TCS34725_GAIN_4X);
+
 #include "EEPROMLogger.h"
 #include <Ultrasonic.h>
-#include <Encoder.h>
 #include <Servo.h>
 // mpu6050 i2c = 0x68
 
@@ -28,17 +37,20 @@
 bool ver = false;      // O Verifica para os switchs
 
 /*
- * Motor 1 = Esquerda (enc)
- * Motor 2 = Direita
- */
-#define mot_in1 9  // laranja, direita, tras
-#define mot_in2 10 // preto, direita, frente
-#define mot_in3 11 // vermelho, esquerda, frente
-#define mot_in4 12 // verde, esquerda, tras
+ * 
+ * 
+*/
+#define servo_esquerda 12
+#define servo_direita 11
+Servo serv_esq;
+Servo serv_dir;
+#define delay_fre 9999999
+#define delay_peq 999999 
+#define delay_pas 999999
 
 //* Definindo velocidades
-#define vel_esq 180 // PWM usado para a velocidade, min == 0 e max == 255
-#define vel_dir 170 //
+#define vel_fre 180
+#define vel_tras 0
 #define mot_par 40  // Delay para o tempo dele ficar parado
 
 //* Valores com Millis
@@ -47,18 +59,10 @@ long int millis_ant = 0;
 #define time_branco 1500 // tempo suficiente para achar o gap, mas nao se perder tanto na linha
 #define time_branco_while 2000 // tempo para ele voltar para linha
 
-//* Valores para encoders
-Encoder enc(3, 2);       // Encoder do motor da esquerda
-long int enc_ant = 0;    // Valor do encoder anterior
-#define enc_fre 170      // Frente apos ver 90 / 140
-#define enc_peq 130      // Valor que vira para completar com while /
-#define enc_pas 40       // Valor que vai para atras /
-#define enc_pas_outro 30 // Valor que vai para atras na passagem ver /
-#define enc_passo 10
-
 //* Valores para desviar obstaculo
 #define desv_lado 1
-#define enc_peq_desv 180
+#define delay_re 99999
+#define delay_peq_desv 99999
 #define frente_1 900  // Valor que ele se distancia do obstaculo
 #define frente_2 1450 // Valor que faz ele ultrapassar o obstaculo
 #define frente_3 550  // Valor que faz ele nao se perder em qualquer linha
@@ -66,7 +70,7 @@ long int enc_ant = 0;    // Valor do encoder anterior
 #define enc_90_2 enc_90 + 40 // Seguunda vez que ele executa o 90 / 70
 #define enc_90_3 enc_90 + 27 // E a terceira / 140
 
-// Valores para servo
+//* Valores para sala de resgate
 Servo serv_vertical;
 #define serv_vertical_pin 7
 #define serv_vertical_min 12
@@ -87,163 +91,130 @@ Ultrasonic ult_meio(30, 31);
 #define bot A10
 
 //* Inicio das funções, para cada caso
-void mot1_anti(int velo = vel_esq)
+void vel_frente(int velo_esq = vel_fre, int velo_dir = vel_fre)
 {
-  analogWrite(mot_in4, velo);
-  analogWrite(mot_in3, 0);
+  serv_esq.write(velo_esq);
+  serv_dir.write(velo_dir);
 }
-void mot1_hor(int velo = vel_esq)
+void vel_direita(int velo_esq = vel_fre)
 {
-  analogWrite(mot_in4, 0);
-  analogWrite(mot_in3, velo);
+  serv_esq.write(velo_esq);
+  serv_dir.write(0);
 }
-void mot1_par()
+void vel_esquerda(int velo_dir = vel_fre)
 {
-  analogWrite(mot_in4, 0);
-  analogWrite(mot_in3, 0);
+  serv_esq.write(0);
+  serv_dir.write(velo_dir);
 }
-
-void mot2_anti(int velo = vel_dir)
+void vel_re(int velo_esq = vel_tras, int velo_dir = vel_tras)
 {
-  analogWrite(mot_in2, 0);
-  analogWrite(mot_in1, velo);
-}
-void mot2_hor(int velo = vel_dir)
-{
-  analogWrite(mot_in2, velo);
-  analogWrite(mot_in1, 0);
-}
-void mot2_par()
-{
-  analogWrite(mot_in1, 0);
-  analogWrite(mot_in2, 0);
-}
-
-void vel_frente(int velo_esq = vel_esq, int velo_dir = vel_dir)
-{
-  analogWrite(mot_in4, 0);
-  analogWrite(mot_in3, velo_esq);
-  analogWrite(mot_in2, velo_dir);
-  analogWrite(mot_in1, 0);
-}
-void vel_direita(int velo_esq = vel_esq, int velo_dir = vel_dir)
-{
-  analogWrite(mot_in4, 0);
-  analogWrite(mot_in3, velo_esq);
-  analogWrite(mot_in2, 0);
-  analogWrite(mot_in1, velo_dir);
-}
-void vel_esquerda(int velo_esq = vel_esq, int velo_dir = vel_dir)
-{
-  analogWrite(mot_in4, velo_esq);
-  analogWrite(mot_in3, 0);
-  analogWrite(mot_in2, velo_dir);
-  analogWrite(mot_in1, 0);
-}
-void vel_re(int velo_esq = vel_esq, int velo_dir = vel_dir)
-{
-  analogWrite(mot_in4, velo_esq);
-  analogWrite(mot_in3, 0);
-  analogWrite(mot_in2, 0);
-  analogWrite(mot_in1, velo_dir);
+  serv_esq.write(velo_esq);
+  serv_dir.write(velo_dir);
 }
 void vel_parar(int velo_esq = mot_par)
 {
-  analogWrite(mot_in4, 0);
-  analogWrite(mot_in3, 0);
-  analogWrite(mot_in2, 0);
-  analogWrite(mot_in1, 0);
+  serv_esq.write(90);
+  serv_dir.write(90);
   delay(velo_esq);
 }
 
-void enc_frente(int enc_valor = enc_passo, int velo_esq = vel_esq, int velo_dir = vel_dir)
-{
-  vel_frente(velo_esq, velo_dir);
-  enc_ant = enc.read();
-  while (enc.read() - enc_ant <= enc_valor)
-  {
-    debug("Indo frente: ");
-    debugln(enc.read());
-  }
-}
+enum cores {
+  branco_branco, branco_verde,
+  verde_branco , verde_verde,
+  vermelho_vermelho,
+  outro
+};
 
-void enc_direita(int enc_valor = enc_passo, int velo_esq = vel_esq, int velo_dir = vel_dir)
+cores sensi()
 {
-  vel_direita(velo_esq, velo_dir);
-  enc_ant = enc.read();
-  while (enc.read() - enc_ant <= enc_valor)
-  {
-    debug("Virando direita: ");
-    debugln(enc.read());
-  }
-}
+  int cor1, cor2;
+  uint16_t r1, g1, b1, c1;
+  uint16_t r2, g2, b2, c2;
 
-void enc_esquerda(int enc_valor = enc_passo, int velo_esq = vel_esq, int velo_dir = vel_dir)
-{
-  vel_esquerda(velo_esq, velo_dir);
-  enc_ant = enc.read();
-  while (enc_ant - enc.read() <= enc_valor)
-  {
-    debug("Virando esquerda: ");
-    debugln(enc.read());
-  }
-}
+  tcs_real.getRawData(&r1, &g1, &b1, &c1);
+  tcs_soft.getRawData(&r2, &g2, &b2, &c2);
 
-void enc_re(int enc_valor = enc_passo, int velo_esq = vel_esq, int velo_dir = vel_dir)
-{
-  vel_re(velo_esq, vel_dir);
-  enc_ant = enc.read();
-  while (enc_ant - enc.read() <= enc_valor)
-  {
-    debug("Indo atras: ");
-    debugln(enc.read());
+  uint16_t t1  = (r1+g1+b1)/3;
+  uint16_t tr1 = (g1+b1)/2;
+  uint16_t tg1 = (r1+b1)/2;
+
+  uint16_t t2  = (r2+g2+b2)/3;
+  uint16_t tr2 = (g2+b2)/2;
+  uint16_t tg2 = (r2+b2)/2;
+
+  if(r1 > tr1*1.07)
+    return vermelho_vermelho;
+  else if(g1 > tg1*1.07)
+    cor1 = 1; //verd
+  else {
+    if(t1 >= 11500) //1050
+      cor1 = 2; //b
+    else 
+      cor1 = 3; //p
   }
+
+  if(r2 > tr2*1.07)
+    return vermelho_vermelho;
+  else if(g2 > tg2*1.07)
+    cor2 = 1;
+  else {
+    if(t2 >= 11500) //1050
+      cor2 = 2;
+    else 
+      cor2 = 3;
+  }
+
+  if     (cor1 == 1 && cor2 == 1)
+    return verde_verde;
+  else if(cor1 == 1 && cor2 == 2)
+    return verde_branco;
+  else if(cor1 == 2 && cor2 == 1)
+    return branco_verde;
+  else if(cor1 == 2 && cor2 == 2)
+    return branco_branco;
+  else
+    return outro;
+
 }
 
 /**
  *! false = direita
  *! true = esquerda
  */
-void desv(int velo_esq = vel_esq, int velo_dir = vel_dir)
+void desv(int velo_esq = vel_fre, int velo_dir = vel_fre)
 {
-  enc_re(enc_pas_outro, velo_esq, velo_dir); //* Dando um passo para atras, isso e bom caso a traseira do robo e maior do que na frente
+  delay(delay_re); //* Dando um passo para atras, isso e bom caso a traseira do robo e maior do que na frente
 /*mot1_par();                                //* Colocando pra parar bem rapido pq sim
 mot2_par();
 delay(mot_par);*/
 #if desv_lado                                //! Esquerda
-  enc_esquerda(enc_90, velo_esq, velo_dir);  //* Girando para esquerda
-  enc_frente(frente_1, velo_esq, velo_dir);  //* Se distanciando do obstaculo
-  enc_direita(enc_90_2, velo_esq, velo_dir); //* Virando para direita, com valor variado para nao girar demais
-  enc_frente(frente_2, velo_esq, velo_dir);  //* Passando do obstaculo
-  enc_direita(enc_90_3, velo_esq, velo_dir); //* Virando para direita, mesmo moitvo anterior
-  enc_frente(frente_3, velo_esq, velo_dir);  //* Andando em frente, para ele nao se confundir linhas aleatorias
+  delay(enc_90);  //* Girando para esquerda
+  delay(frente_1);  //* Se distanciando do obstaculo
+  delay(enc_90_2); //* Virando para direita, com valor variado para nao girar demais
+  delay(frente_2);  //* Passando do obstaculo
+  delay(enc_90_3); //* Virando para direita, mesmo moitvo anterior
+  delay(frente_3);  //* Andando em frente, para ele nao se confundir linhas aleatorias
   vel_frente(velo_esq, velo_dir);            //* Terminando com while para ele encontrar a linah correta
-  while ((digitalRead(s_noroeste) == 1) && (digitalRead(s_nordeste) == 1))
-  {
-    debug("andando para frente (encontrar linha): ");
-    debugln(enc.read());
-  }
-  enc_frente(enc_peq_desv, velo_esq, velo_dir); //* Se afastando um pouco da linha
-  vel_esquerda(velo_esq, velo_dir);             //* Virando para esquerda para se ajeiar na faixa
-  while ((digitalRead(s_noroeste) == 1) && (digitalRead(s_nordeste) == 1))
-  {
-    debug("Virando esquerda (se ajustar na linha): ");
-    debugln(enc.read());
-  }
+  debug("andando para frente (encontrar linha)");
+  while ((digitalRead(s_noroeste) == 1) && (digitalRead(s_nordeste) == 1)); 
+  delay(delay_peq_desv); //* Se afastando um pouco da linha
+  vel_esquerda(velo_esq);             //* Virando para esquerda para se ajeiar na faixa
+  debug("Virando esquerda (se ajustar na linha): ");
+  while ((digitalRead(s_noroeste) == 1) && (digitalRead(s_nordeste) == 1));
 #else                                         //! Direita
-  enc_direita(enc_90, velo_esq, velo_dir);    //* Girando para direita
-  enc_frente(frente_1, velo_esq, velo_dir);   //* Se distanciando do obstaculo
-  enc_esquerda(enc_90_2, velo_esq, velo_dir); //* Virando para esquerda, com valor variado para nao girar demais
-  enc_frente(frente_2, velo_esq, velo_dir);   //* Passando do obstaculo
-  enc_esquerda(enc_90_3, velo_esq, velo_dir); //* Virando para esquerda, mesmo moitvo anterior
-  enc_frente(frente_3, velo_esq, velo_dir);   //* Andando em frente, para ele nao se confundir linhas aleatorias
+  delay(enc_90);    //* Girando para direita
+  delay(frente_1);   //* Se distanciando do obstaculo
+  delay(enc_90_2); //* Virando para esquerda, com valor variado para nao girar demais
+  delay(frente_2);   //* Passando do obstaculo
+  delay(enc_90_3); //* Virando para esquerda, mesmo moitvo anterior
+  delay(frente_3);   //* Andando em frente, para ele nao se confundir linhas aleatorias
   vel_frente(velo_esq, velo_dir);             //* Terminando com while para ele encontrar a linah correta
   while ((digitalRead(s_noroeste) == 1) && (digitalRead(s_nordeste) == 1))
   {
     debug("andando para frente (encontrar linha): ");
     debugln(enc.read());
   }
-  enc_frente(enc_peq_desv, velo_esq, velo_dir); //* Se afastando um pouco da linha
+  delay(enc_peq_desv); //* Se afastando um pouco da linha
   vel_dir(velo_esq, velo_dir);                  //* Virando para direita para se ajeiar na faixa
   while ((digitalRead(s_noroeste) == 1) && (digitalRead(s_nordeste) == 1))
   {
@@ -253,13 +224,14 @@ delay(mot_par);*/
 #endif
 }
 
-void esq_90(int velo_esq = vel_esq, int velo_dir = vel_dir) //* 90 esquerda
+void esq_90(int velo_esq = vel_fre, int velo_dir = vel_fre) //* 90 esquerda
 {
-  enc_frente(enc_fre, velo_esq, velo_dir);
+
+  delay(delay_fre);
 #if T90
   if (digitalRead(s_norte) == 1)
   {
-    enc_esquerda(enc_peq, velo_esq, velo_dir);
+    delay(enc_peq);
     vel_esquerda(velo_esq, velo_dir);
     while (((analogRead(s_noroeste) >= analog_esq) || (analogRead(s_nordeste) >= analog_dir)) && digitalRead(s_oeste) == 1)
     // while ((digitalRead(s_norte) == 1) && (digitalRead(s_oeste) == 1))
@@ -268,23 +240,23 @@ void esq_90(int velo_esq = vel_esq, int velo_dir = vel_dir) //* 90 esquerda
     enc_re(enc_pas);
   }
 #else
-  enc_esquerda(enc_peq, velo_esq, velo_dir);
-  vel_esquerda(velo_esq, velo_dir);
+  delay(delay_peq);
+  vel_esquerda(velo_esq);
   while (((analogRead(s_noroeste) >= analog_esq) || (analogRead(s_nordeste) >= analog_dir)) && digitalRead(s_oeste) == 1)
   // while ((digitalRead(s_norte) == 1) && (digitalRead(s_oeste) == 1))
   {
   }
-  enc_re(enc_pas);
+  delay(delay_pas);
 #endif
 }
 
-void dir_90(int velo_esq = vel_esq, int velo_dir = vel_dir) //* 90 direita
+void dir_90(int velo_esq = vel_fre, int velo_dir = vel_fre) //* 90 direita
 {
-  enc_frente(enc_fre, velo_esq, velo_dir);
+  delay(delay_fre);
 #if T90
   if (digitalRead(s_norte) == 1)
   {
-    enc_direita(enc_peq, velo_esq, velo_dir);
+    delay(enc_peq);
     vel_direita(velo_esq, velo_dir);
     while (((analogRead(s_noroeste) >= analog_esq) || (analogRead(s_nordeste) >= analog_dir)) && digitalRead(s_leste) == 1)
     // while ((digitalRead(s_norte) == 1) && (digitalRead(s_leste) == 1))
@@ -293,13 +265,13 @@ void dir_90(int velo_esq = vel_esq, int velo_dir = vel_dir) //* 90 direita
     enc_re(enc_pas);
   }
 #else
-  enc_direita(enc_peq, velo_esq, velo_dir);
-  vel_direita(velo_esq, velo_dir);
+  delay(delay_peq);
+  vel_direita(velo_dir);
   while (((analogRead(s_noroeste) >= analog_esq) || (analogRead(s_nordeste) >= analog_dir)) && digitalRead(s_leste) == 1)
   // while ((digitalRead(s_norte) == 1) && (digitalRead(s_leste) == 1))
   {
   }
-  enc_re(enc_pas);
+  delay(delay_pas);
 #endif
 }
 

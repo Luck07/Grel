@@ -3,7 +3,7 @@
 #include "Oled.h"    // Dando include no arquivo que tem as bibliotecas e criando o objeto do display oled s
 
 // Usando array para colocar todos os pinos, coloquei os sensores em uma certa posição por causa do BitSwift em baixo
-const int pinos[] = {s_oeste, s_noroeste, s_nordeste, s_leste, s_norte, esq, dir, led_g, mot_in1, mot_in2, mot_in3, mot_in4};
+const int pinos[] = {s_oeste, s_noroeste, s_norte, s_nordeste, s_leste, esq, dir, led_g, mot_in1, mot_in2, mot_in3, mot_in4};
 
 void setup()
 {
@@ -35,7 +35,7 @@ void loop()
 
     //  Essa parte é o bitSwift, criar uma variavel leitura do tipo byte, porem a gente so usa os bits dessa varaivel, a quantidade de bits depende de quantos sensores estao usando
     byte leitura = 0; // Definir sempre 0 quando definir algo como o for abaixo
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 5; i++)
         leitura |= digitalRead(pinos[i]) << i; // Colocando as entrada da tabela da verdade usando um bitshift automatico, o valor do i depende dos sensores
     leitura = (~leitura) & (0b00001111);       // Colocando um inversor para que funcione com a tabela da verdade, pq o sensor dectectar no branco, AND uma mascara para ir so os bits que eu quero
 
@@ -43,7 +43,7 @@ void loop()
     // Alguns nao tem break; porque faz a mesma coisa
     switch (leitura)
     {
-    case 0b0000:
+    case 0b00000:
         if (ver == false)
         {
             mot1_hor(vel_esq);
@@ -61,7 +61,7 @@ void loop()
             millis_ant = millis();
         }
         break;
-    case 0b0110: //! Caso de ele ir so pra frente
+    case 0b01010: //! Caso de ele ir so pra frente
         if (ver == false)
         {
             mot1_hor(vel_esq);
@@ -79,7 +79,7 @@ void loop()
         }
         millis_ant = millis();
         break;
-    case 0b0010: //! Caso dele fazer micro ajuste para direita
+    case 0b00010: //! Caso dele fazer micro ajuste para direita
         if (ver == false)
         {
             vel_direita();
@@ -96,7 +96,7 @@ void loop()
         }
         millis_ant = millis();
         break;
-    case 0b0100: //! Caso dele fazer micro ajuste para esquerda
+    case 0b01000: //! Caso dele fazer micro ajuste para esquerda
         if (ver == false)
         {
             vel_esquerda();
@@ -113,10 +113,10 @@ void loop()
         }
         millis_ant = millis();
         break;
-    case 0b1000:
-    case 0b1100:
-    case 0b1110:
-    case 0b1010: //! Casos de fazer o esquerda 90  
+    case 0b10000:
+    case 0b11000:
+    case 0b11010:
+    case 0b10010: //! Casos de fazer o esquerda 90  
         if (ver == false)
         {
             display.print("1000 / parar");
@@ -133,10 +133,10 @@ void loop()
         }
         millis_ant = millis();
         break;
-    case 0b0001:
-    case 0b0011:
-    case 0b0111:
-    case 0b0101: //! Casos de fazer o direita 90
+    case 0b00001:
+    case 0b00011:
+    case 0b01011:
+    case 0b01001: //! Casos de fazer o direita 90
         if (ver == false)
         {
             display.print("0001 / parar");
