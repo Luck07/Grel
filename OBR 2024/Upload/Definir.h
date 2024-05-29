@@ -167,13 +167,12 @@ cores sensi()
   if     (cor1 == 1 && cor2 == 1)
     return verde_verde;
   else if(cor1 == 1 && cor2 == 2)
-    return verde_branco;
-  else if(cor1 == 2 && cor2 == 1)
     return branco_verde;
-  else if(cor1 == 2 && cor2 == 2)
-    return branco_branco;
+  else if(cor1 == 2 && cor2 == 1)
+    return verde_branco;
   else
-    return outro;
+    return branco_branco;
+
 
 }
 
@@ -226,53 +225,32 @@ delay(mot_par);*/
 
 void esq_90(int velo_esq = vel_fre, int velo_dir = vel_fre) //* 90 esquerda
 {
-
+  if(sensi() == verde_branco)
+  //ir pra frente por tanto tempo e virar completando com while
   delay(delay_fre);
-#if T90
+
   if (digitalRead(s_norte) == 1)
   {
     delay(enc_peq);
     vel_esquerda(velo_esq, velo_dir);
-    while (((analogRead(s_noroeste) >= analog_esq) || (analogRead(s_nordeste) >= analog_dir)) && digitalRead(s_oeste) == 1)
-    // while ((digitalRead(s_norte) == 1) && (digitalRead(s_oeste) == 1))
-    {
-    }
-    enc_re(enc_pas);
+    while (((analogRead(s_noroeste) >= analog_esq) || (analogRead(s_nordeste) >= analog_dir)) && digitalRead(s_oeste) == 1);
+    // while ((digitalRead(s_norte) == 1) && (digitalRead(s_oeste) == 1));
+    //enc_re(enc_pas);
   }
-#else
-  delay(delay_peq);
-  vel_esquerda(velo_esq);
-  while (((analogRead(s_noroeste) >= analog_esq) || (analogRead(s_nordeste) >= analog_dir)) && digitalRead(s_oeste) == 1)
-  // while ((digitalRead(s_norte) == 1) && (digitalRead(s_oeste) == 1))
-  {
-  }
-  delay(delay_pas);
-#endif
 }
 
 void dir_90(int velo_esq = vel_fre, int velo_dir = vel_fre) //* 90 direita
 {
   delay(delay_fre);
-#if T90
+
   if (digitalRead(s_norte) == 1)
   {
     delay(enc_peq);
     vel_direita(velo_esq, velo_dir);
-    while (((analogRead(s_noroeste) >= analog_esq) || (analogRead(s_nordeste) >= analog_dir)) && digitalRead(s_leste) == 1)
-    // while ((digitalRead(s_norte) == 1) && (digitalRead(s_leste) == 1))
-    {
-    }
-    enc_re(enc_pas);
+    while (((analogRead(s_noroeste) >= analog_esq) || (analogRead(s_nordeste) >= analog_dir)) && digitalRead(s_leste) == 1);
+    // while ((digitalRead(s_norte) == 1) && (digitalRead(s_leste) == 1));
+    //enc_re(enc_pas);
   }
-#else
-  delay(delay_peq);
-  vel_direita(velo_dir);
-  while (((analogRead(s_noroeste) >= analog_esq) || (analogRead(s_nordeste) >= analog_dir)) && digitalRead(s_leste) == 1)
-  // while ((digitalRead(s_norte) == 1) && (digitalRead(s_leste) == 1))
-  {
-  }
-  delay(delay_pas);
-#endif
 }
 
 void micro_ajuste_inv()
