@@ -3,7 +3,7 @@
 #include "Oled.h"    // Dando include no arquivo que tem as bibliotecas e criando o objeto do display oled s
 
 // Usando array para colocar todos os pinos, coloquei os sensores em uma certa posição por causa do BitSwift em baixo
-const int pinos[] = {s_oeste, s_noroeste, s_norte, s_nordeste, s_leste, esq, dir, led_g, mot_in1, mot_in2, mot_in3, mot_in4};
+const int pinos[] = {s_oeste, s_noroeste, s_norte, s_nordeste, s_leste};
 
 void setup()
 {
@@ -11,10 +11,11 @@ void setup()
     display.setTextColor(WHITE);               // Colocando cor para o texto
 
     // Colocando os sensores como INPUT, e o resto como OUTPUT, tudo isso pelo array
-    for (int i = 0; i < 7; i++) // Usando o array para fazer os pinmode como input
+    for (int i = 0; i < 5; i++) // Usando o array para fazer os pinmode como input
         pinMode(pinos[i], INPUT);
-    for (int i = 7; i < 12; i++) // Usando o array para fazer que o resto seja como output
-        pinMode(pinos[i], OUTPUT);
+
+  serv_esq.attach(servo_esquerda);
+  serv_dir.attach(servo_direita);
 
 #if serial_on
     Serial.begin(9600); // Iniciando o serial monitor (talvez colocar 115200)
@@ -25,13 +26,13 @@ void loop()
     display.clearDisplay();  // Limpando o display no inicio do loop
     display.setCursor(0, 0); // Setando para todos iniciar no inicio da tela
 
-    if (ult_meio.read() <= 3 && ult_meio.read() > 0) // Se o sensor dectar que esta distancia ativa a função de desviar
+    /*if (ult_meio.read() <= 3 && ult_meio.read() > 0) // Se o sensor dectar que esta distancia ativa a função de desviar
     {
         display.print("Desvia ");
         display.print(ult_meio.read());
         display.display();
         desv(); //! Lembrar de saber qual direcao ele esta indo
-    }
+    }*/
 
     //  Essa parte é o bitSwift, criar uma variavel leitura do tipo byte, porem a gente so usa os bits dessa varaivel, a quantidade de bits depende de quantos sensores estao usando
     byte leitura = 0; // Definir sempre 0 quando definir algo como o for abaixo
@@ -46,8 +47,7 @@ void loop()
     case 0b00000:
         if (ver == false)
         {
-            mot1_hor(vel_esq);
-            mot2_hor(vel_dir);
+            vel_frente();
             display.print("0000");
             display.display();
             debugln("leitura = 0000");
@@ -56,7 +56,7 @@ void loop()
         {
             display.print("0000 / Tras");
             display.display();
-            enc_re(vel_esq, vel_dir, enc_pas_outro);
+            delay(delay_pas);
             ver = false;
             millis_ant = millis();
         }
@@ -64,8 +64,7 @@ void loop()
     case 0b01010: //! Caso de ele ir so pra frente
         if (ver == false)
         {
-            mot1_hor(vel_esq);
-            mot2_hor(vel_dir);
+            vel_frente();
             display.print("0110");
             display.display();
             debugln("leitura = 0110");
@@ -74,7 +73,7 @@ void loop()
         {
             display.print("0110 / Tras");
             display.display();
-            enc_re(vel_esq, vel_dir, enc_pas_outro);
+            delay(delay_pas);
             ver = false;
         }
         millis_ant = millis();
@@ -91,7 +90,7 @@ void loop()
         {
             display.print("0010 / Tras");
             display.display();
-            enc_re(enc_pas_outro);
+            vel_re();
             ver = false;
         }
         millis_ant = millis();
@@ -108,7 +107,7 @@ void loop()
         {
             display.print("0100 / Tras");
             display.display();
-            enc_re(enc_pas_outro);
+            vel_re();
             ver = false;
         }
         millis_ant = millis();
@@ -141,9 +140,7 @@ void loop()
         {
             display.print("0001 / parar");
             display.display();
-            mot1_par();
-            mot2_par();
-            delay(mot_par);
+            vel_parar();
             ver = true;
         }
         else
@@ -161,14 +158,13 @@ void loop()
         {
             display.print("111 / frente");
             display.display();
-            // vel_frente();
-            enc_frente(enc_fre);
+            vel_frente();
         }
         else
         {
             display.print("111 / re");
             display.display();
-            enc_re(enc_pas_outro);
+            vel_re();
             ver = false;
         }
         millis_ant = millis();

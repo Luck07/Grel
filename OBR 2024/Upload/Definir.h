@@ -40,18 +40,20 @@ bool ver = false;      // O Verifica para os switchs
  * 
  * 
 */
-#define servo_esquerda 12
-#define servo_direita 11
+#define servo_esquerda 8
+#define servo_direita 7
 Servo serv_esq;
 Servo serv_dir;
-#define delay_fre 9999999
-#define delay_peq 999999 
+#define delay_fre 300
+#define delay_re 3000
+#define delay_peq 300 
+//#define delay_peq 99999
 #define delay_pas 999999
 
 //* Definindo velocidades
-#define vel_fre 180
-#define vel_tras 0
-#define mot_par 40  // Delay para o tempo dele ficar parado
+#define velocidade_fre 180
+#define velocidade_tras 0
+#define velocidade_par 40  // Delay para o tempo dele ficar parado
 
 //* Valores com Millis
 long int millis_ant = 0;
@@ -61,7 +63,6 @@ long int millis_ant = 0;
 
 //* Valores para desviar obstaculo
 #define desv_lado 1
-#define delay_re 99999
 #define delay_peq_desv 99999
 #define frente_1 900  // Valor que ele se distancia do obstaculo
 #define frente_2 1450 // Valor que faz ele ultrapassar o obstaculo
@@ -90,28 +91,36 @@ Ultrasonic ult_meio(30, 31);
 //* Definicao variadas
 #define bot A10
 
+void calibra()
+{
+
+
+  
+}
+
+
 //* Inicio das funções, para cada caso
-void vel_frente(int velo_esq = vel_fre, int velo_dir = vel_fre)
+void vel_frente(int velo_esq = velocidade_fre, int velo_dir = velocidade_fre)
 {
   serv_esq.write(velo_esq);
   serv_dir.write(velo_dir);
 }
-void vel_direita(int velo_esq = vel_fre)
+void vel_direita(int velo_esq = velocidade_fre)
 {
   serv_esq.write(velo_esq);
   serv_dir.write(0);
 }
-void vel_esquerda(int velo_dir = vel_fre)
+void vel_esquerda(int velo_dir = velocidade_fre)
 {
   serv_esq.write(0);
   serv_dir.write(velo_dir);
 }
-void vel_re(int velo_esq = vel_tras, int velo_dir = vel_tras)
+void vel_re(int velo_esq = velocidade_tras, int velo_dir = velocidade_tras)
 {
   serv_esq.write(velo_esq);
   serv_dir.write(velo_dir);
 }
-void vel_parar(int velo_esq = mot_par)
+void vel_parar(int velo_esq = velocidade_par)
 {
   serv_esq.write(90);
   serv_dir.write(90);
@@ -180,7 +189,7 @@ cores sensi()
  *! false = direita
  *! true = esquerda
  */
-void desv(int velo_esq = vel_fre, int velo_dir = vel_fre)
+void desv(int velo_esq = velocidade_fre, int velo_dir = velocidade_fre)
 {
   delay(delay_re); //* Dando um passo para atras, isso e bom caso a traseira do robo e maior do que na frente
 /*mot1_par();                                //* Colocando pra parar bem rapido pq sim
@@ -223,33 +232,37 @@ delay(mot_par);*/
 #endif
 }
 
-void esq_90(int velo_esq = vel_fre, int velo_dir = vel_fre) //* 90 esquerda
+void esq_90(int velo_esq = velocidade_fre, int velo_dir = velocidade_fre) //* 90 esquerda
 {
-  if(sensi() == verde_branco)
-  //ir pra frente por tanto tempo e virar completando com while
+  //if(sensi() == verde_branco)
+  
+  vel_frente(velo_esq, velo_dir);
   delay(delay_fre);
 
   if (digitalRead(s_norte) == 1)
   {
-    delay(enc_peq);
-    vel_esquerda(velo_esq, velo_dir);
+    vel_esquerda(velo_esq);
+    delay(delay_peq);
     while (((analogRead(s_noroeste) >= analog_esq) || (analogRead(s_nordeste) >= analog_dir)) && digitalRead(s_oeste) == 1);
     // while ((digitalRead(s_norte) == 1) && (digitalRead(s_oeste) == 1));
-    //enc_re(enc_pas);
+    vel_re(velo_esq, velo_dir);
+    delay(delay_re);
   }
 }
 
-void dir_90(int velo_esq = vel_fre, int velo_dir = vel_fre) //* 90 direita
+void dir_90(int velo_esq = velocidade_fre, int velo_dir = velocidade_fre) //* 90 direita
 {
+  vel_frente(velo_esq, velo_dir);
   delay(delay_fre);
 
   if (digitalRead(s_norte) == 1)
   {
-    delay(enc_peq);
-    vel_direita(velo_esq, velo_dir);
+    vel_direita(velo_dir);
+    delay(delay_peq);
     while (((analogRead(s_noroeste) >= analog_esq) || (analogRead(s_nordeste) >= analog_dir)) && digitalRead(s_leste) == 1);
     // while ((digitalRead(s_norte) == 1) && (digitalRead(s_leste) == 1));
-    //enc_re(enc_pas);
+    vel_re(velo_esq, velo_dir);
+    delay(delay_re);
   }
 }
 
