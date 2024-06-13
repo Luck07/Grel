@@ -42,14 +42,14 @@ void MPU6050::fetch_raw() {
     }
 
     _acclX = ((float)raw_data[0])/_lsb_to_g - _accl_Xoffset;
-    _acclX = ((float)raw_data[1])/_lsb_to_g - _accl_Yoffset;
-    _acclX = ((float)raw_data[2])/_lsb_to_g - _accl_Zoffset;
+    _acclY = ((float)raw_data[1])/_lsb_to_g - _accl_Yoffset;
+    _acclZ = ((float)raw_data[2])/_lsb_to_g - _accl_Zoffset;
 
     _temp = (raw_data[3] + 12412.0/*lsb_offset*/)/340.0/*lsb_to_deg*/;
 
     _gyroX = ((float)raw_data[4])/_lsb_to_DGpS - _gyro_Xoffset;
-    _gyroY = ((float)raw_data[5])/_lsb_to_DGpS - _gyro_Xoffset;
-    _gyroZ = ((float)raw_data[6])/_lsb_to_DGpS - _gyro_Xoffset;
+    _gyroY = ((float)raw_data[5])/_lsb_to_DGpS - _gyro_Yoffset;
+    _gyroZ = ((float)raw_data[6])/_lsb_to_DGpS - _gyro_Zoffset;
     //if(_gyroZ>0 && _gyroZ< 0.4) _gyroZ = 0;
     //if(_gyroZ<0 && _gyroZ>-0.4) _gyroZ = 0;
 }
@@ -65,7 +65,7 @@ void MPU6050::update() {
 
     float sign_z = _acclZ<0 ? -1 : 1;
     _accl_angleX =  atan2(_acclY, sign_z*sqrt(_acclZ*_acclZ + _acclX*_acclX)) * (180.0/M_PI);
-    _accl_angleY = -atan2(_acclX,        sqrt(_acclZ*_acclZ + _acclX*_acclX)) * (180.0/M_PI);
+    _accl_angleY = -atan2(_acclX,        sqrt(_acclZ*_acclZ + _acclY*_acclY)) * (180.0/M_PI);
 
     unsigned long mil = millis();
     float dt = (mil - _yaw_int_interval) * 1e-3;
