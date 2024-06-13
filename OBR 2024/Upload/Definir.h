@@ -56,7 +56,7 @@ bool ver = false;      // O Verifica para os switchs
 Servo serv_esq;
 Servo serv_dir;
 #define delay_fre 300
-#define delay_re 3000
+#define delay_re 30
 #define delay_peq 300 
 //#define delay_peq 99999
 #define delay_pas 999999
@@ -143,23 +143,23 @@ void calibra()
 //* Inicio das funções, para cada caso
 void vel_frente(int velo_esq = velocidade_fre, int velo_dir = velocidade_fre)
 {
-  serv_esq.write(velo_esq);
-  serv_dir.write(velo_dir);
+  serv_esq.write(180);
+  serv_dir.write(0);
 }
 void vel_direita(int velo_esq = velocidade_fre)
 {
-  serv_esq.write(velo_esq);
-  serv_dir.write(0);
+  serv_esq.write(180);
+  serv_dir.write(180);
 }
 void vel_esquerda(int velo_dir = velocidade_fre)
 {
   serv_esq.write(0);
-  serv_dir.write(velo_dir);
+  serv_dir.write(0);
 }
 void vel_re(int velo_esq = velocidade_tras, int velo_dir = velocidade_tras)
 {
-  serv_esq.write(velo_esq);
-  serv_dir.write(velo_dir);
+  serv_esq.write(0);
+  serv_dir.write(180);
 }
 void vel_parar(int velo_esq = velocidade_par)
 {
@@ -284,7 +284,7 @@ void esq_90(int velo_esq = velocidade_fre, int velo_dir = velocidade_fre) //* 90
   {
     vel_esquerda(velo_esq);
     delay(delay_peq);
-    while (((analogRead(s_noroeste) >= analog_esq) || (analogRead(s_nordeste) >= analog_dir)) && digitalRead(s_oeste) == 1);
+    while (((analogRead(s_noroeste) >= max_noroeste) || (analogRead(s_nordeste) >= max_nordeste)) && analogRead(s_oeste) >= max_oeste);
     // while ((digitalRead(s_norte) == 1) && (digitalRead(s_oeste) == 1));
     vel_re(velo_esq, velo_dir);
     delay(delay_re);
@@ -300,7 +300,7 @@ void dir_90(int velo_esq = velocidade_fre, int velo_dir = velocidade_fre) //* 90
   {
     vel_direita(velo_dir);
     delay(delay_peq);
-    while (((analogRead(s_noroeste) >= analog_esq) || (analogRead(s_nordeste) >= analog_dir)) && digitalRead(s_leste) == 1);
+    while (((analogRead(s_noroeste) >= max_noroeste) || (analogRead(s_nordeste) >= max_nordeste)) && analogRead(s_leste) >= max_leste);
     // while ((digitalRead(s_norte) == 1) && (digitalRead(s_leste) == 1));
     vel_re(velo_esq, velo_dir);
     delay(delay_re);

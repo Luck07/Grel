@@ -1,138 +1,177 @@
-// Identificação
-#include "Oled.h"
-#include "Definir.h"
+// Switch
+#include "Definir.h" // Dando include nas variaveis e funções
+#include "Oled.h"    // Dando include no arquivo que tem as bibliotecas e criando o objeto do display oled s
 
-const unsigned char aeia[] PROGMEM = {
-    // 'bfcaab3c7ed1666ef086e690ec778ad0, 32x32px
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x90, 0x00, 0x00, 0x01, 0xb0,
-    0x00, 0x00, 0x00, 0x30, 0x01, 0x00, 0x01, 0xbc, 0x08, 0x20, 0x44, 0x34, 0x00, 0x40, 0x08, 0x28,
-    0x00, 0x03, 0x10, 0x20, 0x05, 0xff, 0x80, 0x30, 0x07, 0xfe, 0x20, 0xa0, 0x0f, 0xdf, 0xee, 0x80,
-    0x0f, 0xb9, 0x3d, 0x70, 0x1f, 0xe3, 0x73, 0xc0, 0x1d, 0xe0, 0xe3, 0xc0, 0x1f, 0xe0, 0x00, 0xc0,
-    0x1f, 0x63, 0xa0, 0x40, 0x1f, 0x67, 0xc1, 0xc0, 0x1f, 0x47, 0x21, 0x40, 0x1b, 0x47, 0xe3, 0xc0,
-    0x1f, 0x47, 0xc3, 0xc0, 0x1f, 0x47, 0xc3, 0xc0, 0x0e, 0x5f, 0xdb, 0x80, 0x1b, 0xdf, 0x83, 0xe0,
-    0x03, 0x78, 0x00, 0x80, 0x00, 0x3f, 0xce, 0x00, 0x00, 0x6b, 0xf8, 0x00, 0x00, 0x00, 0x20, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-
-const unsigned char aeiapeqena[] PROGMEM = {
-    // 'bfcaab3c7ed1666ef086e690ec778ad0, 16x16px
-    0x00, 0x00, 0x00, 0x04, 0x00, 0x20, 0x04, 0x2a, 0x2f, 0xc8, 0x3d, 0xc0, 0x3e, 0xec, 0x74, 0x88,
-    0x79, 0x88, 0x7b, 0x90, 0x7b, 0x98, 0x3f, 0x98, 0x17, 0x10, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00};
-
-// Usando array para colocar todos os pinos, coloquei os sensores invertido por causa do BitSwift em baixo
-const int pinos[] = { s_oeste, s_noroeste, s_norte, s_nordeste, s_leste};
-
-float tensaoA0;
-
-int n;
+// Usando array para colocar todos os pinos, coloquei os sensores em uma certa posição por causa do BitSwift em baixo
+const int pinos[] = {s_oeste, s_noroeste, s_norte, s_nordeste, s_leste};
 
 void setup()
 {
-  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-  display.setTextColor(WHITE);
-  display.setCursor(0, 0);
-  Serial.begin(9600);
-  for (int i = 0; i < 5; i++)
-    pinMode(pinos[i], INPUT);
-  //serv_robo.attach(serv_robo_pin);
-  //serv_garra.attach(serv_garra_pin);
+    display.begin(SSD1306_SWITCHCAPVCC, 0x3C); // Protocolo para iniciar o display
+    display.setTextColor(WHITE);               // Colocando cor para o texto
 
+    // Colocando os sensores como INPUT, e o resto como OUTPUT, tudo isso pelo array
+    for (int i = 0; i < 5; i++) // Usando o array para fazer os pinmode como input
+        pinMode(pinos[i], INPUT);
 
-  n = 0;
+  serv_esq.attach(servo_esquerda);
+  serv_dir.attach(servo_direita);
+
+#if serial_on
+    Serial.begin(9600); // Iniciando o serial monitor (talvez colocar 115200)
+#endif
 }
-
 void loop()
 {
-  display.clearDisplay();
-  
-  
+    display.clearDisplay();  // Limpando o display no inicio do loop
+    display.setCursor(0, 0); // Setando para todos iniciar no inicio da tela
 
-  byte aleitura = 0;
-  for (int i = 0; i < 5; i++)
-    aleitura |= digitalRead(pinos[i]) << i;
-  aleitura = (~aleitura) & 0b00011111; //6.181kbb
-  //sensi();
-  calibra();
+    /*if (ult_meio.read() <= 3 && ult_meio.read() > 0) // Se o sensor dectar que esta distancia ativa a função de desviar
+    {
+        display.print("Desvia ");
+        display.print(ult_meio.read());
+        display.display();
+        desv(); //! Lembrar de saber qual direcao ele esta indo
+    }*/
 
+    //  Essa parte é o bitSwift, criar uma variavel leitura do tipo byte, porem a gente so usa os bits dessa varaivel, a quantidade de bits depende de quantos sensores estao usando
+    /*byte leitura = 0; // Definir sempre 0 quando definir algo como o for abaixo
+    for (int i = 0; i < 5; i++)
+        leitura |= digitalRead(pinos[i]) << i; // Colocando as entrada da tabela da verdade usando um bitshift automatico, o valor do i depende dos sensores
+    leitura = (~leitura) & (0b00001111);       */// Colocando um inversor para que funcione com a tabela da verdade, pq o sensor dectectar no branco, AND uma mascara para ir so os bits que eu quero
 
-  display.setCursor(0, lh * 2);
-  display.print("Leitura: ");
-  for (int i = 11; i <= 15; i++)
-    display.print(binString(leitura)[i]);
-  display.print(" Bits");
-
-  display.setCursor(0, lh * 3);
-  display.print("Esq: ");
-  display.print(analogRead(s_nordeste));
-  display.print(" / Dir: ");
-  display.print(analogRead(s_noroeste));
-
-  /*
-  display.setCursor(0, lh * 3);
-  display.print("Tensao: ");
-  display.print(tensaoA0);
-  display.print(" V");
-
-  display.setCursor(0, lh * 4);
-  display.print("Olho: ");
-  display.print(ult_meio.read());
-  display.print("cm");
-
-  display.setCursor(0, lh * 5);
-  display.print("Esq_ldr: ");
-  display.print(m_esq);
-  display.print("(");
-  display.print(analogRead(esq));
-  display.print(")");
-
-  display.setCursor(0, lh * 6);
-  display.print("Dir_ldr: ");
-  display.print(m_dir);
-  display.print("(");
-  display.print(analogRead(dir));
-  display.print(")");
-
-  display.setCursor(0, lh * 7);
-  display.print("Enc: ");
-  display.print(enc.read());
-  */
-
-  display.drawBitmap(W - 32, H - 32 + sin(n * PI / 180) * 3, aeia, 32, 32, WHITE);
-  display.drawBitmap(W - 16, -sin(n * PI / 180) * 1.5, aeiapeqena, 16, 16, WHITE);
-  display.display();
-  n = (n < 360) ? n + 36 : 0;
-
-  display.display();
-
-  Serial.print("Leitura: ");
-  Serial.print(leitura, BIN);
-  Serial.print("Bits / Antiga leitura: ");
-  Serial.print(aleitura, BIN);
-  Serial.print("Bits / AnalogRead: ");
-  Serial.print(analogRead(s_oeste));
-  Serial.print(" / ");
-  Serial.print(analogRead(s_noroeste));
-  Serial.print(" / ");
-  Serial.print(analogRead(s_norte));
-  Serial.print(" / ");
-  Serial.print(analogRead(s_nordeste));
-  Serial.print(" / ");
-  Serial.print(analogRead(s_leste));
-  Serial.print(" / Olho: ");
-  Serial.print(ult_meio.read());
-  Serial.println("cm /");
-}
-
-char *binString(unsigned short n)
-{
-  static char bin[17];
-  int x;
-
-  for (x = 0; x < 16; x++)
-  {
-    bin[x] = n & 0x8000 ? '1' : '0';
-    n <<= 1;
-  }
-  bin[16] = '\0';
-
-  return (bin);
+    calibra();
+    Serial.println(leitura,BIN);
+    // Condições que usa a melhor situação dos sensores, o bit mais da direita é o s_leste e o bit mais na esquerda é o s_oeste
+    // Alguns nao tem break; porque faz a mesma coisa
+    switch (leitura)
+    {
+    case 0b00000:
+        /*if (ver == false)
+        {
+            vel_frente();
+            display.print("0000");
+            display.display();
+            debugln("leitura = 0000");
+        }
+        else
+        {
+            display.print("0000 / Tras");
+            display.display();
+            delay(delay_pas);
+            ver = false;
+            millis_ant = millis();
+        }
+        break;*/
+    case 0b01010: //! Caso de ele ir so pra frente
+        if (ver == false)
+        {
+            vel_frente();
+            display.print("0110");
+            display.display();
+            debugln("leitura = 0110");
+        }
+        else
+        {
+            display.print("0110 / Tras");
+            display.display();
+            delay(delay_pas);
+            ver = false;
+        }
+        millis_ant = millis();
+        break;
+    case 0b00010: //! Caso dele fazer micro ajuste para direita
+        if (ver == false)
+        {
+            vel_direita();
+            display.print("0010 / Direita");
+            display.display();
+            debugln("leitura == 0010 / ajustando para direita");
+        }
+        else
+        {
+            display.print("0010 / Tras");
+            display.display();
+            vel_re();
+            ver = false;
+        }
+        millis_ant = millis();
+        break;
+    case 0b01000: //! Caso dele fazer micro ajuste para esquerda
+        if (ver == false)
+        {
+            vel_esquerda();
+            display.print("0100 / Esquerda");
+            display.display();
+            debugln("leitura == 0100 / ajustando para esquerda");
+        }
+        else
+        {
+            display.print("0100 / Tras");
+            display.display();
+            vel_re();
+            ver = false;
+        }
+        millis_ant = millis();
+        break;
+    case 0b10000:
+    case 0b11000:
+    case 0b11010:
+    case 0b10010: //! Casos de fazer o esquerda 90  
+        if (ver == false)
+        {
+            display.print("1000 / parar");
+            display.display();
+            vel_parar();
+            ver = true;
+        }
+        else
+        {
+            ver = false;
+            display.print("1000 / Esq_90");
+            display.display();
+            esq_90();
+        }
+        millis_ant = millis();
+        break;
+    case 0b00001:
+    case 0b00011:
+    case 0b01011:
+    case 0b01001: //! Casos de fazer o direita 90
+        if (ver == false)
+        {
+            display.print("0001 / parar");
+            display.display();
+            vel_parar();
+            ver = true;
+        }
+        else
+        {
+            ver = false;
+            display.print("0001 / Dir_90");
+            display.display();
+            dir_90();
+        }
+        millis_ant = millis();
+        break;
+    case 0b1111: //! Caso de encruzilhada
+        millis_ant = millis();
+        if (ver == false)
+        {
+            display.print("111 / frente");
+            display.display();
+            vel_frente();
+        }
+        else
+        {
+            display.print("111 / re");
+            display.display();
+            vel_re();
+            ver = false;
+        }
+        millis_ant = millis();
+        break;
+    default:
+        break;
+    }
 }
