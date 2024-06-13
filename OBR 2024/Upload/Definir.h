@@ -32,8 +32,19 @@ Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIO
 #define s_norte A4     //
 #define s_nordeste A0 //
 #define s_leste A2     //
-#define analog_esq 501 // Valor que serve o quanto ele ver o cinza no micro ajuste
-#define analog_dir 501 //
+
+#define analog_esq 501
+#define analog_dir 501 
+
+// diminuir 20 do max
+#define max_oeste 490
+#define max_noroeste 40 // menos esse, foi 10
+#define max_norte 640
+#define max_nordeste 835
+#define max_leste 638
+
+bool s_bit = false;
+byte leitura = 0;
 bool ver = false;      // O Verifica para os switchs
 
 /*
@@ -93,9 +104,39 @@ Ultrasonic ult_meio(30, 31);
 
 void calibra()
 {
+  leitura = 0;
 
+  if (analogRead(s_oeste) >= max_oeste)
+    s_bit = true;
+  else
+    s_bit = false;
 
-  
+  leitura |= s_bit << 0;
+  if (analogRead(s_noroeste) >= max_noroeste)
+    s_bit = true;
+  else
+    s_bit = false;
+
+  leitura |= s_bit << 1;
+  if (analogRead(s_nordeste) >= max_norte)
+    s_bit = true;
+  else
+    s_bit = false;
+
+  leitura |= s_bit << 2;
+  if (analogRead(s_nordeste) >= max_nordeste)
+    s_bit = true;
+  else
+    s_bit = false;
+
+  leitura |= s_bit << 3;
+  if (analogRead(s_leste) >= max_leste)
+    s_bit = true;
+  else
+    s_bit = false;
+
+  leitura |= s_bit << 4;
+  leitura = (~leitura) & 0b00011111;  
 }
 
 

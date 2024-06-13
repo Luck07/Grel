@@ -46,11 +46,12 @@ void loop()
   
   
 
-  byte leitura = 0;
+  byte aleitura = 0;
   for (int i = 0; i < 5; i++)
-    leitura |= digitalRead(pinos[i]) << i;
-  leitura = (~leitura) & 0b00011111; //6.181kbb
+    aleitura |= digitalRead(pinos[i]) << i;
+  aleitura = (~aleitura) & 0b00011111; //6.181kbb
   //sensi();
+  calibra();
 
 
   display.setCursor(0, lh * 2);
@@ -104,10 +105,18 @@ void loop()
 
   Serial.print("Leitura: ");
   Serial.print(leitura, BIN);
-  Serial.print("Bits / Esq: ");
-  Serial.print(analogRead(s_nordeste));
-  Serial.print(" / Dir: ");
+  Serial.print("Bits / Antiga leitura: ");
+  Serial.print(aleitura, BIN);
+  Serial.print("Bits / AnalogRead: ");
+  Serial.print(analogRead(s_oeste));
+  Serial.print(" / ");
   Serial.print(analogRead(s_noroeste));
+  Serial.print(" / ");
+  Serial.print(analogRead(s_norte));
+  Serial.print(" / ");
+  Serial.print(analogRead(s_nordeste));
+  Serial.print(" / ");
+  Serial.print(analogRead(s_leste));
   Serial.print(" / Olho: ");
   Serial.print(ult_meio.read());
   Serial.println("cm /");

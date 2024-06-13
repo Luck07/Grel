@@ -43,28 +43,15 @@ void setup()
 void loop()
 {
   display.clearDisplay();
-
-  //digitalWrite(led_r, 1);
-  //digitalWrite(led_g, 1);
-  //digitalWrite(led_b, 1);
-  //digitalWrite(led_g_meio, 1);
-
-  //analogWrite(mot_in2, vel_esq);
-
-  //mot1_hor(vel_esq);
-  //mot2_hor(vel_dir);
-
-  // mot1_anti(vel_esq);
-  // mot2_anti(vel_dir);
+  
   
 
-  byte leitura = 0;
+  byte aleitura = 0;
   for (int i = 0; i < 5; i++)
-    leitura |= digitalRead(pinos[i]) << i;
-  leitura = (~leitura) & 0b00011111;
-  tensaoA0 = (div(A0) * 5) / 1024.0;
-  tensaoA0 *= 8.4;
-  sensi();
+    aleitura |= digitalRead(pinos[i]) << i;
+  aleitura = (~aleitura) & 0b00011111; //6.181kbb
+  //sensi();
+  calibra();
 
 
   display.setCursor(0, lh * 2);
@@ -118,23 +105,21 @@ void loop()
 
   Serial.print("Leitura: ");
   Serial.print(leitura, BIN);
-  Serial.print("Bits / Esq: ");
-  Serial.print(analogRead(s_nordeste));
-  Serial.print(" / Dir: ");
+  Serial.print("Bits / Antiga leitura: ");
+  Serial.print(aleitura, BIN);
+  Serial.print("Bits / AnalogRead: ");
+  Serial.print(analogRead(s_oeste));
+  Serial.print(" / ");
   Serial.print(analogRead(s_noroeste));
+  Serial.print(" / ");
+  Serial.print(analogRead(s_norte));
+  Serial.print(" / ");
+  Serial.print(analogRead(s_nordeste));
+  Serial.print(" / ");
+  Serial.print(analogRead(s_leste));
   Serial.print(" / Olho: ");
   Serial.print(ult_meio.read());
-  Serial.print("cm / LDR_Esq: ");
-  Serial.print(m_esq);
-  Serial.print("(");
-  Serial.print(analogRead(esq));
-  Serial.print(") / LDR_Dir: ");
-  Serial.print(m_dir);
-  Serial.print("(");
-  Serial.print(analogRead(dir));
-  Serial.print(") / Enc: ");
-  Serial.println(enc.read());
-
+  Serial.println("cm /");
 }
 
 char *binString(unsigned short n)
