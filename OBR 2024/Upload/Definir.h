@@ -36,12 +36,12 @@ Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIO
 #define analog_esq 501
 #define analog_dir 501 
 
-// diminuir 20 do max
-#define max_oeste 490
-#define max_noroeste 40 // menos esse, foi 10
-#define max_norte 640
-#define max_nordeste 835
-#define max_leste 638
+// diminuir 10 do max
+#define max_oeste 80
+#define max_noroeste 98 // menos esse, foi 10
+#define max_norte 60
+#define max_nordeste 58
+#define max_leste 108
 
 bool s_bit = false;
 byte leitura = 0;
@@ -51,8 +51,8 @@ bool ver = false;      // O Verifica para os switchs
  * 
  * 
 */
-#define servo_esquerda 8
-#define servo_direita 7
+#define servo_esquerda 12
+#define servo_direita 11
 Servo serv_esq;
 Servo serv_dir;
 #define delay_fre 300
@@ -84,11 +84,11 @@ long int millis_ant = 0;
 
 //* Valores para sala de resgate
 Servo serv_vertical;
-#define serv_vertical_pin 7
+#define serv_vertical_pin 33
 #define serv_vertical_min 12
 #define serv_vertical_max 90
 Servo serv_porta;
-#define serv_porta_pin 6
+#define serv_porta_pin 34
 #define serv_porta_min 0
 #define serv_porta_max 180
 #define serv_delay 500

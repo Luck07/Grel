@@ -23,6 +23,8 @@ void setup()
 }
 void loop()
 {
+
+  
     display.clearDisplay();  // Limpando o display no inicio do loop
     display.setCursor(0, 0); // Setando para todos iniciar no inicio da tela
 
@@ -38,8 +40,8 @@ void loop()
     /*byte leitura = 0; // Definir sempre 0 quando definir algo como o for abaixo
     for (int i = 0; i < 5; i++)
         leitura |= digitalRead(pinos[i]) << i; // Colocando as entrada da tabela da verdade usando um bitshift automatico, o valor do i depende dos sensores
-    leitura = (~leitura) & (0b00001111);       */// Colocando um inversor para que funcione com a tabela da verdade, pq o sensor dectectar no branco, AND uma mascara para ir so os bits que eu quero
-
+    leitura = (~leitura) & (0b00001111);       // Colocando um inversor para que funcione com a tabela da verdade, pq o sensor dectectar no branco, AND uma mascara para ir so os bits que eu quero
+    */
     calibra();
     Serial.println(leitura,BIN);
     // Condições que usa a melhor situação dos sensores, o bit mais da direita é o s_leste e o bit mais na esquerda é o s_oeste
@@ -47,7 +49,7 @@ void loop()
     switch (leitura)
     {
     case 0b00000:
-        /*if (ver == false)
+        if (ver == false)
         {
             vel_frente();
             display.print("0000");
@@ -62,7 +64,7 @@ void loop()
             ver = false;
             millis_ant = millis();
         }
-        break;*/
+        break;
     case 0b01010: //! Caso de ele ir so pra frente
         if (ver == false)
         {
