@@ -18,7 +18,7 @@ const unsigned char aeiapeqena[] PROGMEM = {
     0x79, 0x88, 0x7b, 0x90, 0x7b, 0x98, 0x3f, 0x98, 0x17, 0x10, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00};
 
 // Usando array para colocar todos os pinos, coloquei os sensores invertido por causa do BitSwift em baixo
-const int pinos[] = { s_oeste, s_noroeste, s_norte, s_nordeste, s_leste};
+const int pinos[] = { s_esq, s_mesq, s_m, s_mdir, s_dir};
 
 void setup()
 {
@@ -35,7 +35,7 @@ void loop()
   byte aleitura = 0;
   for (int i = 0; i < 5; i++)
     aleitura |= digitalRead(pinos[i]) << i;
-  aleitura = (~aleitura) & 0b00011111; //6.181kbb
+  aleitura = (~aleitura) & 0b00011111;
   //sensi();
   calibra();
 
@@ -44,15 +44,15 @@ void loop()
   Serial.print("Bits / Antiga leitura: ");
   Serial.print(aleitura, BIN);
   Serial.print("Bits / AnalogRead: ");
-  Serial.print(analogRead(s_oeste));
+  Serial.print(analogRead(s_esq));
   Serial.print(" / ");
-  Serial.print(analogRead(s_noroeste));
+  Serial.print(analogRead(s_mesq));
   Serial.print(" / ");
-  Serial.print(analogRead(s_norte));
+  Serial.print(analogRead(s_m));
   Serial.print(" / ");
-  Serial.print(analogRead(s_nordeste));
+  Serial.print(analogRead(s_mdir));
   Serial.print(" / ");
-  Serial.print(analogRead(s_leste));
+  Serial.print(analogRead(s_dir));
   Serial.print(" / Olho: ");
   Serial.print(ult_meio.read());
   Serial.println("cm /");

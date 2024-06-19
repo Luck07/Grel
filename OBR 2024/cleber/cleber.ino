@@ -1,59 +1,142 @@
-// Identificação
-#include "definir.h"
+// Switch
+#include "definir.h" // Dando include nas variaveis e funções
 
-const unsigned char aeia[] PROGMEM = {
-    // 'bfcaab3c7ed1666ef086e690ec778ad0, 32x32px
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x90, 0x00, 0x00, 0x01, 0xb0,
-    0x00, 0x00, 0x00, 0x30, 0x01, 0x00, 0x01, 0xbc, 0x08, 0x20, 0x44, 0x34, 0x00, 0x40, 0x08, 0x28,
-    0x00, 0x03, 0x10, 0x20, 0x05, 0xff, 0x80, 0x30, 0x07, 0xfe, 0x20, 0xa0, 0x0f, 0xdf, 0xee, 0x80,
-    0x0f, 0xb9, 0x3d, 0x70, 0x1f, 0xe3, 0x73, 0xc0, 0x1d, 0xe0, 0xe3, 0xc0, 0x1f, 0xe0, 0x00, 0xc0,
-    0x1f, 0x63, 0xa0, 0x40, 0x1f, 0x67, 0xc1, 0xc0, 0x1f, 0x47, 0x21, 0x40, 0x1b, 0x47, 0xe3, 0xc0,
-    0x1f, 0x47, 0xc3, 0xc0, 0x1f, 0x47, 0xc3, 0xc0, 0x0e, 0x5f, 0xdb, 0x80, 0x1b, 0xdf, 0x83, 0xe0,
-    0x03, 0x78, 0x00, 0x80, 0x00, 0x3f, 0xce, 0x00, 0x00, 0x6b, 0xf8, 0x00, 0x00, 0x00, 0x20, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-
-const unsigned char aeiapeqena[] PROGMEM = {
-    // 'bfcaab3c7ed1666ef086e690ec778ad0, 16x16px
-    0x00, 0x00, 0x00, 0x04, 0x00, 0x20, 0x04, 0x2a, 0x2f, 0xc8, 0x3d, 0xc0, 0x3e, 0xec, 0x74, 0x88,
-    0x79, 0x88, 0x7b, 0x90, 0x7b, 0x98, 0x3f, 0x98, 0x17, 0x10, 0x00, 0x40, 0x00, 0x00, 0x00, 0x00};
-
-// Usando array para colocar todos os pinos, coloquei os sensores invertido por causa do BitSwift em baixo
-const int pinos[] = { s_esq, s_mesq, s_m, s_mdir, s_dir};
+// Usando array para colocar todos os pinos, coloquei os sensores em uma certa posição por causa do BitSwift em baixo
+const int pinos[] = {s_oeste, s_noroeste, s_norte, s_nordeste, s_leste};
 
 void setup()
 {
   Serial.begin(9600);
-  for (int i = 0; i < 5; i++)
-    pinMode(pinos[i], INPUT);
+    // Colocando os sensores como INPUT, e o resto como OUTPUT, tudo isso pelo array
+    for (int i = 0; i < 5; i++) // Usando o array para fazer os pinmode como input
+        pinMode(pinos[i], INPUT);
 
   serv_esq.attach(servo_esquerda);
   serv_dir.attach(servo_direita);
 }
-
 void loop()
 {
-  byte aleitura = 0;
-  for (int i = 0; i < 5; i++)
-    aleitura |= digitalRead(pinos[i]) << i;
-  aleitura = (~aleitura) & 0b00011111;
-  //sensi();
-  calibra();
+  //calibra();
+  //Serial.print(leitura, BIN);
+  Serial.print(analogRead(s_noroeste));
+  Serial.print(" / ");
+  Serial.println(analogRead(s_nordeste));
 
-  Serial.print("Leitura: ");
-  Serial.print(leitura, BIN);
-  Serial.print("Bits / Antiga leitura: ");
-  Serial.print(aleitura, BIN);
-  Serial.print("Bits / AnalogRead: ");
-  Serial.print(analogRead(s_esq));
-  Serial.print(" / ");
-  Serial.print(analogRead(s_mesq));
-  Serial.print(" / ");
-  Serial.print(analogRead(s_m));
-  Serial.print(" / ");
-  Serial.print(analogRead(s_mdir));
-  Serial.print(" / ");
-  Serial.print(analogRead(s_dir));
-  Serial.print(" / Olho: ");
-  Serial.print(ult_meio.read());
-  Serial.println("cm /");
+  if ((analogRead(s_noroeste) <= max_noroeste) && (analogRead(s_nordeste) >= max_nordeste )) //! Fazer micro ajuste para esquerda
+  {
+    if (ver == false)
+      {
+          vel_esquerda();
+          Serial.println("Mini esquerda");
+      }
+      else
+      {
+          vel_re();
+          delay(delay_pas);
+          ver = false;
+      }
+  }
+  else if ((analogRead(s_noroeste) >= max_noroeste) && (analogRead(s_nordeste) <= max_nordeste)) //! Fazer micro ajuste para direita
+  {
+    if (ver == false)
+    {
+      vel_direita();
+      Serial.println("Mini direita");
+    }
+    else
+    {
+      vel_re();
+      delay(delay_pas);
+      ver = false;
+    }
+  }
+  else
+  {
+    vel_frente();
+    Serial.println("Frente");
+  }
+  delay(100);
+  vel_parar(1000);
+  
+  // Condições que usa a melhor situação dos sensores, o bit mais da direita é o s_leste e o bit mais na esquerda é o s_oeste
+  // Alguns nao tem break; porque faz a mesma coisa
+  /* switch (leitura)
+  {
+  case 0b1111:
+  case 0b0000:
+  case 0b0110: //! Caso de ele ir so pra frente
+      if (ver == false)
+      {
+          vel_frente();
+          Serial.println(" / Frente");
+      }
+      else
+      {
+          vel_re();
+          delay(delay_pas);
+          ver = false;
+      }
+      break;
+  case 0b0010: //! Caso dele fazer micro ajuste para direita
+      if (ver == false)
+      {
+          vel_direita();
+          Serial.println(" / Mini direita");
+      }
+      else
+      {
+          vel_re();
+          delay(delay_pas);
+          ver = false;
+      }
+      break;
+  case 0b0100: //! Caso dele fazer micro ajuste para esquerda
+      if (ver == false)
+      {
+          vel_esquerda();
+          Serial.println(" / Mini esquerda");
+      }
+      else
+      {
+          vel_re();
+          delay(delay_pas);
+          ver = false;
+      }
+      break;
+  case 0b1000:
+  //case 0b1100:
+  case 0b1110:
+  //case 0b1010: //! Casos de fazer o esquerda 90  
+      if (ver == false)
+      {
+          vel_esquerda();
+          Serial.println(" / Mini esquerda");
+      }
+      else
+      {
+          vel_re();
+          delay(delay_pas);
+          ver = false;
+      }
+      break;
+  case 0b0001:
+  //case 0b0011:
+  case 0b0111:
+  //case 0b0101: //! Casos de fazer o direita 90
+      if (ver == false)
+      {
+          vel_direita();
+          Serial.println(" / Mini direita");
+      }
+      else
+      {
+          vel_re();
+          delay(delay_pas);
+          ver = false;
+      }
+      break;
+  default:
+      break;
+  } */
+  Serial.println();
 }
