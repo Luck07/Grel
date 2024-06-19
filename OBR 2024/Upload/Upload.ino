@@ -23,8 +23,6 @@ void setup()
 }
 void loop()
 {
-
-  
     display.clearDisplay();  // Limpando o display no inicio do loop
     display.setCursor(0, 0); // Setando para todos iniciar no inicio da tela
 
@@ -36,14 +34,8 @@ void loop()
         desv(); //! Lembrar de saber qual direcao ele esta indo
     }*/
 
-    //  Essa parte é o bitSwift, criar uma variavel leitura do tipo byte, porem a gente so usa os bits dessa varaivel, a quantidade de bits depende de quantos sensores estao usando
-    /*byte leitura = 0; // Definir sempre 0 quando definir algo como o for abaixo
-    for (int i = 0; i < 5; i++)
-        leitura |= digitalRead(pinos[i]) << i; // Colocando as entrada da tabela da verdade usando um bitshift automatico, o valor do i depende dos sensores
-    leitura = (~leitura) & (0b00001111);       // Colocando um inversor para que funcione com a tabela da verdade, pq o sensor dectectar no branco, AND uma mascara para ir so os bits que eu quero
-    */
     calibra();
-    Serial.println(leitura,BIN);
+    debugln(leitura);
     // Condições que usa a melhor situação dos sensores, o bit mais da direita é o s_leste e o bit mais na esquerda é o s_oeste
     // Alguns nao tem break; porque faz a mesma coisa
     switch (leitura)

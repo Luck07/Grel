@@ -2,75 +2,45 @@
 #define _FUNCOES_VARIAVEIS_H
 
 #include <SoftwareWire.h>
-#include <Wire.h>
 #include <Adafruit_TCS34725_SWwire.h>
 
-SoftwareWire sWire(52, 53);
+SoftwareWire sWire(6, 7);
 
 Adafruit_TCS34725_SWwire tcs_real = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIONTIME_499MS, TCS34725_GAIN_4X);
 Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIONTIME_499MS, TCS34725_GAIN_4X);
 
-#include "EEPROMLogger.h"
 #include <Ultrasonic.h>
 #include <Servo.h>
 // mpu6050 i2c = 0x68
 
-#define serial_on 1
-#if serial_on
-#define debug(x) Serial.print(x)
-#define debugln(x) Serial.println(x)
-#else
-#define debug(x)
-#define debugln(x)
-#endif
-
-#define T90 0 // Se tiver 90 com T colocar 1, caso nao deixar 0
-
 //* Definindo as portas dos sensores
-#define s_oeste A3     //
-#define s_noroeste A1 //
-#define s_norte A4     //
-#define s_nordeste A0 //
-#define s_leste A2     //
+#define s_esq A4     //
+#define s_mesq A3 //
+#define s_m A0     //
+#define s_mdir A2 //
+#define s_dir A1     //
 
-#define analog_esq 501
-#define analog_dir 501 
-
-// diminuir 10 do max
-#define max_oeste 80
-#define max_noroeste 98 // menos esse, foi 10
-#define max_norte 60
-#define max_nordeste 58
-#define max_leste 108
+// diminuir 20 do max
+#define max_esq 125
+#define max_mesq 170
+#define max_m 130
+#define max_mdir 230
+#define max_dir 200
 
 bool s_bit = false;
 byte leitura = 0;
 bool ver = false;      // O Verifica para os switchs
 
-/*
- * 
- * 
-*/
 #define servo_esquerda 11
 #define servo_direita 12
 Servo serv_esq;
 Servo serv_dir;
 #define delay_fre 300
 #define delay_re 30
-#define delay_peq 300 
-//#define delay_peq 99999
-#define delay_pas 999999
+#define delay_peq 30 
+#define delay_pas 30
 
-//* Definindo velocidades
-#define velocidade_fre 180
-#define velocidade_tras 0
 #define velocidade_par 40  // Delay para o tempo dele ficar parado
-
-//* Valores com Millis
-long int millis_ant = 0;
-#define time_log 2000
-#define time_branco 1500 // tempo suficiente para achar o gap, mas nao se perder tanto na linha
-#define time_branco_while 2000 // tempo para ele voltar para linha
 
 //* Valores para desviar obstaculo
 #define desv_lado 1
@@ -82,61 +52,48 @@ long int millis_ant = 0;
 #define enc_90_2 enc_90 + 40 // Seguunda vez que ele executa o 90 / 70
 #define enc_90_3 enc_90 + 27 // E a terceira / 140
 
-//* Valores para sala de resgate
-Servo serv_vertical;
-#define serv_vertical_pin 33
-#define serv_vertical_min 12
-#define serv_vertical_max 90
-Servo serv_porta;
-#define serv_porta_pin 34
-#define serv_porta_min 0
-#define serv_porta_max 180
-#define serv_delay 500
-
 /*
- * trig == prim (marrom)
- * echo == segun (amarelo)
+ * trig == prim
+ * echo == segun
  */
 Ultrasonic ult_meio(30, 31);
-
-//* Definicao variadas
-#define bot A10
 
 void calibra()
 {
   leitura = 0;
 
-  if (analogRead(s_oeste) >= max_oeste)
+  if (analogRead(s_esq) >= max_esq)
     s_bit = true;
   else
     s_bit = false;
-
   leitura |= s_bit << 0;
-  if (analogRead(s_noroeste) >= max_noroeste)
+
+  if (analogRead(s_mesq) >= max_mesq)
     s_bit = true;
   else
     s_bit = false;
-
   leitura |= s_bit << 1;
-  if (analogRead(s_nordeste) >= max_norte)
+
+  /*
+  if (analogRead(s_m) >= max_m)
     s_bit = true;
   else
     s_bit = false;
+  leitura |= s_bit << 2;*/
 
+  if (analogRead(s_mdir) >= max_mdir)
+    s_bit = true;
+  else
+    s_bit = false;
   leitura |= s_bit << 2;
-  if (analogRead(s_nordeste) >= max_nordeste)
+
+  if (analogRead(s_dir) >= max_dir)
     s_bit = true;
   else
     s_bit = false;
-
   leitura |= s_bit << 3;
-  if (analogRead(s_leste) >= max_leste)
-    s_bit = true;
-  else
-    s_bit = false;
 
-  leitura |= s_bit << 4;
-  leitura = (~leitura) & 0b00011111;  
+  leitura = (~leitura) & 0b00001111;  
 }
 
 
@@ -230,7 +187,7 @@ cores sensi()
  *! false = direita
  *! true = esquerda
  */
-void desv(int velo_esq = velocidade_fre, int velo_dir = velocidade_fre)
+void desv()
 {
   delay(delay_re); //* Dando um passo para atras, isso e bom caso a traseira do robo e maior do que na frente
 /*mot1_par();                                //* Colocando pra parar bem rapido pq sim
@@ -244,12 +201,10 @@ delay(mot_par);*/
   delay(enc_90_3); //* Virando para direita, mesmo moitvo anterior
   delay(frente_3);  //* Andando em frente, para ele nao se confundir linhas aleatorias
   vel_frente();            //* Terminando com while para ele encontrar a linah correta
-  debug("andando para frente (encontrar linha)");
-  while ((digitalRead(s_noroeste) == 1) && (digitalRead(s_nordeste) == 1)); 
+  while ((digitalRead(s_mesq) == 1) && (digitalRead(s_mdir) == 1)); 
   delay(delay_peq_desv); //* Se afastando um pouco da linha
   vel_esquerda();             //* Virando para esquerda para se ajeiar na faixa
-  debug("Virando esquerda (se ajustar na linha): ");
-  while ((digitalRead(s_noroeste) == 1) && (digitalRead(s_nordeste) == 1));
+  while ((digitalRead(s_mesq) == 1) && (digitalRead(s_mdir) == 1));
 #else                                         //! Direita
   delay(enc_90);    //* Girando para direita
   delay(frente_1);   //* Se distanciando do obstaculo
@@ -258,70 +213,46 @@ delay(mot_par);*/
   delay(enc_90_3); //* Virando para esquerda, mesmo moitvo anterior
   delay(frente_3);   //* Andando em frente, para ele nao se confundir linhas aleatorias
   vel_frente(velo_esq, velo_dir);             //* Terminando com while para ele encontrar a linah correta
-  while ((digitalRead(s_noroeste) == 1) && (digitalRead(s_nordeste) == 1))
+  while ((digitalRead(s_mesq) == 1) && (digitalRead(s_mdir) == 1))
   {
-    debug("andando para frente (encontrar linha): ");
-    debugln(enc.read());
   }
   delay(enc_peq_desv); //* Se afastando um pouco da linha
   vel_dir(velo_esq, velo_dir);                  //* Virando para direita para se ajeiar na faixa
-  while ((digitalRead(s_noroeste) == 1) && (digitalRead(s_nordeste) == 1))
+  while ((digitalRead(s_mesq) == 1) && (digitalRead(s_mdir) == 1))
   {
-    debug("Virando direita (se ajustar na linha): ");
-    debugln(enc.read());
   }
 #endif
 }
 
-void esq_90(int velo_esq = velocidade_fre, int velo_dir = velocidade_fre) //* 90 esquerda
+void esq_90() //* 90 esquerda
 {
-  //if(sensi() == verde_branco)
-  
   vel_frente();
   delay(delay_fre);
 
-  if (digitalRead(s_norte) == 1)
+  if (analogRead(s_m) >= max_m)
   {
     vel_esquerda();
     delay(delay_peq);
-    while (((analogRead(s_noroeste) >= max_noroeste) || (analogRead(s_nordeste) >= max_nordeste)) && analogRead(s_oeste) >= max_oeste);
-    // while ((digitalRead(s_norte) == 1) && (digitalRead(s_oeste) == 1));
+    while (((analogRead(s_mesq) >= max_mesq) || (analogRead(s_mdir) >= max_mdir)) && analogRead(s_esq) >= max_esq);
+    // while ((digitalRead(s_m) == 1) && (digitalRead(s_esq) == 1));
     vel_re();
     delay(delay_re);
   }
 }
 
-void dir_90(int velo_esq = velocidade_fre, int velo_dir = velocidade_fre) //* 90 direita
+void dir_90() //* 90 direita
 {
   vel_frente();
   delay(delay_fre);
 
-  if (digitalRead(s_norte) == 1)
+  if (analogRead(s_m) >= max_m)
   {
     vel_direita();
     delay(delay_peq);
-    while (((analogRead(s_noroeste) >= max_noroeste) || (analogRead(s_nordeste) >= max_nordeste)) && analogRead(s_leste) >= max_leste);
-    // while ((digitalRead(s_norte) == 1) && (digitalRead(s_leste) == 1));
+    while (((analogRead(s_mesq) >= max_mesq) || (analogRead(s_mdir) >= max_mdir)) && analogRead(s_dir) >= max_dir);
+    // while ((digitalRead(s_m) == 1) && (digitalRead(s_dir) == 1));
     vel_re();
     delay(delay_re);
-  }
-}
-
-void micro_ajuste_inv()
-{
-  if ((analogRead(s_noroeste) <= analog_esq) && (analogRead(s_nordeste) >= analog_dir)) //! Fazer micro ajuste para esquerda
-  {
-    vel_esquerda();
-    debugln("leitura == 0010 / ajustando para esquerda");
-  }
-  else if ((analogRead(s_noroeste) >= analog_esq) && (analogRead(s_nordeste) <= analog_dir)) //! Fazer micro ajuste para direita
-  {
-    vel_direita();
-    debugln("leitura == 0100 / ajustando para direita");
-  }
-  else
-  {
-    vel_re();
   }
 }
 #endif
