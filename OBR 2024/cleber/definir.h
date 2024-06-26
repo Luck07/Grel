@@ -21,13 +21,13 @@ Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIO
 #define s_dir A4    // A4
 
 #define branco_esq 965 // ressistor 36k
-#define branco_mesq 966 // ressistor 36k
+#define branco_mesq 970 // ressistor 36k
 #define branco_m 861
 #define branco_mdir 971
 #define branco_dir 848
 
 #define preto_esq 904
-#define preto_mesq 772
+#define preto_mesq 740
 #define preto_m 469
 #define preto_mdir 726
 #define preto_dir 541
