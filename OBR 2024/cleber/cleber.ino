@@ -1,11 +1,38 @@
 // Switch
 #include "definir.h"  // Dando include nas variaveis e funções
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+Adafruit_SSD1306 display(128, 64, &Wire, -1);
+#define W 128
+#define H 64
+#define lw 6
+#define lh 8
+
+const unsigned char aeia[] PROGMEM = {
+    // 'bfcaab3c7ed1666ef086e690ec778ad0, 32x32px
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x90, 0x00, 0x00, 0x01, 0xb0,
+    0x00, 0x00, 0x00, 0x30, 0x01, 0x00, 0x01, 0xbc, 0x08, 0x20, 0x44, 0x34, 0x00, 0x40, 0x08, 0x28,
+    0x00, 0x03, 0x10, 0x20, 0x05, 0xff, 0x80, 0x30, 0x07, 0xfe, 0x20, 0xa0, 0x0f, 0xdf, 0xee, 0x80,
+    0x0f, 0xb9, 0x3d, 0x70, 0x1f, 0xe3, 0x73, 0xc0, 0x1d, 0xe0, 0xe3, 0xc0, 0x1f, 0xe0, 0x00, 0xc0,
+    0x1f, 0x63, 0xa0, 0x40, 0x1f, 0x67, 0xc1, 0xc0, 0x1f, 0x47, 0x21, 0x40, 0x1b, 0x47, 0xe3, 0xc0,
+    0x1f, 0x47, 0xc3, 0xc0, 0x1f, 0x47, 0xc3, 0xc0, 0x0e, 0x5f, 0xdb, 0x80, 0x1b, 0xdf, 0x83, 0xe0,
+    0x03, 0x78, 0x00, 0x80, 0x00, 0x3f, 0xce, 0x00, 0x00, 0x6b, 0xf8, 0x00, 0x00, 0x00, 0x20, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 // Usando array para colocar todos os pinos, coloquei os sensores em uma certa posição por causa do BitSwift em baixo
 const int pinos[] = { s_esq, s_mesq, s_m, s_mdir, s_dir };
 
+int n;
+
 void setup() {
   Serial.begin(9600);
+
+  /* display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 0);
+  display.setTextSize(2); */
+
   // Colocando os sensores como INPUT, e o resto como OUTPUT, tudo isso pelo array
   for (int i = 0; i < 5; i++)  // Usando o array para fazer os pinmode como input
     pinMode(pinos[i], INPUT);
@@ -14,7 +41,14 @@ void setup() {
   serv_dir.attach(servo_direita);
 }
 void loop() {
-  //calibra();
+  /* display.clearDisplay();
+  display.setCursor(0, 0);
+  display.print("PRIMEIRO\nSEGUE\nFAIXA!!!");
+  display.drawBitmap(W - 32, H - 32 + sin(n * PI / 180) * 3, aeia, 32, 32, WHITE);
+  display.display();
+  n = (n < 360) ? n + 36 : 0;
+
+  display.display(); */
   //Serial.print(leitura, BIN);
   bool besq = map(analogRead(s_esq), preto_esq, branco_esq, 0, 1023) >= 500 ? 1 : 0;
   bool bmesq = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023) >= 500 ? 1 : 0;
@@ -22,7 +56,37 @@ void loop() {
   bool bmdir = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023) >= 500 ? 1 : 0;
   bool bdir = map(analogRead(s_dir), preto_dir, branco_dir, 0, 1023) >= 500 ? 1 : 0;
 
-  if((besq && bmesq && bm && bmdir && bdir) || (besq && bmesq && !bm && bmdir && bdir) || (besq && !bmesq && !bm && !bmdir && bdir) || (!besq && !bmesq && !bm && !bmdir && !bdir))
+  Serial.print(besq);
+  Serial.print(" / ");
+  Serial.print(bmesq);
+  Serial.print(" / ");
+  Serial.print(bm);
+  Serial.print(" / ");
+  Serial.print(bmdir);
+  Serial.print(" / ");
+  Serial.print(bdir);
+  Serial.println(" / ");
+
+
+   /* if ((besq && bdir) || (!besq && !bdir))
+    vel_frente();
+  else if ((besq && !bdir))
+    vel_direita();
+  else
+    vel_esquerda(); */
+
+  if((besq && bmesq && bmdir && bdir) || (besq && !bmesq && !bmdir && bdir))
+    vel_frente();
+  else if ((besq && bmesq && !bmdir && bdir))
+    vel_direita();
+  else if ((besq && !bmesq && bmdir && bdir))
+    vel_esquerda();
+  else if ((besq && bmesq && bmdir && !bdir) || (besq && !bmesq && !bmdir && !bdir))
+    dir_90();
+  //else if ((!besq && bmesq && bmdir && bdir) || (!besq && !bmesq && !bmdir && bdir))
+    //esq_90();
+    
+  /* if((besq && bmesq && bm && bmdir && bdir) || (besq && bmesq && !bm && bmdir && bdir) || (besq && !bmesq && !bm && !bmdir && bdir) || (!besq && !bmesq && !bm && !bmdir && !bdir))
   {
     vel_frente();
   }
@@ -36,14 +100,14 @@ void loop() {
   }
   else if((!besq && bmesq && bm && bmdir && bdir) || (!besq && !bmesq && !bm && !bmdir && bdir) || (!besq && bmesq && !bm && bmdir && bdir) || (!besq && !bmesq && bm && !bmdir && bdir))
   {
-    //esq_90();
-    //vel_parar(3000);
+    esq_90();
+    vel_parar(3000);
   }
   else if((besq && bmesq && bm && bmdir && !bdir) || (besq && !bmesq && !bm && !bmdir && !bdir) || (besq && bmesq && !bm && bmdir && !bdir) || (besq && !bmesq && bm && !bmdir && !bdir))
   {
     dir_90();
-    //vel_parar(3000);
-  }
+    vel_parar(3000);
+  }  */
   /* if ((analogRead(s_mesq) >= media_mesq) && (analogRead(s_mdir) <= media_mdir))  //! Fazer micro ajuste para esquerda
   {
     if (ver == false) {

@@ -14,31 +14,30 @@ Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIO
 // mpu6050 i2c = 0x68
 
 //* Definindo as portas dos sensores
-#define s_esq A15     //
-#define s_mesq A2    //
-#define s_m A0     //
-#define s_mdir A3 //
-#define s_dir A4     //
+#define s_esq A15     // A15
+#define s_mesq A2    // A2
+#define s_m A0     // A0
+#define s_mdir A3 // A3
+#define s_dir A4    // A4
 
+#define branco_esq 965 // ressistor 36k
+#define branco_mesq 966 // ressistor 36k
+#define branco_m 861
+#define branco_mdir 971
+#define branco_dir 848
 
-#define branco_esq 227
-#define branco_mesq 251
-#define branco_m 155
-#define branco_mdir 196
-#define branco_dir 137
-
-#define preto_esq 180
-#define preto_mesq 170
-#define preto_m 75
-#define preto_mdir 108
-#define preto_dir 86
+#define preto_esq 904
+#define preto_mesq 772
+#define preto_m 469
+#define preto_mdir 726
+#define preto_dir 541
 
 //Esquerda sendo branco e direita sendo preto
-#define media_esq (145 + 90) / 2
-#define media_mesq (192 + 110) / 2
-#define media_m (155 + 78) / 2
-#define media_mdir (245 + 156) / 2
-#define media_dir (212 + 160) / 2
+#define media_esq (branco_esq + preto_esq) / 2
+#define media_mesq (branco_mesq + preto_mesq) / 2
+#define media_m (branco_m + preto_m) / 2
+#define media_mdir (branco_mdir + preto_mdir) / 2
+#define media_dir (branco_dir + preto_dir) / 2
 
 bool s_bit = false;
 byte leitura = 0;
@@ -50,7 +49,7 @@ Servo serv_esq;
 Servo serv_dir;
 #define delay_fre 500
 #define delay_re 30
-#define delay_peq 1500 
+#define delay_peq 30 
 #define delay_pas 30
 
 #define velocidade_par 40  // Delay para o tempo dele ficar parado
@@ -156,18 +155,18 @@ void calibra()
 //* Inicio das funções, para cada caso
 void vel_frente()
 {
-  serv_esq.write(100);
-  serv_dir.write(80);
+  serv_esq.write(110);
+  serv_dir.write(70);
 }
 void vel_direita()
 {
-  serv_esq.write(100); // talvez usar 90
-  serv_dir.write(100);
+  serv_esq.write(90); // talvez usar 90
+  serv_dir.write(110);
 }
 void vel_esquerda()
 {
-  serv_esq.write(80);
-  serv_dir.write(80); // talvez usar 90
+  serv_esq.write(70);
+  serv_dir.write(90); // talvez usar 90
 }
 void vel_re()
 {
@@ -185,10 +184,14 @@ void esq_90() //* 90 esquerda
 {
   vel_frente();
   delay(delay_fre);
-  vel_esquerda();
+  //vel_esquerda();
+  serv_esq.write(70);
+  serv_dir.write(70);
   delay(delay_peq);
   //while (((analogRead(s_mesq) <= media_mesq) || (analogRead(s_mdir) <= media_mdir)) && analogRead(s_esq) <= media_esq);
-  // while ((digitalRead(s_m) == 1) && (digitalRead(s_esq) == 1));
+  //while ((analogRead(s_m) <= media_m) && (analogRead(s_dir) <= media_dir));
+    //while ((map(analogRead(s_m), preto_m, branco_m, 0, 1023) >= 500) && (map(analogRead(s_dir), preto_dir, branco_dir, 0, 1023) >= 500));
+
   //vel_re();
   //delay(delay_re);
 }
@@ -197,10 +200,14 @@ void dir_90() //* 90 direita
 {
   vel_frente();
   delay(delay_fre);
-  vel_direita();
+  //vel_direita();
+  serv_esq.write(110);
+  serv_dir.write(110);
   delay(delay_peq);
   //while ((analogRead(s_mesq) >= media_mesq) && (analogRead(s_mdir) >= media_mdir) /* && (analogRead(s_dir) <= media_dir) */);
-  // while ((digitalRead(s_m) == 1) && (digitalRead(s_dir) == 1));
+  //while ((analogRead(s_m) <= media_m) && (analogRead(s_esq) <= media_esq));
+  //while ((map(analogRead(s_m), preto_m, branco_m, 0, 1023) >= 500) && (map(analogRead(s_esq), preto_esq, branco_esq, 0, 1023) >= 500));
+
   //vel_re();
   //delay(delay_re);
 }
