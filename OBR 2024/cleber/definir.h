@@ -20,17 +20,17 @@ Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIO
 #define s_mdir A3 // A3
 #define s_dir A4    // A4
 
-#define branco_esq 965 // ressistor 36k
-#define branco_mesq 960 // ressistor 36k
-#define branco_m 861
-#define branco_mdir 960
-#define branco_dir 848
+#define branco_esq 964 // ressistor 36k
+#define branco_mesq 966 // ressistor 36k
+#define branco_m 857
+#define branco_mdir 966
+#define branco_dir 829
 
-#define preto_esq 904
-#define preto_mesq 780
-#define preto_m 469
-#define preto_mdir 700
-#define preto_dir 541
+#define preto_esq 942
+#define preto_mesq 825
+#define preto_m 465
+#define preto_mdir 738
+#define preto_dir 532
 
 //Esquerda sendo branco e direita sendo preto
 #define media_esq (branco_esq + preto_esq) / 2
@@ -49,7 +49,7 @@ Servo serv_esq;
 Servo serv_dir;
 #define delay_fre 300
 #define delay_re 30
-#define delay_peq 2500 
+#define delay_peq 1250 
 #define delay_pas 30
 
 #define velocidade_par 40  // Delay para o tempo dele ficar parado
@@ -167,21 +167,31 @@ void vel_frente()
 
 void vel_direita()
 {
-  int v = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023);
-  v = (1023 - v) /102;
-  int v2 = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023);
-  v2 = (1023 - v2) /102;
-  serv_esq.write(serv_esq.read() - v2); // talvez usar 90
-  serv_dir.write(serv_dir.read() - v); //80
+  int ddv_dir = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023);
+  int ddv_esq = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023);
+  ddv_dir = (1023 - ddv_dir) /102;
+  ddv_esq = (1023 - ddv_esq) /102;
+  serv_esq.write(serv_esq.read() - ddv_esq); // talvez usar 90
+  serv_dir.write(serv_dir.read() - ddv_dir); //80 
+
+  // int v = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 70);
+  // int v2 = map(analogRead(s_mdir), preto_mdir, branco_mdir, 80, 180);
+  // serv_esq.write(v);
+  // serv_dir.write(v2);
 }
 void vel_esquerda()
 {
-  int v = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023);
-  v = (1023 - v) /102;
-  int v2 = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023);
-  v2 = (1023 - v2) /102;
-  serv_esq.write(serv_esq.read() + v);
-  serv_dir.write(serv_dir.read() + v2); // talvez usar 90
+  int ddv_dir = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023);
+  int ddv_esq = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023);
+  ddv_dir = (1023 - ddv_dir) /102;
+  ddv_esq = (1023 - ddv_esq) /102;
+  serv_esq.write(serv_esq.read() + ddv_esq);
+  serv_dir.write(serv_dir.read() + ddv_dir); // talvez usar 90 
+
+  // int v = map(analogRead(s_mesq), preto_mesq, branco_mesq, 80, 180);
+  // int v2 = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 70);
+  // serv_esq.write(v2);
+  // serv_dir.write(v);
 }
 void vel_re()
 {
@@ -203,6 +213,9 @@ void esq_90() //* 90 esquerda
   serv_esq.write(80);
   serv_dir.write(80);
   delay(delay_peq);
+  int i = 600;
+  while (i >= 500)
+    i = map(analogRead(s_m), preto_m, branco_m, 0, 1023);
   //while (((analogRead(s_mesq) <= media_mesq) || (analogRead(s_mdir) <= media_mdir)) && analogRead(s_esq) <= media_esq);
   //while ((analogRead(s_m) <= media_m) && (analogRead(s_dir) <= media_dir));
     //while ((map(analogRead(s_m), preto_m, branco_m, 0, 1023) >= 500) && (map(analogRead(s_dir), preto_dir, branco_dir, 0, 1023) >= 500));
@@ -219,6 +232,10 @@ void dir_90() //* 90 direita
   serv_esq.write(100);
   serv_dir.write(100);
   delay(delay_peq);
+  int i = 600;
+  while (i >= 500)
+    i = map(analogRead(s_m), preto_m, branco_m, 0, 1023);
+
   //while ((analogRead(s_mesq) >= media_mesq) && (analogRead(s_mdir) >= media_mdir) /* && (analogRead(s_dir) <= media_dir) */);
   //while ((analogRead(s_m) <= media_m) && (analogRead(s_esq) <= media_esq));
   //while ((map(analogRead(s_m), preto_m, branco_m, 0, 1023) >= 500) && (map(analogRead(s_esq), preto_esq, branco_esq, 0, 1023) >= 500));
