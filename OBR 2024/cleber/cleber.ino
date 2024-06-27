@@ -24,6 +24,7 @@ const unsigned char aeia[] PROGMEM = {
 const int pinos[] = { s_esq, s_mesq, s_m, s_mdir, s_dir };
 
 int n;
+bool a = false;
 
 void setup() {
   Serial.begin(9600);
@@ -67,15 +68,79 @@ void loop() {
   Serial.print(bdir);
   Serial.println(" / ");
 
+  
+  if(besq && bdir) {
+    if(!bm && (bmesq && bmdir))
+      vel_frente();
+    else if(bmesq && !bmdir) {
+      if(!a) {
+        a = true;
+        Serial.println("a true dir");
+      } else {
+        a = false;
+        vel_esquerda();
+      }
+    } else {
+      if(!a) {
+        Serial.println("a true esq");
+        a = true;
+      } else {
+        a = false;
+        vel_direita();
+      }
+    }
+  } else {
+    a = true;
+    if(!bdir) {
+      Serial.println("direita 90");
+      dir_90();
+    } else {
+      Serial.println("esquerda 90");
+      esq_90();
+    }
+  }
 
-   /* if ((besq && bdir) || (!besq && !bdir))
+  
+  if(a) {
+    if (!bm)
+      vel_frente();
+    else if ((bmesq && !bmdir))
+      vel_esquerda();
+    else
+      vel_direita();
+    a = false;
+  }
+  
+
+  /*
+  //if(!bm) {
+    if(!bm && (bmesq && bmdir))
+      vel_frente();
+    else if(bmesq && !bmdir) {
+      //if(!bdir)
+      //  dir_90();
+      //else
+        vel_esquerda();
+    } else {
+      //if(!besq)
+      //  esq_90();
+      //else
+        vel_direita();
+    }
+  //}
+  */
+
+  /*if (!bm/* && ((bmesq && bmdir) || (!bmesq && !bmdir)))
     vel_frente();
-  else if ((besq && !bdir))
-    vel_direita();
+  else if ((bmesq && !bmdir))
+    vel_esquerda();
   else
-    vel_esquerda(); */
+    vel_direita(); */
 
-  if((besq && bmesq && bmdir && bdir) || (besq && !bmesq && !bmdir && bdir))
+//delay(100);
+//vel_parar(100);
+
+  /*if((besq && bmesq && bmdir && bdir) || (besq && !bmesq && !bmdir && bdir))
     vel_frente();
   else if ((besq && bmesq && !bmdir && bdir))
     vel_direita();
@@ -162,9 +227,5 @@ void loop() {
       default:
         break;
     } */
-  //delay(1000);
-//Serial.println();
-//delay(100);
-//vel_parar(1000);
+  
 }
-
