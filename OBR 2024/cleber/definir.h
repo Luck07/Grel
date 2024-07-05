@@ -47,6 +47,7 @@ bool ver = false;      // O Verifica para os switchs
 #define servo_direita 12
 Servo serv_esq;
 Servo serv_dir;
+
 #define delay_fre 300
 #define delay_re 30
 #define delay_peq 1250 
