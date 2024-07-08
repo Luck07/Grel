@@ -41,6 +41,7 @@ void loop() {
   display.display(); */
   //Serial.print(leitura, BIN);
   bool besq = map(analogRead(s_esq), preto_esq, branco_esq, 0, 1023) >= 500 ? 1 : 0;
+  //bool besq = 0;
   bool bmesq = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023) >= 500 ? 1 : 0;
   bool bm = map(analogRead(s_m), preto_m, branco_m, 0, 1023) >= 500 ? 1 : 0;
   bool bmdir = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023) >= 500 ? 1 : 0;
@@ -97,7 +98,7 @@ void loop() {
 
     } else {
       Serial.println("esquerda 90");
-      esq_90();
+      //esq_90();
 
       /*
       serv_dir.write(180);

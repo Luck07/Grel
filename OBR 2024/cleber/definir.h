@@ -9,7 +9,7 @@ SoftwareWire sWire(6, 7);
 Adafruit_TCS34725_SWwire tcs_real = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIONTIME_499MS, TCS34725_GAIN_4X);
 Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIONTIME_499MS, TCS34725_GAIN_4X);
 
-#include <Ultrasonic.h>
+//#include <Ultrasonic.h>
 #include <Servo.h>
 // mpu6050 i2c = 0x68
 
@@ -21,15 +21,15 @@ Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIO
 #define s_dir A4    // A4
 
 #define branco_esq 964 // ressistor 36k
-#define branco_mesq 966 // ressistor 36k
+#define branco_mesq 956//966 // ressistor 36k
 #define branco_m 857
-#define branco_mdir 966
+#define branco_mdir 957// 966
 #define branco_dir 829
 
 #define preto_esq 942
-#define preto_mesq 825
+#define preto_mesq 656 //825
 #define preto_m 465
-#define preto_mdir 738
+#define preto_mdir 560
 #define preto_dir 532
 
 //Esquerda sendo branco e direita sendo preto
@@ -69,7 +69,8 @@ Servo serv_dir;
  * trig == prim
  * echo == segun
  */
-Ultrasonic ult_meio(30, 31);
+
+//Ultrasonic ult_meio(30, 31);
 
 /* void calibra()
 {
@@ -168,12 +169,14 @@ void vel_frente()
 
 void vel_direita()
 {
-  int ddv_dir = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023);
-  int ddv_esq = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023);
-  ddv_dir = (1023 - ddv_dir) /102;
-  ddv_esq = (1023 - ddv_esq) /102;
-  serv_esq.write(serv_esq.read() - ddv_esq); // talvez usar 90
-  serv_dir.write(serv_dir.read() - ddv_dir); //80 
+  serv_esq.write(90);
+  serv_dir.write(80);
+  // int ddv_dir = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023);
+  // int ddv_esq = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023);
+  // ddv_dir = (1023 - ddv_dir) /102;
+  // ddv_esq = (1023 - ddv_esq) /102;
+  // serv_esq.write(serv_esq.read() - ddv_esq); // talvez usar 90
+  // serv_dir.write(serv_dir.read() - ddv_dir); //80 
 
   // int v = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 70);
   // int v2 = map(analogRead(s_mdir), preto_mdir, branco_mdir, 80, 180);
@@ -182,12 +185,14 @@ void vel_direita()
 }
 void vel_esquerda()
 {
-  int ddv_dir = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023);
-  int ddv_esq = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023);
-  ddv_dir = (1023 - ddv_dir) /102;
-  ddv_esq = (1023 - ddv_esq) /102;
-  serv_esq.write(serv_esq.read() + ddv_esq);
-  serv_dir.write(serv_dir.read() + ddv_dir); // talvez usar 90 
+  serv_esq.write(100);
+  serv_dir.write(90);
+  // int ddv_dir = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023);
+  // int ddv_esq = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023);
+  // ddv_dir = (1023 - ddv_dir) /102;
+  // ddv_esq = (1023 - ddv_esq) /102;
+  // serv_esq.write(serv_esq.read() + ddv_esq);
+  // serv_dir.write(serv_dir.read() + ddv_dir); // talvez usar 90 
 
   // int v = map(analogRead(s_mesq), preto_mesq, branco_mesq, 80, 180);
   // int v2 = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 70);
