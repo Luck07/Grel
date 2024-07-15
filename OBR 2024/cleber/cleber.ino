@@ -53,12 +53,12 @@ void loop() {
     uint8_t mdir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 100), 0, 100);
     uint8_t dir  = constrain(map(analogRead(s_dir) , preto_dir , branco_dir , 0, 100), 0, 100);
 
-    const uint8_t max = 50;
-    bool besq  = esq  >= max;
-    bool bmesq = mesq >= max-10;
+    const uint8_t max = 60;
+    bool besq  = esq  >= (max+5);
+    bool bmesq = mesq >= (max-15);
     bool bm    = m    >= max;
-    bool bdir  = dir  >= max-10;
-    bool bmdir = mdir >= max;
+    bool bmdir = mdir >= (max-15);
+    bool bdir  = dir  >= (max+5);
 
     Serial.print(" / ");
     Serial.print(esq);  Serial.print("-"); Serial.print(besq);  Serial.print(" / ");

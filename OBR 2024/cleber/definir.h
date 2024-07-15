@@ -174,11 +174,15 @@ void vel_direita()
   
   uint8_t ddv_dir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023), 0, 1023);
   uint8_t ddv_esq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023), 0, 1023);
-  ddv_dir = (1023 - ddv_dir) /102;
-  ddv_esq = (1023 - ddv_esq) /102;
-  //serv_esq.write(90 - ddv_esq); // talvez usar 90
-  serv_esq.write(90 - ddv_esq);
+  ddv_dir = (1023 - ddv_dir) /100;
+  ddv_esq = (1023 - ddv_esq) /100;
+
+  serv_esq.write(90 - (ddv_esq*0.75));
   serv_dir.write(90 - ddv_dir); //80 
+  
+//   serv_esq.write(serv_esq.read() - ddv_esq);
+//   serv_dir.write(serv_dir.read() - ddv_dir); //80 
+
 
   // int v = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 70);
   // int v2 = map(analogRead(s_mdir), preto_mdir, branco_mdir, 80, 180);
@@ -192,11 +196,15 @@ void vel_esquerda()
 
   uint8_t ddv_dir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023), 0, 1023);
   uint8_t ddv_esq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023), 0, 1023);
-  ddv_dir = (1023 - ddv_dir) /102;
-  ddv_esq = (1023 - ddv_esq) /102;
+  ddv_dir = (1023 - ddv_dir) /100;
+  ddv_esq = (1023 - ddv_esq) /100;
+
   serv_esq.write(90 + ddv_esq);
-  //serv_dir.write(90 + ddv_dir); // talvez usar 90 
-  serv_dir.write(90 + ddv_dir);
+  serv_dir.write(90 + (ddv_dir*0.75));
+
+//   serv_esq.write(serv_esq.read() + ddv_esq);
+//   serv_dir.write(serv_dir.read() + ddv_dir);
+
 
   // int v = map(analogRead(s_mesq), preto_mesq, branco_mesq, 80, 180);
   // int v2 = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 70);
