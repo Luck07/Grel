@@ -169,14 +169,16 @@ void vel_frente()
 
 void vel_direita()
 {
-  serv_esq.write(90);
-  serv_dir.write(80);
-  // int ddv_dir = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023);
-  // int ddv_esq = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023);
-  // ddv_dir = (1023 - ddv_dir) /102;
-  // ddv_esq = (1023 - ddv_esq) /102;
-  // serv_esq.write(serv_esq.read() - ddv_esq); // talvez usar 90
-  // serv_dir.write(serv_dir.read() - ddv_dir); //80 
+//   serv_esq.write(90);
+//   serv_dir.write(80);
+  
+  uint8_t ddv_dir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023), 0, 1023);
+  uint8_t ddv_esq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023), 0, 1023);
+  ddv_dir = (1023 - ddv_dir) /102;
+  ddv_esq = (1023 - ddv_esq) /102;
+  //serv_esq.write(90 - ddv_esq); // talvez usar 90
+  serv_esq.write(90 - ddv_esq);
+  serv_dir.write(90 - ddv_dir); //80 
 
   // int v = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 70);
   // int v2 = map(analogRead(s_mdir), preto_mdir, branco_mdir, 80, 180);
@@ -185,14 +187,16 @@ void vel_direita()
 }
 void vel_esquerda()
 {
-  serv_esq.write(100);
-  serv_dir.write(90);
-  // int ddv_dir = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023);
-  // int ddv_esq = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023);
-  // ddv_dir = (1023 - ddv_dir) /102;
-  // ddv_esq = (1023 - ddv_esq) /102;
-  // serv_esq.write(serv_esq.read() + ddv_esq);
-  // serv_dir.write(serv_dir.read() + ddv_dir); // talvez usar 90 
+//   serv_esq.write(100);
+//   serv_dir.write(90);
+
+  uint8_t ddv_dir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023), 0, 1023);
+  uint8_t ddv_esq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023), 0, 1023);
+  ddv_dir = (1023 - ddv_dir) /102;
+  ddv_esq = (1023 - ddv_esq) /102;
+  serv_esq.write(90 + ddv_esq);
+  //serv_dir.write(90 + ddv_dir); // talvez usar 90 
+  serv_dir.write(90 + ddv_dir);
 
   // int v = map(analogRead(s_mesq), preto_mesq, branco_mesq, 80, 180);
   // int v2 = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 70);
@@ -215,13 +219,25 @@ void esq_90() //* 90 esquerda
 {
   vel_frente();
   delay(delay_fre);
+
+    serv_esq.write(80);
+    serv_dir.write(80);
+    delay(200);
+
+    while(/*map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023)>=500  &&
+          map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023)>=500  &&*/
+          map(analogRead(s_m), preto_m, branco_m, 0, 1023)>=500  &&
+          map(analogRead(s_dir), preto_dir, branco_dir, 0, 1023)>=500) {}
   //vel_esquerda();
-  serv_esq.write(80);
-  serv_dir.write(80);
-  delay(delay_peq);
-  int i = 600;
-  while (i >= 500)
-    i = map(analogRead(s_m), preto_m, branco_m, 0, 1023);
+  //serv_esq.write(80);
+  //serv_dir.write(80);
+  //delay(delay_peq);
+    // serv_esq.write(80);
+    // serv_dir.write(80);
+    //while(map(analogRead(s_dir), preto_dir, branco_dir, 0, 1023) >= 500) { }
+
+    // serv_esq.write(80);
+    // serv_dir.write(80);
   //while (((analogRead(s_mesq) <= media_mesq) || (analogRead(s_mdir) <= media_mdir)) && analogRead(s_esq) <= media_esq);
   //while ((analogRead(s_m) <= media_m) && (analogRead(s_dir) <= media_dir));
     //while ((map(analogRead(s_m), preto_m, branco_m, 0, 1023) >= 500) && (map(analogRead(s_dir), preto_dir, branco_dir, 0, 1023) >= 500));
@@ -232,15 +248,17 @@ void esq_90() //* 90 esquerda
 
 void dir_90() //* 90 direita
 {
-  vel_frente();
-  delay(delay_fre);
+    vel_frente();
+    delay(delay_fre-100);
   //vel_direita();
-  serv_esq.write(100);
-  serv_dir.write(100);
-  delay(delay_peq);
-  int i = 600;
-  while (i >= 500)
-    i = map(analogRead(s_m), preto_m, branco_m, 0, 1023);
+    serv_esq.write(100);
+    serv_dir.write(100);
+    delay(200);
+
+    while(/*map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023)>=500  &&
+          map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023)>=500  &&*/
+          map(analogRead(s_m), preto_m, branco_m, 0, 1023)>=500  &&
+          map(analogRead(s_esq), preto_esq, branco_esq, 0, 1023)>=500) {}
 
   //while ((analogRead(s_mesq) >= media_mesq) && (analogRead(s_mdir) >= media_mdir) /* && (analogRead(s_dir) <= media_dir) */);
   //while ((analogRead(s_m) <= media_m) && (analogRead(s_esq) <= media_esq));
