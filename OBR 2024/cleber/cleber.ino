@@ -13,7 +13,6 @@
 const int pinos[] = { s_esq, s_mesq, s_m, s_mdir, s_dir };
 
 int n;
-bool a = false;
 
 void setup() {
   Serial.begin(9600);
@@ -53,52 +52,222 @@ void loop() {
     uint8_t mdir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 100), 0, 100);
     uint8_t dir  = constrain(map(analogRead(s_dir) , preto_dir , branco_dir , 0, 100), 0, 100);
 
-    const uint8_t max = 60;
-    bool besq  = esq  >= (max+5);
-    bool bmesq = mesq >= (max-15);
-    bool bm    = m    >= max;
-    bool bmdir = mdir >= (max-15);
-    bool bdir  = dir  >= (max+5);
+    const uint8_t max = 50;
+    bool besq  = esq  <= (max-30);
+    bool bmesq = mesq <= (max);
+    bool bm    = m    <= (max+15);
+    bool bmdir = mdir <= (max);
+    bool bdir  = dir  <= (max);
 
-    Serial.print(" / ");
-    Serial.print(esq);  Serial.print("-"); Serial.print(besq);  Serial.print(" / ");
-    Serial.print(mesq); Serial.print("-"); Serial.print(bmesq); Serial.print(" / ");
-    Serial.print(m);    Serial.print("-"); Serial.print(bm);    Serial.print(" / ");
-    Serial.print(mdir); Serial.print("-"); Serial.print(bmdir); Serial.print(" / ");
-    Serial.print(dir);  Serial.print("-"); Serial.print(bdir);  Serial.println(" / ");
+    byte b_sens = 0b00000;
+    b_sens |= besq  << 4;
+    b_sens |= bmesq << 3;
+    b_sens |= bm    << 2;
+    b_sens |= bmdir << 1;
+    b_sens |= bdir;
 
+    // Serial.print(besq); 
+    // Serial.print(bmesq); 
+    // Serial.print(bm); 
+    // Serial.print(bmdir); 
+    // Serial.println(bdir); 
+    Serial.print(b_sens, BIN); Serial.print("\t");
+    //return;
+    
+    // Serial.print(" / ");
+    // Serial.print(esq);  Serial.print("-"); Serial.print(besq);  Serial.print(" / ");
+    // Serial.print(mesq); Serial.print("-"); Serial.print(bmesq); Serial.print(" / ");
+    // Serial.print(m);    Serial.print("-"); Serial.print(bm);    Serial.print(" / ");
+    // Serial.print(mdir); Serial.print("-"); Serial.print(bmdir); Serial.print(" / ");
+    // Serial.print(dir);  Serial.print("-"); Serial.print(bdir);  Serial.println(" / ");
+
+    // Serial.print(analogRead(s_esq)); Serial.print(" / ");
+    // Serial.print(analogRead(s_mesq)); Serial.print(" / ");
+    // Serial.print(analogRead(s_m)); Serial.print(" / ");
+    // Serial.print(analogRead(s_mdir)); Serial.print(" / ");
+    // Serial.print(analogRead(s_dir)); Serial.println(" / ");
+    
     /*
-    if(besq && bdir) {
-        uint8_t ddv_dir = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 180);
-        uint8_t ddv_esq = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 180);
-        ddv_dir = constrain((180 - ddv_dir) /10, 0, 180);
-        ddv_esq = constrain((180 - ddv_esq) /10, 0, 180);
-
-        if(!bm) {
-            serv_esq.write(100);
-            serv_dir.write(80);
-        } else {
-            int aa1 = serv_esq.read();
-            int aa2 = serv_dir.read();;
-            if(!bmesq)
-                serv_esq.write(aa1 - ddv_esq); // talvez usar 90
-            else
-                serv_esq.write(aa1 + ddv_esq); // talvez usar 90
-
-            if(!bmdir)
-                serv_dir.write(aa2 + ddv_dir); //80 
-            else
-                serv_dir.write(aa2 - ddv_dir);
-        }
-    } else {
-        if(!besq)
-            esq_90();
-        else
-            dir_90();
+    switch(b_sens) {
+        case 0b11111:
+            Serial.println("encru");
+            vel_parar(0);
+            break;
+        case 0b10000:
+        case 0b10010:
+        case 0b10110:
+        case 0b11010:
+        case 0b11110:
+        case 0b10100:
+        case 0b11000:
+        case 0b11100:
+            vel_frente();
+            delay(300);
+            if(besq) {
+                vel_re();
+                delay(450);
+                Serial.println("90 esq");
+                esq_90();
+            }
+            break;
+        case 0b00001:
+        case 0b00011:
+        case 0b00101:
+        case 0b00111:
+        case 0b01001:
+        case 0b01011:
+        case 0b01101:
+        case 0b01111:
+            vel_frente();
+            delay(300);
+            if(bdir) {
+                vel_re();
+                delay(450);
+                Serial.println("90 dir");
+                dir_90();
+            } else {
+                //serv_dir.write()
+            }
+            break;
+        case 0b01100:
+        case 0b00110:
+        case 0b01010:
+        case 0b00100:
+        case 0b01110:
+            Serial.println("frente");
+            vel_frente();
+            //delay(200);
+            break;
+        case 0b01000:
+        //case 0b01100:
+            Serial.println("micro esq");
+            vel_direita();
+            //serv_dir.write(90 - (100-m)/5);
+            //serv_esq.write(90 - (100-m)/2);
+            break;  
+        case 0b00010:
+        //case 0b00110:
+            Serial.println("micro dir");
+            vel_esquerda();
+            //delay(100);
+            //serv_dir.write(90 + (100-m)/2); 
+            //serv_esq.write(90 + (100-m)/5);
+            break;
+        case 0b00000:
+            Serial.println("frente (gap)");
+            vel_frente();
+            delay(400);
+            break;
+        default: Serial.print("."); break;
     }
     */
 
+   
+switch(b_sens) {
+        case 0b10000:
+        case 0b10010:
+        case 0b10110:
+        case 0b11010:
+        case 0b11110:
+        case 0b10100:
+        case 0b11000:
+        case 0b11100: //casos de 90 esquerda
+            if(!ver)
+          {
+            Serial.println("90 esq Falso");
+            ver = true;
+            vel_parar();
+          }
+          else
+          {
+            Serial.println("90 esq Verdadeiro");
+            ver = false;
+            esq_90();
+          }
+          break;
+        case 0b00001:
+        case 0b00011:
+        case 0b00101:
+        case 0b00111:
+        case 0b01001:
+        case 0b01011:
+        case 0b01101:
+        case 0b01111: // casos de 90 graus direita
+          if(!ver)
+          {
+            Serial.println("90 dir Falso");
+            vel_parar();
+            ver = true;
+          }
+          else
+          {
+            Serial.println("90 dir Verdadeiro");
+            ver = false;
+            dir_90();
+          }
+            break;
+        case 0b01100:
+        case 0b00110:
+        case 0b01010:
+        case 0b00100:
+        case 0b01110:
+          if(!ver)
+          {
+            Serial.println("Frente");
+            vel_frente();
+          }
+          else
+          {
+            Serial.println("Frente Verdadeiro");
+            ver = false;
+            vel_re();
+            delay(delay_re);
+          }
+            break;
+        case 0b01000:
+        //case 0b01100:
+            if(!ver)
+            {
+              Serial.println("micro esq");
+            vel_direita();
+            }
+            else 
+            {
+              Serial.println("micro esq Verdadeiro");
+              ver = false;
+              vel_re();
+            delay(delay_re);
+            }
+            //serv_dir.write(90 - (100-m)/5);
+            //serv_esq.write(90 - (100-m)/2);
+            break;  
+        case 0b00010:
+        //case 0b00110:
+            if(!ver)
+            {
+              Serial.println("micro dir");
+            vel_esquerda();
+            }
+            else 
+            {
+              Serial.println("micro dir Verdadeiro");
+              ver = false;
+              vel_re();
+            delay(delay_re);
+            }
+            //delay(100);
+            //serv_dir.write(90 + (100-m)/2); 
+            //serv_esq.write(90 + (100-m)/5);
+            break;
+        case 0b00000:
+            Serial.println("frente (gap)");
+            vel_frente();
+            delay(400);
+            break;
+        default: Serial.print("."); break;
+    }
     
+    /*
     if(besq && bdir) {
         if(bmesq && bmdir) {
             Serial.print("frente");
@@ -141,7 +310,7 @@ void loop() {
         serv_esq.write(180);
         delay(1800); // velocidade angular (direita): 450º/9s = 360º/7.2s = 50º/s = 1.7453 rad/s
         // -> 450º--9s / 90º--1.8s
-        */
+        /
 
         } else if(!besq) {
         Serial.println("esquerda 90");
@@ -154,7 +323,7 @@ void loop() {
         serv_dir.write(0);
         serv_esq.write(90);
         delay(1800);
-        */
+        /
         } else {
             Serial.println("encru");
             serv_esq.write(90);
@@ -172,6 +341,7 @@ void loop() {
             vel_direita();
         a = false;
     }
+    */
     
     
 

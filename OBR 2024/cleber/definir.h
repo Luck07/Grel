@@ -13,24 +13,25 @@ Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIO
 #include <Servo.h>
 // mpu6050 i2c = 0x68
 
+
 //* Definindo as portas dos sensores
-#define s_esq A15     // A15
-#define s_mesq A2    // A2
-#define s_m A0     // A0
-#define s_mdir A3 // A3
+#define s_esq A15       // A15
+#define s_mesq A2      // A2
+#define s_m A0        // A0
+#define s_mdir A3    // A3
 #define s_dir A4    // A4
 
-#define branco_esq 964 // ressistor 36k
-#define branco_mesq 956//966 // ressistor 36k
-#define branco_m 857
-#define branco_mdir 957// 966
-#define branco_dir 829
+#define branco_esq 949
+#define branco_mesq 953
+#define branco_m 947
+#define branco_mdir 959
+#define branco_dir 863
 
-#define preto_esq 942
-#define preto_mesq 656 //825
-#define preto_m 465
-#define preto_mdir 560
-#define preto_dir 532
+#define preto_esq 822
+#define preto_mesq 687 //825
+#define preto_m 477
+#define preto_mdir 580
+#define preto_dir 540
 
 //Esquerda sendo branco e direita sendo preto
 #define media_esq (branco_esq + preto_esq) / 2
@@ -41,19 +42,18 @@ Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIO
 
 bool s_bit = false;
 byte leitura = 0;
-bool ver = false;      // O Verifica para os switchs
+bool ver = false;     // O Verifica para os switchs
 
 #define servo_esquerda 11
 #define servo_direita 12
 Servo serv_esq;
 Servo serv_dir;
 
-#define delay_fre 300
-#define delay_re 30
-#define delay_peq 1250 
-#define delay_pas 30
+#define delay_fre 150 // 350
+#define velocidade_par 300  // 300
+#define delay_re 300 // 300
+#define delay_peq 100 //100
 
-#define velocidade_par 40  // Delay para o tempo dele ficar parado
 
 //* Valores para desviar obstaculo
 #define desv_lado 1
@@ -72,93 +72,11 @@ Servo serv_dir;
 
 //Ultrasonic ult_meio(30, 31);
 
-/* void calibra()
-{
-  leitura = 0;
-
-  if (analogRead(s_esq) >= max_esq)
-    s_bit = true;
-  else
-    s_bit = false;
-  leitura |= s_bit << 0;
-
-  if (analogRead(s_mesq) >= max_mesq)
-    s_bit = true;
-  else
-    s_bit = false;
-  leitura |= s_bit << 1;
-
-  /*
-  if (analogRead(s_m) >= max_m)
-    s_bit = true;
-  else
-    s_bit = false;
-  leitura |= s_bit << 2;
-
-  if (analogRead(s_mdir) >= max_mdir)
-    s_bit = true;
-  else
-    s_bit = false;
-  leitura |= s_bit << 2;
-
-  if (analogRead(s_dir) >= max_dir)
-    s_bit = true;
-  else
-    s_bit = false;
-  leitura |= s_bit << 3;
-
-  leitura = (~leitura) & 0b00001111;  
-} */
-
-void calibra()
-{
-  leitura = 0;
-  s_bit = analogRead(s_esq) >= media_esq ? 1 : 0;
-  leitura |= s_bit << 0;
-
-  s_bit = analogRead(s_mesq) >= media_mesq ? 1 : 0;
-  leitura |= s_bit << 1; 
-
-  /* s_bit = analogRead(s_m) <= media_m ? 1 : 0;
-  leitura |= s_bit << 1; */
-
-  s_bit = analogRead(s_mdir) >= media_mdir ? 1 : 0;
-  leitura |= s_bit << 2;
-
-  s_bit = analogRead(s_dir) >= media_dir ? 1 : 0;
-  leitura |= s_bit << 3;
-
-  leitura = (~leitura) & 0b00001111;
-}
-
-/* 
-void calibra()
-{
-  leitura = 0;
-
-  s_bit = analogRead(s_esq) >= media_esq ? 1 : 0;
-  leitura |= s_bit << 0;
-
-  s_bit = analogRead(s_mesq) >= media_mesq ? 1 : 0;
-  leitura |= s_bit << 1; 
-
-  s_bit = analogRead(s_m) <= media_m ? 1 : 0;
-  leitura |= s_bit << 1; 
-
-  s_bit = analogRead(s_mdir) >= media_mdir ? 1 : 0;
-  leitura |= s_bit << 2;
-
-  s_bit = analogRead(s_dir) >= media_dir ? 1 : 0;
-  leitura |= s_bit << 3;
-
-  leitura = (~leitura) & 0b00001111;
-} */
-
 //* Inicio das funções, para cada caso
 void vel_frente()
 {
-  serv_esq.write(100);
-  serv_dir.write(80);
+  serv_esq.write(120);
+  serv_dir.write(60);
 }
 
 /*bool besq = map(analogRead(s_esq), preto_esq, branco_esq, 0, 1023) >= 500 ? 1 : 0;
@@ -230,25 +148,40 @@ void esq_90() //* 90 esquerda
 
     serv_esq.write(80);
     serv_dir.write(80);
-    delay(200);
+    delay(delay_peq);
+    Serial.println("passo");
+    
+    // for(;;) {
 
-    while(/*map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023)>=500  &&
-          map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023)>=500  &&*/
-          map(analogRead(s_m), preto_m, branco_m, 0, 1023)>=500  &&
-          map(analogRead(s_dir), preto_dir, branco_dir, 0, 1023)>=500) {}
-  //vel_esquerda();
-  //serv_esq.write(80);
-  //serv_dir.write(80);
-  //delay(delay_peq);
-    // serv_esq.write(80);
-    // serv_dir.write(80);
+    //   if(constrain(map(analogRead(s_m), preto_m, branco_m, 0, 100), 0, 100) <= 50) {
+    //     break;
+    //   }
+
+    //   if(constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100) <= 50) {
+        // serv_esq.write(80);
+        // serv_dir.write(100);
+        // delay(820);
+
+        // serv_dir.write(90);
+        // serv_esq.write(180);
+        // delay(1800/2);
+
+        // serv_esq.write(100);
+        // serv_dir.write(80);
+        // delay(820/2);
+
+        //* velocidade (medida):  ~16cm/s, largura (medida): 13cm
+        //* velocidade angular (direita): 450º/9s = 360º/7.2s = 50º/s = 1.7453 rad/s
+        //* 16cm--1s / 13/2cm--0.41s
+        //* 450º--9s / 90º--1.8s
+
+    //     break;
+    //   }
+    // }
+    while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50  &&
+          constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {}
+
     //while(map(analogRead(s_dir), preto_dir, branco_dir, 0, 1023) >= 500) { }
-
-    // serv_esq.write(80);
-    // serv_dir.write(80);
-  //while (((analogRead(s_mesq) <= media_mesq) || (analogRead(s_mdir) <= media_mdir)) && analogRead(s_esq) <= media_esq);
-  //while ((analogRead(s_m) <= media_m) && (analogRead(s_dir) <= media_dir));
-    //while ((map(analogRead(s_m), preto_m, branco_m, 0, 1023) >= 500) && (map(analogRead(s_dir), preto_dir, branco_dir, 0, 1023) >= 500));
 
   //vel_re();
   //delay(delay_re);
@@ -257,20 +190,43 @@ void esq_90() //* 90 esquerda
 void dir_90() //* 90 direita
 {
     vel_frente();
-    delay(delay_fre-100);
+    delay(delay_fre);
   //vel_direita();
     serv_esq.write(100);
     serv_dir.write(100);
-    delay(200);
+    delay(delay_peq);
+    Serial.println("passo");
 
-    while(/*map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023)>=500  &&
-          map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023)>=500  &&*/
-          map(analogRead(s_m), preto_m, branco_m, 0, 1023)>=500  &&
-          map(analogRead(s_esq), preto_esq, branco_esq, 0, 1023)>=500) {}
+    // for(;;) {
+      
+    //   if(constrain(map(analogRead(s_m), preto_m, branco_m, 0, 100), 0, 100) <= 50) {
+    //     break;
+    //   }
 
-  //while ((analogRead(s_mesq) >= media_mesq) && (analogRead(s_mdir) >= media_mdir) /* && (analogRead(s_dir) <= media_dir) */);
-  //while ((analogRead(s_m) <= media_m) && (analogRead(s_esq) <= media_esq));
-  //while ((map(analogRead(s_m), preto_m, branco_m, 0, 1023) >= 500) && (map(analogRead(s_esq), preto_esq, branco_esq, 0, 1023) >= 500));
+    //   if(constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100)<=50) {
+        // serv_esq.write(80);
+        // serv_dir.write(100);
+        // delay(820);
+
+        // serv_dir.write(0);
+        // serv_esq.write(90);
+        // delay(1800/2);
+
+        // serv_esq.write(100);
+        // serv_dir.write(80);
+        // delay(820/2);
+
+        //* velocidade (medida):  ~16cm/s, largura (medida): 13cm
+        //* velocidade angular (direita): 450º/9s = 360º/7.2s = 50º/s = 1.7453 rad/s
+        //* 16cm--1s / 13/2cm--0.41s
+        //* 450º--9s / 90º--1.8s
+
+    //     break;
+    //   }
+    // }
+
+    while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=65  &&
+          constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100)>=20) {}
 
   //vel_re();
   //delay(delay_re);
