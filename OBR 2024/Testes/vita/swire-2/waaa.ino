@@ -3,8 +3,8 @@
 #include <SoftwareWire.h>
 #include <SoftWire.h>
 
-#include "Adafruit_I2CDevice.h"
-#include "Adafruit_TCS34725.h"
+#include "Adafruit_I2CDevice_SoftWire.h"
+#include "Adafruit_TCS34725_SoftWire.h"
 
 SoftwareWire swWire(1, 2);
 SoftWire sWire(3, 4);
