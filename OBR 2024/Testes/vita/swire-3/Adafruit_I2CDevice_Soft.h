@@ -1,22 +1,19 @@
-#ifndef Adafruit_I2CDevice_h
-#define Adafruit_I2CDevice_h
+#ifndef _ADAFRUIT_I2CDEVICE_SOFT_H
+#define _ADAFRUIT_I2CDEVICE_SOFT_H
+
+#include <Arduino.h>
+#include <Wire.h>
+
+//#include "SoftWire.h"
 
 ///< The class which defines how we will talk to this device over I2C
 template <class WIRE_T>
 class Adafruit_I2CDevice {
-private:
-  WIRE_T* _wire;
-  uint8_t _addr;
-  //TwoWire *_wire;
-  
-  bool _begun;
-  size_t _maxBufferSize;
-
 public:
   //Adafruit_I2CDevice(uint8_t addr, TwoWire*  theWire = &Wire);
   //Adafruit_I2CDevice(uint8_t addr, SoftWire* theWire);
 
-  Adafruit_I2CDevice(WIRE_T* theWire, uint8_t addr) {
+  Adafruit_I2CDevice(uint8_t addr, WIRE_T* theWire) {
       _addr = addr;
       _wire = theWire;
       _begun = false;
@@ -86,9 +83,8 @@ public:
       size_t read_len =
           ((len - pos) > maxBufferSize()) ? maxBufferSize() : (len - pos);
       bool read_stop = (pos < (len - read_len)) ? false : stop;
-      if (!_read(buffer + pos, read_len, read_stop)) {
+      if (!_read(buffer + pos, read_len, read_stop))
         return false;
-      }
       pos += read_len;
     }
     return true;
@@ -166,9 +162,9 @@ public:
   }
   }
 
-  bool write_then_read(const uint8_t *write_buffer,
-                                         size_t write_len, uint8_t *read_buffer,
-                                         size_t read_len, bool stop = false) {
+  bool write_then_read(const uint8_t *write_buffer, size_t write_len,
+                       uint8_t *read_buffer, size_t read_len,
+                       bool stop = false) {
       if (!write(write_buffer, write_len, stop)) {
         return false;
       }
@@ -234,64 +230,51 @@ public:
   }
 
 private:
+  uint8_t _addr;
+  //TwoWire *_wire;
+  WIRE_T* _wire;
+  bool _begun;
+  size_t _maxBufferSize;
   bool _read(uint8_t *buffer, size_t len, bool stop) {
-size_t recv;
-
 #if defined(TinyWireM_h)
-  recv = _wire->requestFrom((uint8_t)_addr, (uint8_t)len);
-  // if(_wire_type == WIRE_TYPE_SOFT)
-  //   recv = _softwire->requestFrom((uint8_t)_addr, (uint8_t)len);
-  // else
-  //   recv = _wire->requestFrom((uint8_t)_addr, (uint8_t)len);
+    size_t recv = _wire->requestFrom((uint8_t)_addr, (uint8_t)len);
 #elif defined(ARDUINO_ARCH_MEGAAVR)
-  recv = _wire->requestFrom(_addr, len, stop);
-  // if(_wire_type == WIRE_TYPE_SOFT)
-  //   recv = _softwire->requestFrom(_addr, len, stop);
-  // else
-  //   size_t recv = _wire->requestFrom(_addr, len, stop);
+    size_t recv = _wire->requestFrom(_addr, len, stop);
 #else
-  recv =_wire->requestFrom((uint8_t)_addr, (uint8_t)len, (uint8_t)stop);
-  // if(_wire_type == WIRE_TYPE_SOFT)
-  //   recv = _softwire->requestFrom((uint8_t)_addr, (uint8_t)len, (uint8_t)stop);
-  // else
-  //   recv = _wire->requestFrom((uint8_t)_addr, (uint8_t)len, (uint8_t)stop);
+    size_t recv = _wire->requestFrom((uint8_t)_addr, (uint8_t)len, (uint8_t)stop);
 #endif
 
-  if (recv != len) {
-    // Not enough data available to fulfill our obligation!
+    if (recv != len) {
+      // Not enough data available to fulfill our obligation!
 #ifdef DEBUG_SERIAL
-    DEBUG_SERIAL.print(F("\tI2CDevice did not receive enough data: "));
-    DEBUG_SERIAL.println(recv);
+      DEBUG_SERIAL.print(F("\tI2CDevice did not receive enough data: "));
+      DEBUG_SERIAL.println(recv);
 #endif
-    return false;
-  }
-
-  for (uint16_t i = 0; i < len; i++) {
-    buffer[i] = _wire->read();
-    // if(_wire_type == WIRE_TYPE_SOFT)
-    //   buffer[i] = _softwire->read();
-    // else
-    //   buffer[i] = _wire->read();
-  }
-
-#ifdef DEBUG_SERIAL
-  DEBUG_SERIAL.print(F("\tI2CREAD  @ 0x"));
-  DEBUG_SERIAL.print(_addr, HEX);
-  DEBUG_SERIAL.print(F(" :: "));
-  for (uint16_t i = 0; i < len; i++) {
-    DEBUG_SERIAL.print(F("0x"));
-    DEBUG_SERIAL.print(buffer[i], HEX);
-    DEBUG_SERIAL.print(F(", "));
-    if (len % 32 == 31) {
-      DEBUG_SERIAL.println();
+      return false;
     }
-  }
-  DEBUG_SERIAL.println();
+
+    for (uint16_t i = 0; i < len; i++) {
+      buffer[i] = _wire->read();
+    }
+
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.print(F("\tI2CREAD  @ 0x"));
+    DEBUG_SERIAL.print(_addr, HEX);
+    DEBUG_SERIAL.print(F(" :: "));
+    for (uint16_t i = 0; i < len; i++) {
+      DEBUG_SERIAL.print(F("0x"));
+      DEBUG_SERIAL.print(buffer[i], HEX);
+      DEBUG_SERIAL.print(F(", "));
+      if (len % 32 == 31) {
+        DEBUG_SERIAL.println();
+      }
+    }
+    DEBUG_SERIAL.println();
 #endif
 
-  return true;
+    return true;
   }
 
 };
 
-#endif // Adafruit_I2CDevice_h
+#endif // _ADAFRUIT_I2CDEVICE_SOFT_H

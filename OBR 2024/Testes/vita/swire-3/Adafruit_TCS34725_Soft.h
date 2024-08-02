@@ -1,5 +1,5 @@
-#ifndef _TCS34725_H_
-#define _TCS34725_H_
+#ifndef _ADAFRUIT_TCS34725_SOFT_H
+#define _ADAFRUIT_TCS34725_SOFT_H
 
 #if ARDUINO >= 100
 #include <Arduino.h>
@@ -7,7 +7,7 @@
 #include <WProgram.h>
 #endif
 
-#include "Adafruit_I2CDevice_SoftWire.h"
+#include "Adafruit_I2CDevice_Soft.h"
 
 #define TCS34725_ADDRESS (0x29)     /**< I2C address **/
 #define TCS34725_COMMAND_BIT (0x80) /**< Command bit **/
@@ -187,10 +187,10 @@ public:
   *          The Wire object
   *  @return True if initialization was successful, otherwise false.
   */
-  boolean begin(uint8_t addr, WIRE_T* theWire) {
+  boolean begin(WIRE_T* theWire, uint8_t addr = TCS34725_ADDRESS) {
     if (i2c_dev)
       delete i2c_dev;
-    i2c_dev = new Adafruit_I2CDevice<WIRE_T>(theWire, addr);
+    i2c_dev = new Adafruit_I2CDevice<WIRE_T>(addr, theWire);
 
     return init();
   }
@@ -200,12 +200,15 @@ public:
   *  @return True if initialization was successful, otherwise false.
   */
   boolean init() {
-    if (!i2c_dev->begin())
+    if (!i2c_dev->begin()) {
+      Serial.println("i2c_dev begin failed");
       return false;
+    }
 
     /* Make sure we're actually connected */
     uint8_t x = read8(TCS34725_ID);
     if ((x != 0x4d) && (x != 0x44) && (x != 0x10)) {
+      Serial.println("i2c_dev connection test failed");
       return false;
     }
     _tcs34725Initialised = true;
@@ -227,7 +230,7 @@ public:
   */
   void setIntegrationTime(uint8_t it) {
     if (!_tcs34725Initialised) {
-      Serial.println("ERRO EM DEFINIR TEMPO DE INTEGRAR / TCS34725 NAO INICIALIZADO");
+      Serial.println("ERRO setIntegrationTime(uint8_t) / TCS34725 NAO INICIALIZADO");
       return;
       //begin();
     }
@@ -246,7 +249,7 @@ public:
   */
   void setGain(tcs34725Gain_t gain) {
     if (!_tcs34725Initialised) {
-      Serial.println("ERRO EM DEFINIR GANHO / TCS34725 NAO INICIALIZADO");
+      Serial.println("ERRO setGain(tcs34725Gain_t) / TCS34725 NAO INICIALIZADO");
       return;
       //begin();
     }
@@ -271,7 +274,7 @@ public:
   */
   void getRawData(uint16_t *r, uint16_t *g, uint16_t *b, uint16_t *c) {
     if (!_tcs34725Initialised) {
-      Serial.println("ERRO EM RESGATAR DADOS (RAW) / TCS34725 NAO INICIALIZADO");
+      Serial.println("ERRO getRawData(uint16_t*, uint16_t*, uint16_t*, uint16_t*) / TCS34725 NAO INICIALIZADO");
       return;
       //begin();
     }
@@ -326,7 +329,7 @@ public:
   */
   void getRawDataOneShot(uint16_t *r, uint16_t *g, uint16_t *b, uint16_t *c) {
     if (!_tcs34725Initialised) {
-      Serial.println("ERRO EM RESGATAR DADOS (RAW ONE SHOT) / TCS34725 NAO INICIALIZADO");
+      Serial.println("ERRO getRawDataOneShot(uint16_t*, uint16_t*, uint16_t*, uint16_t*) / TCS34725 NAO INICIALIZADO");
       return;
       //begin();
     }
@@ -596,4 +599,4 @@ private:
   }
 };
 
-#endif
+#endif // _ADAFRUIT_TCS34725_SOFT_H
