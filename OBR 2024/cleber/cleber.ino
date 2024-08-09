@@ -16,7 +16,12 @@ int n;
 
 void setup() {
   Serial.begin(9600);
-
+  if(!tcs_real.begin(&Wire)) {
+    Serial.println("tcs real n");
+  };
+ if(!tcs_soft.begin(&sWire)) {
+  Serial.println("tcs soft n");
+ };
   /* display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display.setTextColor(WHITE);
   display.setCursor(0, 0);
@@ -28,7 +33,16 @@ void setup() {
 
   serv_esq.attach(servo_esquerda);
   serv_dir.attach(servo_direita);
+
+  
 }
+
+bool verde(int r, int g, int b, float tol=1.03) { //soft 1 real 1.05
+  Serial.print(g); Serial.print("/"); Serial.print((r+b+g)/3); Serial.print("-"); Serial.print(tol*(r+b+g)/3); Serial.print("\t");
+  if((r+b+g)/3 >= 2900) return false;
+  return (g >= tol*(r+b+g)/3);
+}
+
 void loop() {
   /* display.clearDisplay();
   display.setCursor(0, 0);
@@ -66,12 +80,16 @@ void loop() {
     b_sens |= bmdir << 1;
     b_sens |= bdir;
 
-    // Serial.print(besq); 
-    // Serial.print(bmesq); 
-    // Serial.print(bm); 
-    // Serial.print(bmdir); 
-    // Serial.println(bdir); 
-    Serial.print(b_sens, BIN); Serial.print("\t");
+    uint16_t r1, g1, b1, c1;
+    uint16_t r2, g2, b2, c2;
+    uint16_t tg1, tg2;
+
+     Serial.print(besq); 
+     Serial.print(bmesq); 
+     Serial.print(bm); 
+     Serial.print(bmdir); 
+     Serial.print(bdir);  Serial.print("\t");
+    //Serial.print(b_sens, BIN); Serial.print("\t");
     //return;
     
     // Serial.print(" / ");
@@ -162,7 +180,22 @@ void loop() {
     }
     */
 
-   
+  bool _r, _s;
+  tcs_real.getRawData(&r1, &g1, &b1, &c1);
+            tcs_soft.getRawData(&r2, &g2, &b2, &c2);
+            _r = verde(r1, g1, b1, 1.05);
+            _s = verde(r2, g2, b2, 1.00);
+            if(_r && _s) {
+              Serial.print("2 verde ");
+            } else if(_r && !_s) {
+              Serial.print("real verde ");
+            } else if(!_r && _s) {
+              Serial.print("soft verde ");
+            } else {
+              Serial.print("NADa verde ");
+            }
+            // Serial.print(g1); Serial.print("/"); Serial.print((r1+b1+g1)/3); Serial.print("-"); Serial.print(1.05*(r1+b1+g1)/3); Serial.print("\t");
+            // Serial.print(g2); Serial.print("/"); Serial.print((r2+b2+g2)/3); Serial.print("-"); Serial.print(1.01*(r2+b2+g2)/3); Serial.print("\t");
 switch(b_sens) {
         case 0b10000:
         case 0b10010:
@@ -172,6 +205,7 @@ switch(b_sens) {
         case 0b10100:
         case 0b11000:
         case 0b11100: //casos de 90 esquerda
+        
             if(!ver)
           {
             Serial.println("90 esq Falso");
@@ -193,6 +227,7 @@ switch(b_sens) {
         case 0b01011:
         case 0b01101:
         case 0b01111: // casos de 90 graus direita
+        
           if(!ver)
           {
             Serial.println("90 dir Falso");
@@ -262,7 +297,33 @@ switch(b_sens) {
         case 0b00000:
             Serial.println("frente (gap)");
             vel_frente();
-            delay(400);
+            delay(800);
+            break;
+        case 0b11111:
+        case 0b10001:
+        case 0b10011:
+        case 0b10101:
+        case 0b10111:
+        case 0b11001:
+        case 0b11011:
+        case 0b11101:
+            vel_parar(0);
+            Serial.println("");
+            // tcs_real.getRawData(&r1, &g1, &b1, &c1);
+            // tcs_soft.getRawData(&r2, &g2, &b2, &c2);
+            // _r = verde(r1, g1, b1);
+            // _s = verde(r2, g2, b2);
+            // if(_r && _s) {
+            //   Serial.print("2 verde ");
+            // } else if(_r && !_s) {
+            //   Serial.print("real verde ");
+            // } else if(!_r && _s) {
+            //   Serial.print("soft verde ");
+            // } else {
+            //   Serial.print("NADa verde ");
+            // }
+            // Serial.print(g1); Serial.print("/"); Serial.print((r1+b1)/2); Serial.print("-"); Serial.print(1.03*(r1+b1)/2); Serial.print("\t");
+            // Serial.print(g2); Serial.print("/"); Serial.print((r2+b2)/2); Serial.print("-"); Serial.print(1.03*(r2+b2)/2); Serial.println("\t");
             break;
         default: Serial.print("."); break;
     }
