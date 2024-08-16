@@ -21,17 +21,17 @@ Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIO
 #define s_mdir A3    // A3
 #define s_dir A4    // A4
 
-#define branco_esq 949
-#define branco_mesq 953
-#define branco_m 947
-#define branco_mdir 959
-#define branco_dir 863
+#define branco_esq 972 // 949
+#define branco_mesq 974 // 974
+#define branco_m 976 // 976
+#define branco_mdir 976 // 959
+#define branco_dir 973 // 863
 
-#define preto_esq 822
-#define preto_mesq 687 //825
-#define preto_m 477
-#define preto_mdir 580
-#define preto_dir 540
+#define preto_esq 830 // 822
+#define preto_mesq 746 // 687
+#define preto_m 563 // 477
+#define preto_mdir 626 // 580
+#define preto_dir 686 // 540
 
 //Esquerda sendo branco e direita sendo preto
 #define media_esq (branco_esq + preto_esq) / 2
@@ -49,7 +49,7 @@ bool ver = false;     // O Verifica para os switchs
 Servo serv_esq;
 Servo serv_dir;
 
-#define delay_fre 150 // 350
+#define delay_fre 300 // 350
 #define velocidade_par 300  // 300
 #define delay_re 300 // 300
 #define delay_peq 100 //100
@@ -87,16 +87,16 @@ void vel_frente()
 
 void vel_direita()
 {
-//   serv_esq.write(90);
-//   serv_dir.write(80);
+  serv_esq.write(0);
+  serv_dir.write(0);
   
-  uint8_t ddv_dir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023), 0, 1023);
-  uint8_t ddv_esq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023), 0, 1023);
-  ddv_dir = (1023 - ddv_dir) /100;
-  ddv_esq = (1023 - ddv_esq) /100;
+  // uint8_t ddv_dir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023), 0, 1023);
+  // uint8_t ddv_esq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023), 0, 1023);
+  // ddv_dir = (1023 - ddv_dir) /100;
+  // ddv_esq = (1023 - ddv_esq) /100;
 
-  serv_esq.write(90 - (ddv_esq*0.75));
-  serv_dir.write(90 - ddv_dir); //80 
+  // serv_esq.write(90 - (ddv_esq*0.75));
+  // serv_dir.write(90 - ddv_dir); //80 
   
 //   serv_esq.write(serv_esq.read() - ddv_esq);
 //   serv_dir.write(serv_dir.read() - ddv_dir); //80 
@@ -109,16 +109,16 @@ void vel_direita()
 }
 void vel_esquerda()
 {
-//   serv_esq.write(100);
-//   serv_dir.write(90);
+  serv_esq.write(180);
+  serv_dir.write(180);
 
-  uint8_t ddv_dir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023), 0, 1023);
-  uint8_t ddv_esq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023), 0, 1023);
-  ddv_dir = (1023 - ddv_dir) /100;
-  ddv_esq = (1023 - ddv_esq) /100;
+  // uint8_t ddv_dir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023), 0, 1023);
+  // uint8_t ddv_esq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023), 0, 1023);
+  // ddv_dir = (1023 - ddv_dir) /100;
+  // ddv_esq = (1023 - ddv_esq) /100;
 
-  serv_esq.write(90 + ddv_esq);
-  serv_dir.write(90 + (ddv_dir*0.75));
+  // serv_esq.write(90 + ddv_esq);
+  // serv_dir.write(90 + (ddv_dir*0.75));
 
 //   serv_esq.write(serv_esq.read() + ddv_esq);
 //   serv_dir.write(serv_dir.read() + ddv_dir);
@@ -146,8 +146,8 @@ void esq_90() //* 90 esquerda
   vel_frente();
   delay(delay_fre);
 
-    serv_esq.write(80);
-    serv_dir.write(80);
+    serv_esq.write(0);
+    serv_dir.write(0);
     delay(delay_peq);
     Serial.println("passo");
     
@@ -192,8 +192,8 @@ void dir_90() //* 90 direita
     vel_frente();
     delay(delay_fre);
   //vel_direita();
-    serv_esq.write(100);
-    serv_dir.write(100);
+    serv_esq.write(180);
+    serv_dir.write(180);
     delay(delay_peq);
     Serial.println("passo");
 
