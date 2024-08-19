@@ -19,6 +19,17 @@ const int pinos[] = { s_esq, s_mesq, s_m, s_mdir, s_dir };
 
 int n;
 
+bool verde(int r, int g, int b, float tol = 1.03) {  //soft 1 real 1.05
+  Serial.print(g);
+  Serial.print("/");
+  Serial.print((r + b + g) / 3);
+  Serial.print("-");
+  Serial.print(tol * (r + b + g) / 3);
+  Serial.print("\t");
+  if ((r + b + g) / 3 >= 2900) return false;
+  return (g >= tol * (r + b + g) / 3);
+}
+
 void setup() {
   Serial.begin(9600);
 
@@ -45,32 +56,9 @@ void setup() {
 
   serv_esq.attach(servo_esquerda);
   serv_dir.attach(servo_direita);
-
-  //cmpr(x): 20cm
-  //larg(y): 15cm
-
-  //v frente 120,60 = 19.8cm/5s = 3.96cm/s (4.26cm/s calculado com v ang (-0.30 7.1%))
-  //v frente 180, 0 = 26.3cm/5s = 5.26cm/s (5.53cm/s calculado com v ang (-0.27 4.9%))
-
-  //v ang esq 120 = 90g/7.65s = 11.76g/s -> 2.05cm/s
-  //v ang esq 180 = 90g/5.7s  = 15.78g/s -> 2.75cm/s
-
-  //v ang dir 60 = 90g/7.1s  = 12.67g/s  -> 2.21cm/s
-  //v ang dir 0  = 90g/5.65s = 15.92g/   -> 2.77cm/s
 }
 
-bool verde(int r, int g, int b, float tol = 1.03) {  //soft 1 real 1.05
-  Serial.print(g);
-  Serial.print("/");
-  Serial.print((r + b + g) / 3);
-  Serial.print("-");
-  Serial.print(tol * (r + b + g) / 3);
-  Serial.print("\t");
-  if ((r + b + g) / 3 >= 2900) return false;
-  return (g >= tol * (r + b + g) / 3);
-}
-
-void loop() {return;
+void loop() {
   /* display.clearDisplay();
   display.setCursor(0, 0);
   display.print("PRIMEIRO\nSEGUE\nFAIXA!!!");
@@ -117,6 +105,15 @@ void loop() {return;
   Serial.print(bmdir);
   Serial.print(bdir);
   Serial.print("\t");
+
+  display.clear();
+  display.setCursor(W/3, 0);
+  display.print(besq);
+  display.print(bmesq);
+  display.print(bm);
+  display.print(bmdir);
+  display.print(bdir);
+
   //Serial.print(b_sens, BIN); Serial.print("\t");
   //return;
 
@@ -133,7 +130,10 @@ void loop() {return;
   // Serial.print(analogRead(s_mdir)); Serial.print(" / ");
   // Serial.print(analogRead(s_dir)); Serial.println(" / ");
 
-  bool _r, _s;
+  display.setCursor(0, 2);
+  display.print("nada");
+  display.setCursor(W-30, 2);
+  display.print("nada");
   switch (b_sens) {
     case 0b10000:
     case 0b10010:
@@ -143,29 +143,27 @@ void loop() {return;
     case 0b10100:
     case 0b11000:
     case 0b11100:  //casos de 90 esquerda
-      tcs_real.getRawData(&r1, &g1, &b1, &c1);
+      //tcs_real.getRawData(&r1, &g1, &b1, &c1);
       tcs_soft.getRawData(&r2, &g2, &b2, &c2);
       //_r = verde(r1, g1, b1, 1.05);
-      _s = verde(r2, g2, b2, 1.00);
-      if(!_s) {
-        vel_frente();
-      } else if (!ver) {
+      if(verde(r2, g2, b2, 1.00)) {
+        Serial.println("90 esq verde");
+        display.setCursor(0, 2);
+        display.print("verde");
+        esq_90();
+        break;
+      }
+        
+      if (!ver) {
         Serial.println("90 esq Falso");
+        display.setCursor(W/3, 1);
+        display.print("90 esq falso");
         ver = true;
         vel_parar();
       } else {
+        display.setCursor(W/3, 1);
+        display.print("90 esq verdadeiro");
         Serial.println("90 esq Verdadeiro");
-
-        // if (_r && _s) {
-        //   Serial.print("2 verde ");
-        // } else if (_r && !_s) {
-        //   Serial.print("real verde ");
-        // } else if (!_r && _s) {
-        //   Serial.print("soft verde ");
-        // } else {
-        //   Serial.print("NADa verde ");
-        // }
-
         ver = false;
         esq_90();
       }
@@ -179,27 +177,25 @@ void loop() {return;
     case 0b01101:
     case 0b01111:  // casos de 90 graus direita
 
+      tcs_real.getRawData(&r1, &g1, &b1, &c1);
+      if(verde(r1, g1, b1, 1.05)) {
+        Serial.println("90 dir verde");
+        display.setCursor(W-30, 2);
+        display.print("verde");
+        esq_90();
+        break;
+      }
+
       if (!ver) {
         Serial.println("90 dir Falso");
+        display.setCursor(W/3, 1);
+        display.print("90 esq falso");
         vel_parar();
         ver = true;
       } else {
         Serial.println("90 dir Verdadeiro");
-
-        tcs_real.getRawData(&r1, &g1, &b1, &c1);
-        tcs_soft.getRawData(&r2, &g2, &b2, &c2);
-        _r = verde(r1, g1, b1, 1.05);
-        _s = verde(r2, g2, b2, 1.00);
-        if (_r && _s) {
-          Serial.print("2 verde ");
-        } else if (_r && !_s) {
-          Serial.print("real verde ");
-        } else if (!_r && _s) {
-          Serial.print("soft verde ");
-        } else {
-          Serial.print("NADa verde ");
-        }
-
+        display.setCursor(W/3, 1);
+        display.print("90 esq verdadeiro");
         ver = false;
         dir_90();
       }
@@ -260,37 +256,52 @@ void loop() {return;
     case 0b10111:
     case 0b11001:
     case 0b11011:
-    case 0b11101:
+    case 0b11101: //encru
       vel_parar(0);
       tcs_real.getRawData(&r1, &g1, &b1, &c1);
       tcs_soft.getRawData(&r2, &g2, &b2, &c2);
-      _r = verde(r1, g1, b1, 1.05);
-      _s = verde(r2, g2, b2, 1.00);
+      bool _r = verde(r1, g1, b1, 1.05);
+      bool _s = verde(r2, g2, b2, 1.00);
+      
       if (_r && _s) {
-        Serial.print("2 verde ");
+        Serial.print("tudo verd");
+        display.setCursor(0, 2);
+        display.print("verde");
+        display.setCursor(W-30, 2);
+        display.print("verde");
+
+        serv_esq.write(180);
+        serv_dir.write(180);
+        delay(delay_calc_eixo_dir(180));
+        
       } else if (_r && !_s) {
         Serial.print("real verde ");
+        display.setCursor(0, 2);
+        display.print("nada");
+        display.setCursor(W-30, 2);
+        display.print("verde");
+
+        dir_90();
+
       } else if (!_r && _s) {
         Serial.print("soft verde ");
+        display.setCursor(0, 2);
+        display.print("verde");
+        display.setCursor(W-5, 2);
+        display.print("nada");
+
+        esq_90();
+
       } else {
         Serial.print("NADa verde ");
+        display.setCursor(0, 2);
+        display.print("nada");
+        display.setCursor(W-30, 2);
+        display.print("nada");
+
+        vel_parar(0);
       }
       Serial.println("");
-      // tcs_real.getRawData(&r1, &g1, &b1, &c1);
-      // tcs_soft.getRawData(&r2, &g2, &b2, &c2);
-      // _r = verde(r1, g1, b1);
-      // _s = verde(r2, g2, b2);
-      // if(_r && _s) {
-      //   Serial.print("2 verde ");
-      // } else if(_r && !_s) {
-      //   Serial.print("real verde ");
-      // } else if(!_r && _s) {
-      //   Serial.print("soft verde ");
-      // } else {
-      //   Serial.print("NADa verde ");
-      // }
-      // Serial.print(g1); Serial.print("/"); Serial.print((r1+b1)/2); Serial.print("-"); Serial.print(1.03*(r1+b1)/2); Serial.print("\t");
-      // Serial.print(g2); Serial.print("/"); Serial.print((r2+b2)/2); Serial.print("-"); Serial.print(1.03*(r2+b2)/2); Serial.println("\t");
       break;
     default: Serial.print("."); break;
   }
