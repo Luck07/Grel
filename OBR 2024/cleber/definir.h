@@ -4,6 +4,9 @@
 #include <SoftwareWire.h>
 #include <Adafruit_TCS34725_SWwire.h>
 
+#include "medicoes.h"
+#include "oled.h"
+
 SoftwareWire sWire(6, 7);
  
 Adafruit_TCS34725_SWwire tcs_real = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIONTIME_180MS, TCS34725_GAIN_16X); //direita
@@ -13,25 +16,24 @@ Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIO
 #include <Servo.h>
 // mpu6050 i2c = 0x68
 
-
 //* Definindo as portas dos sensores
-#define s_esq A15       // A15
-#define s_mesq A2      // A2
-#define s_m A0        // A0
-#define s_mdir A3    // A3
-#define s_dir A4    // A4
+#define s_esq  A15 // A15
+#define s_mesq A2  // A2
+#define s_m    A0  // A0
+#define s_mdir A3  // A3
+#define s_dir  A4  // A4
 
-#define branco_esq 972 // 949
+#define branco_esq  972 // 949 
 #define branco_mesq 974 // 974
-#define branco_m 976 // 976
+#define branco_m    976 // 976
 #define branco_mdir 976 // 959
-#define branco_dir 973 // 863
+#define branco_dir  973 // 863
 
-#define preto_esq 830 // 822
+#define preto_esq  830 // 822
 #define preto_mesq 746 // 687
-#define preto_m 563 // 477
+#define preto_m    563 // 477
 #define preto_mdir 626 // 580
-#define preto_dir 686 // 540
+#define preto_dir  686 // 540
 
 //Esquerda sendo branco e direita sendo preto
 #define media_esq (branco_esq + preto_esq) / 2
@@ -65,6 +67,21 @@ Servo serv_dir;
 #define enc_90_2 enc_90 + 40 // Seguunda vez que ele executa o 90 / 70
 #define enc_90_3 enc_90 + 27 // E a terceira / 140
 
+void ler_sensores(bool* besq, bool* bmesq, bool* bm, bool* bmdir, bool* bdir) {
+  uint8_t esq  = constrain(map(analogRead(s_esq) , preto_esq , branco_esq , 0, 100), 0, 100);
+  uint8_t mesq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 100), 0, 100);
+  uint8_t m    = constrain(map(analogRead(s_m)   , preto_m   , branco_m   , 0, 100), 0, 100);
+  uint8_t mdir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 100), 0, 100);
+  uint8_t dir  = constrain(map(analogRead(s_dir) , preto_dir , branco_dir , 0, 100), 0, 100);
+
+  const uint8_t max = 50;
+  *besq  = esq  <= (max - 30);
+  *bmesq = mesq <= (max);
+  *bm    = m    <= (max + 15);
+  *bmdir = mdir <= (max);
+  *bdir  = dir  <= (max);
+}
+
 /*
  * trig == prim
  * echo == segun
@@ -77,6 +94,11 @@ void vel_frente()
 {
   serv_esq.write(120);
   serv_dir.write(60);
+}
+
+void vel_frente_max() {
+  serv_esq.write(180);
+  serv_dir.write(0);
 }
 
 /*bool besq = map(analogRead(s_esq), preto_esq, branco_esq, 0, 1023) >= 500 ? 1 : 0;
@@ -131,9 +153,15 @@ void vel_esquerda()
 }
 void vel_re()
 {
-  serv_esq.write(80);
-  serv_dir.write(100);
+  serv_esq.write(60);
+  serv_dir.write(120);
 }
+
+void vel_re_max() {
+  serv_esq.write(0);
+  serv_dir.write(180);
+}
+
 void vel_parar(int velo_esq = velocidade_par)
 {
   serv_esq.write(90);

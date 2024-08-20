@@ -3,21 +3,8 @@
 // #include <Adafruit_GFX.h>
 // #include <Adafruit_SSD1306.h>
 
-#include <MicroLCD.h>
-
-//#include "Oled.h"
-
-#define W 128
-#define H 64
-#define lw 6
-#define lh 8
-
-LCD_SSD1306 display; 
-
 // Usando array para colocar todos os pinos, coloquei os sensores em uma certa posição por causa do BitSwift em baixo
 const int pinos[] = { s_esq, s_mesq, s_m, s_mdir, s_dir };
-
-int n;
 
 bool verde(int r, int g, int b, float tol = 1.03) {  //soft 1 real 1.05
   Serial.print(g);
@@ -59,6 +46,7 @@ void setup() {
 }
 
 void loop() {
+
   /* display.clearDisplay();
   display.setCursor(0, 0);
   display.print("PRIMEIRO\nSEGUE\nFAIXA!!!");
@@ -75,18 +63,21 @@ void loop() {
   //   bool bmdir = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023) >= 500 ? 1 : 0;
   //   bool bdir = map(analogRead(s_dir), preto_dir, branco_dir, 0, 1023) >= 500 ? 1 : 0;
 
-  uint8_t esq  = constrain(map(analogRead(s_esq) , preto_esq , branco_esq , 0, 100), 0, 100);
-  uint8_t mesq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 100), 0, 100);
-  uint8_t m    = constrain(map(analogRead(s_m)   , preto_m   , branco_m   , 0, 100), 0, 100);
-  uint8_t mdir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 100), 0, 100);
-  uint8_t dir  = constrain(map(analogRead(s_dir) , preto_dir , branco_dir , 0, 100), 0, 100);
+  // uint8_t esq  = constrain(map(analogRead(s_esq) , preto_esq , branco_esq , 0, 100), 0, 100);
+  // uint8_t mesq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 100), 0, 100);
+  // uint8_t m    = constrain(map(analogRead(s_m)   , preto_m   , branco_m   , 0, 100), 0, 100);
+  // uint8_t mdir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 100), 0, 100);
+  // uint8_t dir  = constrain(map(analogRead(s_dir) , preto_dir , branco_dir , 0, 100), 0, 100);
 
-  const uint8_t max = 50;
-  bool besq  = esq  <= (max - 30);
-  bool bmesq = mesq <= (max);
-  bool bm    = m    <= (max + 15);
-  bool bmdir = mdir <= (max);
-  bool bdir  = dir  <= (max);
+  // const uint8_t max = 50;
+  // bool besq  = esq  <= (max - 30);
+  // bool bmesq = mesq <= (max);
+  // bool bm    = m    <= (max + 15);
+  // bool bmdir = mdir <= (max);
+  // bool bdir  = dir  <= (max);
+
+  bool besq, bmesq, bm, bmdir, bdir;
+  ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
 
   byte b_sens = 0b00000;
   b_sens |= besq  << 4;
@@ -95,9 +86,11 @@ void loop() {
   b_sens |= bmdir << 1;
   b_sens |= bdir;
 
-  uint16_t r1, g1, b1, c1;
-  uint16_t r2, g2, b2, c2;
+  uint16_t r1, g1, b1, c1; //esq, soft
+  uint16_t r2, g2, b2, c2; //dir, real
   uint16_t tg1, tg2;
+  bool verde_esq = false;
+  bool verde_dir = false;
 
   Serial.print(besq);
   Serial.print(bmesq);
@@ -106,16 +99,14 @@ void loop() {
   Serial.print(bdir);
   Serial.print("\t");
 
-  display.clear();
-  display.setCursor(W/3, 0);
-  display.print(besq);
-  display.print(bmesq);
-  display.print(bm);
-  display.print(bmdir);
-  display.print(bdir);
+  //display.clear();
 
-  //Serial.print(b_sens, BIN); Serial.print("\t");
-  //return;
+  // display.setCursor(W/2 - (2*lw), 0);
+  // display.print(besq);
+  // display.print(bmesq);
+  // display.print(bm);
+  // display.print(bmdir);
+  // display.print(bdir);
 
   // Serial.print(" / ");
   // Serial.print(esq);  Serial.print("-"); Serial.print(besq);  Serial.print(" / ");
@@ -124,16 +115,25 @@ void loop() {
   // Serial.print(mdir); Serial.print("-"); Serial.print(bmdir); Serial.print(" / ");
   // Serial.print(dir);  Serial.print("-"); Serial.print(bdir);  Serial.println(" / ");
 
+
   // Serial.print(analogRead(s_esq)); Serial.print(" / ");
   // Serial.print(analogRead(s_mesq)); Serial.print(" / ");
   // Serial.print(analogRead(s_m)); Serial.print(" / ");
   // Serial.print(analogRead(s_mdir)); Serial.print(" / ");
   // Serial.print(analogRead(s_dir)); Serial.println(" / ");
 
-  display.setCursor(0, 2);
-  display.print("nada");
-  display.setCursor(W-30, 2);
-  display.print("nada");
+  // tcs_soft.getRawData(&r1, &g1,&b1,&c1);
+  // verde_esq = verde(r1,g1,b1,1.00);
+  // tcs_real.getRawData(&r2, &g2, &b2, &c2);
+  // verde_dir = verde(r2, g2, b2, 1.05);
+  // Serial.println("");
+  // return;
+
+  OLED::print_sens(besq, bmesq, bm, bmdir, bdir);
+  OLED::print_verdes(verde_esq, verde_dir);
+  // delay(200);
+  //return;
+
   switch (b_sens) {
     case 0b10000:
     case 0b10010:
@@ -143,29 +143,36 @@ void loop() {
     case 0b10100:
     case 0b11000:
     case 0b11100:  //casos de 90 esquerda
-      //tcs_real.getRawData(&r1, &g1, &b1, &c1);
-      tcs_soft.getRawData(&r2, &g2, &b2, &c2);
-      //_r = verde(r1, g1, b1, 1.05);
-      if(verde(r2, g2, b2, 1.00)) {
-        Serial.println("90 esq verde");
-        display.setCursor(0, 2);
-        display.print("verde");
-        esq_90();
-        break;
-      }
-        
+      OLED::print_90(false, ver);
       if (!ver) {
         Serial.println("90 esq Falso");
-        display.setCursor(W/3, 1);
-        display.print("90 esq falso");
         ver = true;
         vel_parar();
       } else {
-        display.setCursor(W/3, 1);
-        display.print("90 esq verdadeiro");
         Serial.println("90 esq Verdadeiro");
         ver = false;
-        esq_90();
+
+        tcs_soft.getRawData(&r1, &g1, &b1, &c1);
+        verde_esq = verde(r1, g1, b1, 1.00);
+        OLED::print_verdes(verde_esq, verde_dir);
+        if(verde_esq) {
+          Serial.println("90 esq verde");
+          serv_esq.write(0);
+          serv_dir.write(0);
+          delay(medicoes::esq_giro_ms_max(45));
+          esq_90();
+        } else {
+          vel_frente_max();
+          delay(medicoes::frente_ms_max(FITA_LARGURA * 1.5));
+          vel_parar();
+
+          ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
+          if(!(besq || bmesq || bm || bmdir || bdir)) {
+            vel_re_max();
+            delay(medicoes::tras_ms_max(FITA_LARGURA * 1.5));
+            esq_90();
+          }
+        }
       }
       break;
     case 0b00001:
@@ -176,28 +183,36 @@ void loop() {
     case 0b01011:
     case 0b01101:
     case 0b01111:  // casos de 90 graus direita
-
-      tcs_real.getRawData(&r1, &g1, &b1, &c1);
-      if(verde(r1, g1, b1, 1.05)) {
-        Serial.println("90 dir verde");
-        display.setCursor(W-30, 2);
-        display.print("verde");
-        esq_90();
-        break;
-      }
-
+      OLED::print_90(true, ver);
       if (!ver) {
         Serial.println("90 dir Falso");
-        display.setCursor(W/3, 1);
-        display.print("90 esq falso");
         vel_parar();
         ver = true;
       } else {
         Serial.println("90 dir Verdadeiro");
-        display.setCursor(W/3, 1);
-        display.print("90 esq verdadeiro");
         ver = false;
-        dir_90();
+        
+        tcs_real.getRawData(&r2, &g2, &b2, &c2);
+        verde_dir = verde(r2, g2, b2, 1.05);
+        OLED::print_verdes(verde_esq, verde_dir);
+        if(verde_dir) {
+          Serial.println("90 dir verde");
+          serv_esq.write(180);
+          serv_dir.write(180);
+          delay(medicoes::dir_giro_ms_max(45));
+          dir_90();
+        } else {
+          vel_frente_max();
+          delay(medicoes::frente_ms_max(FITA_LARGURA * 1.5));
+          vel_parar();
+
+          ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
+          if(!(besq || bmesq || bm || bmdir || bdir)) {
+            vel_re_max();
+            delay(medicoes::tras_ms_max(FITA_LARGURA * 1.5));
+            dir_90();
+          }
+        }
       }
       break;
     case 0b01100:
@@ -205,6 +220,7 @@ void loop() {
     case 0b01010:
     case 0b00100:
     case 0b01110:
+      OLED::print_frente(ver);
       if (!ver) {
         Serial.println("Frente");
         vel_frente();
@@ -216,7 +232,8 @@ void loop() {
       }
       break;
     case 0b01000:
-      //case 0b01100:
+    //case 0b01100:
+      OLED::print_micro(false, ver);
       if (!ver) {
         Serial.println("micro esq");
         vel_direita();
@@ -230,7 +247,8 @@ void loop() {
       //serv_esq.write(90 - (100-m)/2);
       break;
     case 0b00010:
-      //case 0b00110:
+    //case 0b00110:
+      OLED::print_micro(true, ver);
       if (!ver) {
         Serial.println("micro dir");
         vel_esquerda();
@@ -245,9 +263,10 @@ void loop() {
       //serv_esq.write(90 + (100-m)/5);
       break;
     case 0b00000:
+      OLED::print_gap();
       Serial.println("frente (gap)");
       vel_frente();
-      delay(800);
+      delay(200);
       break;
     case 0b11111:
     case 0b10001:
@@ -257,49 +276,45 @@ void loop() {
     case 0b11001:
     case 0b11011:
     case 0b11101: //encru
-      vel_parar(0);
-      tcs_real.getRawData(&r1, &g1, &b1, &c1);
-      tcs_soft.getRawData(&r2, &g2, &b2, &c2);
-      bool _r = verde(r1, g1, b1, 1.05);
-      bool _s = verde(r2, g2, b2, 1.00);
-      
-      if (_r && _s) {
-        Serial.print("tudo verd");
-        display.setCursor(0, 2);
-        display.print("verde");
-        display.setCursor(W-30, 2);
-        display.print("verde");
+      OLED::print_encru();
+      vel_parar();
 
+      COISO:
+      delay(180);
+      tcs_soft.getRawData(&r1, &g1, &b1, &c1);
+      delay(180);
+      tcs_real.getRawData(&r2, &g2, &b2, &c2);
+      verde_esq = verde(r1, g1, b1, 1.00);
+      verde_dir = verde(r2, g2, b2, 1.05);
+      OLED::print_verdes(verde_esq, verde_dir);
+      
+      display.clearLine(3);
+      display.setCursor(0, 3);
+      if (verde_esq && verde_dir) {
+        display.print("giro");
+        Serial.print("tudo verd");
         serv_esq.write(180);
         serv_dir.write(180);
-        delay(delay_calc_eixo_dir(180));
-        
-      } else if (_r && !_s) {
-        Serial.print("real verde ");
-        display.setCursor(0, 2);
-        display.print("nada");
-        display.setCursor(W-30, 2);
-        display.print("verde");
-
-        dir_90();
-
-      } else if (!_r && _s) {
-        Serial.print("soft verde ");
-        display.setCursor(0, 2);
-        display.print("verde");
-        display.setCursor(W-5, 2);
-        display.print("nada");
-
+        delay(medicoes::dir_giro_ms_max(180));
+      } else if (verde_esq && !verde_dir) {
+        display.print("esq");
+        Serial.print("esq verde");
         esq_90();
-
+      } else if (!verde_esq && verde_dir) {
+        display.print("dir");
+        Serial.print("dir verde");
+        dir_90();
       } else {
-        Serial.print("NADa verde ");
-        display.setCursor(0, 2);
         display.print("nada");
-        display.setCursor(W-30, 2);
-        display.print("nada");
-
-        vel_parar(0);
+        Serial.print("NADa verde");
+        goto COISO;
+        // while(verde_esq == false || verde_dir == false) {
+        //   tcs_soft.getRawData(&r1, &g1, &b1, &c1);
+        //   delay(180);
+        //   tcs_real.getRawData(&r2, &g2, &b2, &c2);
+        //   verde_esq = verde(r1, g1, b1, 1.00);
+        //   verde_dir = verde(r2, g2, b2, 1.05);
+        // }
       }
       Serial.println("");
       break;
