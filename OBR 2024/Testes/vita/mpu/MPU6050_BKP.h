@@ -93,13 +93,13 @@ public:
     // float pitch() { return _angleY; }
     // float roll()  { return _angleX; }
 
-    // roll e pitch trocados por caudsa da posicao do mpu
-    float yaw()   { return  _angleZ; }
-    float pitch() { return -_angleX; }
-    float roll()  { return  _angleY; }
+    
+    float yaw()   { return   _angleZ; }
+    float pitch() { return  -_angleY; }
+    float roll()  { return   _angleX; }
     void reset_yaw()   { _angleZ = 0; }
-    void reset_pitch() { _angleX = 0; }
-    void reset_roll()  { _angleY = 0; }
+    void reset_pitch() { _angleY = 0; }
+    void reset_roll()  { _angleX = 0; }
 
     float temp() { return _temp; }
 private:

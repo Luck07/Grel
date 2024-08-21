@@ -1,17 +1,30 @@
-#include "./mpu.h"
+//#include "./mpu.h"
+#include <Wire.h>
+#include "MPU6050_BKP.h"
+MPU6050 mpu(Wire);
+
 
 void setup() {
   Serial.begin(9600);
-  MPU::begin();
+  mpu.begin();
+  // MPU::begin();
 
-  //MPU::mpu.calcOffsets(true, true);
-  MPU::calibrar_offsets();
-  Serial.print(" ");
-  delay(2000);
+  // //MPU::mpu.calcOffsets(true, true);
+  mpu.calibrar_offsets(5000);
+  delay(1000);
+
+  // MPU::calibrar_offsets();
+  // Serial.print(" ");
+  // delay(2000);
 }
 
 void loop() {
-  MPU::update();
+  mpu.update();
+
+  float yaw = mpu.yaw();
+  float pit = mpu.pitch();
+  float rol = mpu.roll();
+  if(yaw >= (90.0 - (90.0*5.0/100.0)) || yaw <= -90.0 + (90.0*5.0/100.0)) mpu.reset_yaw();
 
   // Serial.print("gyro xyz ");
   // Serial.print(MPU::gyroX()); Serial.print("\t");
@@ -24,13 +37,13 @@ void loop() {
   // Serial.println(MPU::accZ());
 
   Serial.print("roll(x):");
-  Serial.print(MPU::roll());
+  Serial.print(rol);
   Serial.print(",");
   Serial.print("pitch(y):");
-  Serial.print(MPU::pitch());
+  Serial.print(pit);
   Serial.print(",");
   Serial.print("yaw(z):");
-  Serial.println(MPU::yaw());
+  Serial.println(yaw);
 
   delay(10);
 }
