@@ -3,6 +3,7 @@
 
 #include <SoftwareWire.h>
 #include <Adafruit_TCS34725_SWwire.h>
+#include <Ultrasonic.h>
 
 #include "medicoes.h"
 #include "oled.h"
@@ -12,7 +13,8 @@ SoftwareWire sWire(6, 7);
 Adafruit_TCS34725_SWwire tcs_real = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIONTIME_180MS, TCS34725_GAIN_16X); //direita
 Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIONTIME_180MS, TCS34725_GAIN_16X); //esquerda
 
-//#include <Ultrasonic.h>
+
+
 #include <Servo.h>
 // mpu6050 i2c = 0x68
 
@@ -23,17 +25,17 @@ Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIO
 #define s_mdir A3  // A3
 #define s_dir  A4  // A4
 
-#define branco_esq  972 // 949 
-#define branco_mesq 974 // 974
-#define branco_m    976 // 976
-#define branco_mdir 976 // 959
-#define branco_dir  973 // 863
+#define branco_esq  971 // 949 
+#define branco_mesq 973 // 974
+#define branco_m    975 // 976
+#define branco_mdir 975 // 959
+#define branco_dir  971 // 863
 
-#define preto_esq  830 // 822
-#define preto_mesq 746 // 687
-#define preto_m    563 // 477
-#define preto_mdir 626 // 580
-#define preto_dir  686 // 540
+#define preto_esq  809 // 822
+#define preto_mesq 719 // 687
+#define preto_m    547 // 477
+#define preto_mdir 600 // 580
+#define preto_dir  622 // 540
 
 //Esquerda sendo branco e direita sendo preto
 #define media_esq (branco_esq + preto_esq) / 2
@@ -69,16 +71,16 @@ Servo serv_dir;
 
 void ler_sensores(bool* besq, bool* bmesq, bool* bm, bool* bmdir, bool* bdir) {
   uint8_t esq  = constrain(map(analogRead(s_esq) , preto_esq , branco_esq , 0, 100), 0, 100);
-  uint8_t mesq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 100), 0, 100);
+  uint8_t mesq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 200), 0, 200);
   uint8_t m    = constrain(map(analogRead(s_m)   , preto_m   , branco_m   , 0, 100), 0, 100);
-  uint8_t mdir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 100), 0, 100);
+  uint8_t mdir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 200), 0, 200);
   uint8_t dir  = constrain(map(analogRead(s_dir) , preto_dir , branco_dir , 0, 100), 0, 100);
 
   const uint8_t max = 50;
-  *besq  = esq  <= (max - 30);
-  *bmesq = mesq <= (max);
+  *besq  = esq  <= (max + 30);
+  *bmesq = mesq <= (max*2);
   *bm    = m    <= (max + 15);
-  *bmdir = mdir <= (max);
+  *bmdir = mdir <= (max*2);
   *bdir  = dir  <= (max);
 }
 
@@ -87,7 +89,7 @@ void ler_sensores(bool* besq, bool* bmesq, bool* bm, bool* bmdir, bool* bdir) {
  * echo == segun
  */
 
-//Ultrasonic ult_meio(30, 31);
+Ultrasonic ultra_sonico(49, 48);
 
 //* Inicio das funções, para cada caso
 void vel_frente()

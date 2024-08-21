@@ -43,7 +43,13 @@ void setup() {
 
   serv_esq.attach(servo_esquerda);
   serv_dir.attach(servo_direita);
+
+  
+
+
 }
+
+byte prv = 0;
 
 void loop() {
 
@@ -75,7 +81,6 @@ void loop() {
   // bool bm    = m    <= (max + 15);
   // bool bmdir = mdir <= (max);
   // bool bdir  = dir  <= (max);
-
   bool besq, bmesq, bm, bmdir, bdir;
   ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
 
@@ -115,7 +120,6 @@ void loop() {
   // Serial.print(mdir); Serial.print("-"); Serial.print(bmdir); Serial.print(" / ");
   // Serial.print(dir);  Serial.print("-"); Serial.print(bdir);  Serial.println(" / ");
 
-
   // Serial.print(analogRead(s_esq)); Serial.print(" / ");
   // Serial.print(analogRead(s_mesq)); Serial.print(" / ");
   // Serial.print(analogRead(s_m)); Serial.print(" / ");
@@ -131,8 +135,28 @@ void loop() {
 
   OLED::print_sens(besq, bmesq, bm, bmdir, bdir);
   OLED::print_verdes(verde_esq, verde_dir);
+  display.clearLine(3);
+  Serial.print("(ultrasonico=");
+  Serial.print(ultra_sonico.read());
+  Serial.println(") ");
   // delay(200);
   //return;
+
+  unsigned long m = 0;
+  
+  int ult = ultra_sonico.read();
+
+  
+  display.clearLine(5);
+  display.setCursor(0, 5);
+  display.print(ult);
+  display.print(" / ");
+  display.print(m);
+  display.print(" / ");
+  display.print(prv, BIN);
+
+  //return;
+
 
   switch (b_sens) {
     case 0b10000:
@@ -164,7 +188,7 @@ void loop() {
         } else {
           vel_frente_max();
           delay(medicoes::frente_ms_max(FITA_LARGURA * 1.5));
-          vel_parar();
+          vel_parar(0);
 
           ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
           if(!(besq || bmesq || bm || bmdir || bdir)) {
@@ -204,7 +228,7 @@ void loop() {
         } else {
           vel_frente_max();
           delay(medicoes::frente_ms_max(FITA_LARGURA * 1.5));
-          vel_parar();
+          vel_parar(0);
 
           ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
           if(!(besq || bmesq || bm || bmdir || bdir)) {
@@ -217,18 +241,47 @@ void loop() {
       break;
     case 0b01100:
     case 0b00110:
-    case 0b01010:
     case 0b00100:
     case 0b01110:
+    case 0b01010:
+    // case 0b01000:
+    // case 0b00010:
       OLED::print_frente(ver);
       if (!ver) {
         Serial.println("Frente");
+
+        if(ult <= 5 && ult > 0) {
+          OLED::print_obs();
+          serv_dir.write(0);
+          serv_esq.write(0);
+          int _aj = 0;
+          if(bmesq || bmdir) {
+            _aj = (bmesq - bmdir)*10;
+          }
+          delay(medicoes::esq_giro_ms_max(90+_aj));
+          vel_frente_max();
+          delay(medicoes::frente_ms_max(12));
+          serv_dir.write(180);
+          serv_esq.write(180);
+          delay(medicoes::dir_giro_ms_max(80+_aj));
+          vel_frente_max();
+          delay(medicoes::frente_ms_max(15 + ult*2));
+          serv_dir.write(180);
+          serv_esq.write(180);
+          delay(medicoes::dir_giro_ms_max(80+_aj));
+          vel_frente_max();
+          delay(medicoes::frente_ms_max(8));
+          serv_dir.write(0);
+          serv_esq.write(0);
+          delay(medicoes::esq_giro_ms_max(60+_aj));
+        }
+
         vel_frente();
       } else {
         Serial.println("Frente Verdadeiro");
         ver = false;
         vel_re();
-        delay(delay_re);
+        delay(delay_re/2);
       }
       break;
     case 0b01000:
@@ -241,7 +294,7 @@ void loop() {
         Serial.println("micro esq Verdadeiro");
         ver = false;
         vel_re();
-        delay(delay_re);
+        delay(delay_re/2);
       }
       //serv_dir.write(90 - (100-m)/5);
       //serv_esq.write(90 - (100-m)/2);
@@ -256,7 +309,7 @@ void loop() {
         Serial.println("micro dir Verdadeiro");
         ver = false;
         vel_re();
-        delay(delay_re);
+        delay(delay_re/2);
       }
       //delay(100);
       //serv_dir.write(90 + (100-m)/2);
@@ -265,8 +318,74 @@ void loop() {
     case 0b00000:
       OLED::print_gap();
       Serial.println("frente (gap)");
+
+      display.clearLine(4);
+      display.setCursor(OLED::center(14), 3);
+      display.print("gap -> prv ");
+      if(prv == 0b01000) {
+        display.print("esq");
+        serv_esq.write(0);
+        serv_dir.write(0);
+        delay(medicoes::dir_giro_ms_max(30));
+      } else if(prv == 0b00010) {
+        display.print("dir");
+        serv_esq.write(180);
+        serv_dir.write(180);
+        delay(medicoes::esq_giro_ms_max(30));
+      } else {
+        display.print("fre");
+      }
       vel_frente();
       delay(200);
+
+      // m = millis();
+      // if(m <= 1000)
+      //   break;
+
+
+
+      // //m = 0;
+      // // if(besq||bmesq||bm||bdir)
+      // //   break;
+
+      // //while(!(besq||bmesq||bm||bdir)  || m <= 2525) {
+      // for(m=0; m<=2500; m=millis()) {
+      //   ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
+      //   if(besq||bmesq||bm||bdir)
+      //     break;
+      //   display.clearLine(5);
+      //   display.setCursor(0, 5);
+      //   display.print(ult);
+      //   display.print(" / ");
+      //   display.print(m);
+      //   display.print(" / ");
+      //   display.print(prv, BIN);
+      //   OLED::print_sens(besq, bmesq, bm, bmdir, bdir);
+      // }
+
+      // if(!(besq||bmesq||bm||bdir)) {
+      //     vel_re();
+      //     delay(2500/2);
+
+      //     display.setCursor(0, 3);
+      //   if(prv | 0b11000) {
+      //     display.print("gap -> prv esq");
+      //     serv_esq.write(0);
+      //     serv_dir.write(0);
+      //     delay(medicoes::dir_giro_ms_max(30));
+      //   } else if(prv | 0b00011) {
+      //     display.print("gap -> prv dir");
+      //     serv_esq.write(180);
+      //     serv_dir.write(180);
+      //     delay(medicoes::esq_giro_ms_max(30));
+      //   } else {
+      //     display.print("gap -> prv fre");
+      //   }
+      //   vel_frente();
+      // }
+
+      // vel_frente();
+      // delay(200);
       break;
     case 0b11111:
     case 0b10001:
@@ -280,22 +399,21 @@ void loop() {
       vel_parar();
 
       COISO:
-      delay(180);
       tcs_soft.getRawData(&r1, &g1, &b1, &c1);
-      delay(180);
       tcs_real.getRawData(&r2, &g2, &b2, &c2);
       verde_esq = verde(r1, g1, b1, 1.00);
       verde_dir = verde(r2, g2, b2, 1.05);
       OLED::print_verdes(verde_esq, verde_dir);
       
       display.clearLine(3);
-      display.setCursor(0, 3);
+      display.setCursor(OLED::center(12), 3);
+      display.print("encru -> ");
       if (verde_esq && verde_dir) {
-        display.print("giro");
+        display.print("180");
         Serial.print("tudo verd");
-        serv_esq.write(180);
-        serv_dir.write(180);
-        delay(medicoes::dir_giro_ms_max(180));
+        serv_esq.write(0);
+        serv_dir.write(0);
+        delay(medicoes::esq_giro_ms_max(180));
       } else if (verde_esq && !verde_dir) {
         display.print("esq");
         Serial.print("esq verde");
@@ -305,19 +423,20 @@ void loop() {
         Serial.print("dir verde");
         dir_90();
       } else {
-        display.print("nada");
+        display.print("nad");
         Serial.print("NADa verde");
-        goto COISO;
-        // while(verde_esq == false || verde_dir == false) {
-        //   tcs_soft.getRawData(&r1, &g1, &b1, &c1);
-        //   delay(180);
-        //   tcs_real.getRawData(&r2, &g2, &b2, &c2);
-        //   verde_esq = verde(r1, g1, b1, 1.00);
-        //   verde_dir = verde(r2, g2, b2, 1.05);
-        // }
+        vel_frente_max();
+        delay(medicoes::frente_ms_max(2));
+        vel_frente();
+        //goto COISO;
       }
       Serial.println("");
       break;
     default: Serial.print("."); break;
   }
+  prv = b_sens;
+
+  if(b_sens != 0b00000)
+    m = 0;
+
 }

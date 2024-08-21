@@ -13,9 +13,12 @@
 LCD_SSD1306 display; 
 
 namespace OLED {
+
+  inline int center(int strlen) { return (W - strlen) * (lw/2); }
+
  void print_sens(bool besq, bool bmesq, bool bm, bool bmdir, bool bdir) {
   display.clearLine(0);
-  display.setCursor((W*lw/2) - (5*lw/2),0);
+  display.setCursor(center(5), 0);
   display.print(besq);
   display.print(bmesq);
   display.print(bm);
@@ -23,20 +26,26 @@ namespace OLED {
   display.print(bdir);
  }
 
+ void print_obs() {
+  display.clearLine(1);
+  display.setCursor(center(9), 1);
+  display.print("OBSTACULO");
+ }
+
   void print_90(bool direita, bool ver) {
     display.clearLine(1);
     if(ver)
-    display.setCursor((W*lw/2) - (17*lw/2), 1);
+      display.setCursor(center(17), 1);
     else
-    display.setCursor((W*lw/2) - (12*lw/2), 1);
+      display.setCursor(center(12), 1);
     
     if(direita)
-    display.print("90 dir ");
+      display.print("90 dir ");
     else
-    display.print("90 esq ");
+      display.print("90 esq ");
 
     if(ver)
-    display.print("verdadeiro");
+      display.print("verdadeiro");
     else
     display.print("falso");
  }
@@ -45,10 +54,10 @@ namespace OLED {
   display.clearLine(1);
   //frente Verdadeiro
   if(ver) {
-   display.setCursor((W*lw/2) - (17*lw/2), 1);
+   display.setCursor(center(17), 1);
    display.print("frente verdadeiro");
   } else {
-   display.setCursor((W*lw/2) - (6*lw/2), 1);
+   display.setCursor(center(6), 1);
    display.print("frente");
   }
  }
@@ -57,9 +66,9 @@ namespace OLED {
    //micro esq verdadeiro
    display.clearLine(1);
    if(ver)
-    display.setCursor((W*lw/2) - (20*lw/2), 1);
+    display.setCursor(center(20), 1);
    else
-    display.setCursor((W*lw/2) - (9*lw/2), 1);
+    display.setCursor(center(9), 1);
    
    if(direita)
     display.print("micro dir ");
@@ -72,13 +81,13 @@ namespace OLED {
 
  void print_gap() {
   display.clearLine(1);
-  display.setCursor((W*lw/2) - (3*lw/2), 1);
+  display.setCursor(center(3), 1);
   display.print("gap");
  }
 
  void print_encru() {
   display.clearLine(1);
-  display.setCursor((W*lw/2) - (5*lw/2), 1);
+  display.setCursor(center(5), 1);
   display.print("encru");
  }
 
@@ -86,16 +95,16 @@ namespace OLED {
   display.clearLine(2);
 
   //verde / verde
-  display.setCursor((W*lw/2) - (13*lw/2), 2);
+  display.setCursor(center(13), 2);
   if(esq)
    display.print("verde");
   else
    display.print(".....");
 
-  display.setCursor((W*lw/2) - (13*lw/2) + (6*lw), 2);
+  display.setCursor(center(13) + (6*lw), 2);
   display.print("/");
 
-  display.setCursor((W*lw/2) - (13*lw/2) + (8*lw), 2);
+  display.setCursor(center(13) + (8*lw), 2);
   if(dir)
    display.print("verde");
   else
