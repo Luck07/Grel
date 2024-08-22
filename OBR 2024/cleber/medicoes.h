@@ -1,9 +1,19 @@
 #ifndef _MEDICOES_H
 #define _MEDICOES_H
 
-#define COMPRIMENTO 20 //cm
-#define LARGURA     15 //cm
+#define COMPRIMENTO 21 //cm
+#define LARGURA     15.5 //cm
 #define FITA_LARGURA 2 //cm
+
+
+/*
+  funcao de trajetoria = f(t) = sqrt(l*l - t*t) + t
+  -> d/dt = -t/sqrt(l*l - t*t) + 1
+    -> d/dt = 0 -> max
+    -> max = l/sqrt(2)
+  -> f(l/sqrt(2)) - l = distancia minima
+*/
+#define DISTANCIA_MINIMA_OBSTACULO 8.69 //cm
 
 #define V_FRENTE     3.96 //cm/s (120,60) 
 #define V_FRENTE_MAX 5.26 //cm/s (180, 0)
@@ -23,8 +33,8 @@
 #define V_GIRO_ESQ     30    //ang/s (60,60)
 #define V_GIRO_ESQ_MAX 38.29 //ang/s ( 0, 0)
 
-#define V_GIRO_DIR     29    //ang/s (120,120)
-#define V_GIRO_DIR_MAX 38.29 //ang/s (180,180)
+#define V_GIRO_DIR     29.5  //ang/s (120,120)
+#define V_GIRO_DIR_MAX 42.85 //ang/s (180,180)
 
 namespace medicoes {
  inline unsigned long frente_ms    (int cm) { return (unsigned long)1000*cm/V_FRENTE    ; }

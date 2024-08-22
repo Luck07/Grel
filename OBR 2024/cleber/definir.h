@@ -7,12 +7,13 @@
 
 #include "medicoes.h"
 #include "oled.h"
+#include "MPU6050_BKP.h"
 
 SoftwareWire sWire(6, 7);
  
 Adafruit_TCS34725_SWwire tcs_real = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIONTIME_180MS, TCS34725_GAIN_16X); //direita
 Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIONTIME_180MS, TCS34725_GAIN_16X); //esquerda
-
+MPU6050 mpu(Wire);
 
 
 #include <Servo.h>

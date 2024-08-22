@@ -20,10 +20,10 @@ bool verde(int r, int g, int b, float tol = 1.03) {  //soft 1 real 1.05
 void setup() {
   Serial.begin(9600);
 
-  display.begin();
-  display.setFontSize(FONT_SIZE_SMALL);
-  display.clear();
-  display.print("oi");
+  // display.begin();
+  // display.setFontSize(FONT_SIZE_SMALL);
+  // display.clear();
+  // display.print("oi");
 
   if (!tcs_real.begin(&Wire)) {
     Serial.println("tcs real n");
@@ -44,14 +44,52 @@ void setup() {
   serv_esq.attach(servo_esquerda);
   serv_dir.attach(servo_direita);
 
+  // mpu.begin();
+  // mpu.calibrar_offsets(1000);
   
+  serv_esq.write(180);
+  serv_dir.write(180);
+  unsigned long _n = 0;
 
+  // mpu.reset_yaw();
 
+  for(_n=millis(); _n <= 4200; _n=millis()) {
+    // mpu.update();
+    // display.clear();
+    // display.setCursor(0,0);
+    // yaw = mpu.yaw();
+    // pit = mpu.pitch();
+    // rol = mpu.roll();
+    Serial.println(_n);
+    // display.print(_n);
+    // display.setCursor(0,1);
+    // display.print(yaw); display.print("/");
+    // display.print(pit); display.print("/");
+    // display.print(rol);
+  }
+  // mpu.update();
+  // display.setCursor(0,3);
+  // display.print(_n);
+  // display.setCursor(0,4);
+  // display.print(yaw); display.print("/");
+  // display.print(pit); display.print("/");
+  // display.print(rol);
+  // vel_parar();
+  // delay(2000);
+
+  // serv_esq.write(60);
+  // serv_dir.write(60);
+  // _n = 0;
+  // for(_n = millis(); _n <=5000 +6000; _n=millis()) {
+  //   Serial.println(_n-6000);
+  // }
+  // display.println(_n-6000);
+  vel_parar();
 }
 
 byte prv = 0;
 
-void loop() {
+void loop() {return;
 
   /* display.clearDisplay();
   display.setCursor(0, 0);
@@ -97,6 +135,8 @@ void loop() {
   bool verde_esq = false;
   bool verde_dir = false;
 
+  int ult = ultra_sonico.read();
+
   Serial.print(besq);
   Serial.print(bmesq);
   Serial.print(bm);
@@ -137,14 +177,12 @@ void loop() {
   OLED::print_verdes(verde_esq, verde_dir);
   display.clearLine(3);
   Serial.print("(ultrasonico=");
-  Serial.print(ultra_sonico.read());
+  Serial.print(ult);
   Serial.println(") ");
   // delay(200);
   //return;
 
   unsigned long m = 0;
-  
-  int ult = ultra_sonico.read();
 
   
   display.clearLine(5);
@@ -155,7 +193,7 @@ void loop() {
   display.print(" / ");
   display.print(prv, BIN);
 
-  //return;
+  return;
 
 
   switch (b_sens) {
@@ -434,9 +472,10 @@ void loop() {
       break;
     default: Serial.print("."); break;
   }
-  prv = b_sens;
 
-  if(b_sens != 0b00000)
+  if(b_sens != 0b00000) {
+    prv = b_sens;
     m = 0;
+  }
 
 }
