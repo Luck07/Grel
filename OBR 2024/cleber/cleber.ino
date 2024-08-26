@@ -46,10 +46,10 @@ void setup() {
   serv_esq.attach(servo_esquerda);
   serv_dir.attach(servo_direita);
 
-  // mpu.begin();
-  // display.print("calibrando");
-  // mpu.calibrar_offsets(1000);
-  // display.clear();
+  mpu.begin();
+  display.print("calibrando mpu");
+  mpu.calibrar_offsets();
+  display.clear();
 
   // unsigned long mmm = 0;
   // int yaw = 0;
@@ -193,7 +193,7 @@ void loop() {
   // Serial.print(analogRead(s_m)); Serial.print(" / ");
   // Serial.print(analogRead(s_mdir)); Serial.print(" / ");
   // Serial.print(analogRead(s_dir)); Serial.println(" / ");
-
+  
   // tcs_soft.getRawData(&r1, &g1,&b1,&c1);
   // verde_esq = verde(r1,g1,b1,1.00);
   // tcs_real.getRawData(&r2, &g2, &b2, &c2);
@@ -254,8 +254,8 @@ void loop() {
 
           ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
           if(!(besq || bmesq || bm || bmdir || bdir)) {
-            // vel_re_max();
-            // delay(medicoes::tras_ms_max(FITA_LARGURA * 1.5));
+            vel_re_max();
+            delay(medicoes::tras_ms_max(FITA_LARGURA * 1.5));
             esq_90();
           }
         }
@@ -294,8 +294,8 @@ void loop() {
 
           ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
           if(!(besq || bmesq || bm || bmdir || bdir)) {
-            // vel_re_max();
-            // delay(medicoes::tras_ms_max(FITA_LARGURA * 1.5));
+            vel_re_max();
+            delay(medicoes::tras_ms_max(FITA_LARGURA * 1.5));
             dir_90();
           }
         }
@@ -314,28 +314,55 @@ void loop() {
 
         if(ult <= 9 && ult > 0) {
           OLED::print_obs();
-          serv_dir.write(0);
+          int yaw;
+          mpu.update();
+          
+          yaw = 0;
+          mpu.reset_yaw();
           serv_esq.write(0);
-          int _aj = 0;
-          // if(bmesq || bmdir) {
-          //   _aj = (bmesq - bmdir)*10;
-          // }
-          delay(medicoes::esq_giro_ms_max(90+_aj));
+          serv_dir.write(0);
+          while(abs(yaw) < 90) {
+            mpu.update();
+            yaw = mpu.yaw();
+          }
+
           vel_frente_max();
           delay(medicoes::frente_ms_max(12));
-          serv_dir.write(180);
+
+          yaw = 0;
+          mpu.reset_yaw();
           serv_esq.write(180);
-          delay(medicoes::dir_giro_ms_max(80+_aj));
-          vel_frente_max();
-          delay(medicoes::frente_ms_max(15 + ult*2));
           serv_dir.write(180);
-          serv_esq.write(180);
-          delay(medicoes::dir_giro_ms_max(80+_aj));
+          while(abs(yaw) < 90) {
+            mpu.update();
+            yaw = mpu.yaw();
+          }
+
           vel_frente_max();
-          delay(medicoes::frente_ms_max(8));
-          serv_dir.write(0);
+          delay(medicoes::frente_ms_max(25));
+
+          yaw = 0;
+          mpu.reset_yaw();
+          serv_esq.write(180);
+          serv_dir.write(180);
+          while(abs(yaw) < 90) {
+            mpu.update();
+            yaw = mpu.yaw();
+          }
+
+          vel_frente_max();
+          delay(medicoes::frente_ms_max(12));
+
+          yaw = 0;
+          mpu.reset_yaw();
           serv_esq.write(0);
-          delay(medicoes::esq_giro_ms_max(60+_aj));
+          serv_dir.write(0);
+          while(abs(yaw) < 60) {
+            mpu.update();
+            yaw = mpu.yaw();
+          }
+          while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50  &&
+                constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {}
         }
 
         vel_frente();
@@ -381,24 +408,28 @@ void loop() {
       OLED::print_gap();
       Serial.println("frente (gap)");
       vel_frente_max();
+      delay(delay_fre);
 
-      vel_parar(180);
-      tcs_soft.getRawData(&r1, &g1, &b1, &c1);
-      if(verde(g1, r1, b1, 1.25)) {
-        tcs_real.getRawData(&r2, &g2, &b2, &c2);
-        if(verde(g2, r2, b2, 1.25)) {
-          vel_parar();
-          delay(7000);
-            display.clear();
-            display.print("ebaaa");
-          while(true) {
-            display.invertDisplay(true);
-            delay(1000);
-            display.invertDisplay(false);
-            delay(1000);
-          }
-        }
-      }
+      // vel_parar(180);
+      // tcs_soft.getRawData(&r1, &g1, &b1, &c1);
+      // ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
+      // if((verde(g1, r1, b1, 1.25)) {
+      //   tcs_real.getRawData(&r2, &g2, &b2, &c2);
+      //   if(verde(g2, r2, b2, 1.25)) {
+      //     vel_parar();
+      //     delay(7000);
+      //       display.clear();
+      //       display.print("ebaaa");
+      //     while(true) {
+      //       display.invertDisplay(true);
+      //       delay(1000);
+      //       display.invertDisplay(false);
+      //       delay(1000);
+      //     }
+      //   } else {
+      //     vel_frente_max();
+      //   }
+      // }
 
       
       // display.clearLine(4);

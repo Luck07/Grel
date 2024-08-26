@@ -26,17 +26,17 @@ MPU6050 mpu(Wire);
 #define s_mdir A3  // A3
 #define s_dir  A4  // A4
 
-#define branco_esq  971 // 949 
-#define branco_mesq 973 // 974
-#define branco_m    975 // 976
-#define branco_mdir 975 // 959
-#define branco_dir  971 // 863
+#define branco_esq  967 // 971
+#define branco_mesq 969 // 973
+#define branco_m    972 // 975
+#define branco_mdir 971 // 975
+#define branco_dir  969 // 971
 
-#define preto_esq  809 // 822
-#define preto_mesq 719 // 687
-#define preto_m    547 // 477
-#define preto_mdir 600 // 580
-#define preto_dir  622 // 540
+#define preto_esq  853 // 809
+#define preto_mesq 792 // 719
+#define preto_m    485 // 547
+#define preto_mdir 664 // 600
+#define preto_dir  617 // 622
 
 //Esquerda sendo branco e direita sendo preto
 #define media_esq (branco_esq + preto_esq) / 2
