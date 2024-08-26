@@ -54,7 +54,7 @@ bool ver = false;     // O Verifica para os switchs
 Servo serv_esq;
 Servo serv_dir;
 
-#define delay_fre 300 // 350
+#define delay_fre 350 // 350
 #define velocidade_par 300  // 300
 #define delay_re 300 // 300
 #define delay_peq 100 //100
@@ -92,6 +92,7 @@ void ler_sensores(bool* besq, bool* bmesq, bool* bm, bool* bmdir, bool* bdir) {
 
 Ultrasonic ultra_sonico(49, 48);
 
+
 //* Inicio das funções, para cada caso
 void vel_frente()
 {
@@ -112,16 +113,24 @@ void vel_frente_max() {
 
 void vel_direita()
 {
-  serv_esq.write(0);
-  serv_dir.write(0);
-  
-  // uint8_t ddv_dir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023), 0, 1023);
-  // uint8_t ddv_esq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023), 0, 1023);
-  // ddv_dir = (1023 - ddv_dir) /100;
-  // ddv_esq = (1023 - ddv_esq) /100;
+  // serv_esq.write(0);
+  // serv_dir.write(0);
 
-  // serv_esq.write(90 - (ddv_esq*0.75));
-  // serv_dir.write(90 - ddv_dir); //80 
+  uint8_t ddv = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 90), 0, 90);
+  //ddv = 90 - ddv;
+  Serial.print(ddv);Serial.print("&");
+  serv_esq.write(constrain(90 - ddv, 0, 90));
+  serv_dir.write(constrain(90 - (90 - ddv/2), 0, 90));
+  
+  // uint8_t ddv_dir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 90), 0, 90);
+  // uint8_t ddv_esq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 90), 0, 90);
+  // Serial.print(ddv_dir); Serial.print("/");Serial.print(ddv_esq);Serial.print("--");
+  // ddv_dir = (90 - ddv_dir) /9;
+  // ddv_esq = (90 - ddv_esq) /9;
+  // Serial.print(ddv_dir); Serial.print("/");Serial.print(ddv_esq);Serial.print("--");
+
+  // serv_esq.write(90 - (ddv_esq*10));
+  // serv_dir.write(90 - (ddv_dir*10)); //80 
   
 //   serv_esq.write(serv_esq.read() - ddv_esq);
 //   serv_dir.write(serv_dir.read() - ddv_dir); //80 
@@ -134,16 +143,25 @@ void vel_direita()
 }
 void vel_esquerda()
 {
-  serv_esq.write(180);
-  serv_dir.write(180);
+  // serv_esq.write(180);
+  // serv_dir.write(180);
 
-  // uint8_t ddv_dir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023), 0, 1023);
-  // uint8_t ddv_esq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023), 0, 1023);
-  // ddv_dir = (1023 - ddv_dir) /100;
-  // ddv_esq = (1023 - ddv_esq) /100;
+  // uint8_t ddv_dir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 90), 0, 90);
+  // uint8_t ddv_esq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 90), 0, 90);
+  // Serial.print(ddv_dir); Serial.print("/");Serial.print(ddv_esq);Serial.print("--");
+  // ddv_dir = (90 - ddv_dir) /9;
+  // ddv_esq = (90 - ddv_esq) /9;
+  // Serial.print(ddv_dir); Serial.print("/");Serial.print(ddv_esq);Serial.print("--");
 
-  // serv_esq.write(90 + ddv_esq);
-  // serv_dir.write(90 + (ddv_dir*0.75));
+  // serv_esq.write(90 + (ddv_esq*10));
+  // serv_dir.write(90 + (ddv_dir*10));
+
+  uint8_t ddv = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 90), 0, 90);
+  // ddv /= 100;
+  // ddv = 90 - ddv;
+  Serial.print(ddv);Serial.print("&");
+  serv_esq.write(constrain(90 + ddv, 90, 180));
+  serv_dir.write(constrain(90 + (90 - ddv/2), 90, 180));
 
 //   serv_esq.write(serv_esq.read() + ddv_esq);
 //   serv_dir.write(serv_dir.read() + ddv_dir);
@@ -172,15 +190,29 @@ void vel_parar(int velo_esq = velocidade_par)
   delay(velo_esq);
 }
 
-void esq_90() //* 90 esquerda
+void giro_dir_ang(int angulo) {
+  serv_esq.write(180);
+  serv_dir.write(180);
+  delay(medicoes::dir_giro_ms_max(angulo));
+}
+
+void giro_esq_ang(int angulo) {
+  serv_esq.write(0);
+  serv_dir.write(0);
+  delay(medicoes::esq_giro_ms_max(angulo));
+}
+
+
+void esq_90(unsigned long delay_giro = 0) //* 90 esquerda
 {
+
   vel_frente();
   delay(delay_fre);
-
-    serv_esq.write(0);
-    serv_dir.write(0);
-    delay(delay_peq);
-    Serial.println("passo");
+  serv_esq.write(0);
+  serv_dir.write(0);
+  delay(delay_giro + delay_peq);
+  Serial.println("passo");
+  
     
     // for(;;) {
 
@@ -218,15 +250,15 @@ void esq_90() //* 90 esquerda
   //delay(delay_re);
 }
 
-void dir_90() //* 90 direita
+void dir_90(unsigned long delay_giro = 0) //* 90 direita
 {
-    vel_frente();
-    delay(delay_fre);
-  //vel_direita();
-    serv_esq.write(180);
-    serv_dir.write(180);
-    delay(delay_peq);
-    Serial.println("passo");
+  vel_frente();
+  delay(delay_fre);
+//vel_direita();
+  serv_esq.write(180);
+  serv_dir.write(180);
+  delay(delay_giro + delay_peq);
+  Serial.println("passo");
 
     // for(;;) {
       

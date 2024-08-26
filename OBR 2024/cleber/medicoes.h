@@ -31,10 +31,10 @@
 #define V_ANG_DIR_MAX 15.92 //ang/s (90,  0) -> 2.77cm/s no raio comprimento/2
 
 #define V_GIRO_ESQ     30    //ang/s (60,60)
-#define V_GIRO_ESQ_MAX 38.29 //ang/s ( 0, 0)
+#define V_GIRO_ESQ_MAX 35.57 //ang/s ( 0, 0)
 
 #define V_GIRO_DIR     29.5  //ang/s (120,120)
-#define V_GIRO_DIR_MAX 42.85 //ang/s (180,180)
+#define V_GIRO_DIR_MAX 37.06 //ang/s (180,180)
 
 namespace medicoes {
  inline unsigned long frente_ms    (int cm) { return (unsigned long)1000*cm/V_FRENTE    ; }
