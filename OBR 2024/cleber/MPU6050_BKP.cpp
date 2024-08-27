@@ -19,7 +19,7 @@ byte MPU6050::read_data(byte reg) {
     wire->beginTransmission(MPU6050_ADDR);
     wire->write(reg);
     wire->endTransmission(true);
-    wire->requestFrom(MPU6050_ADDR, (uint8_t)1);
+    wire->requestFrom((uint8_t)MPU6050_ADDR, (uint8_t)1);
     byte data = wire->read();
     return data;
 }
@@ -32,7 +32,7 @@ void MPU6050::fetch_raw() {
     // total: 0x3b-0x48 = 59-72
     wire->write(MPU6050_ACCL_OUT_REG);
     wire->endTransmission(false);
-    wire->requestFrom(MPU6050_ADDR, (uint8_t)14);
+    wire->requestFrom((uint8_t)MPU6050_ADDR, (uint8_t)14);
 
     int16_t raw_data[7]; // [ax,ay,az, temp, gx,gy,gz]
 
@@ -152,7 +152,7 @@ void MPU6050::calibrar_offsets(int total, bool print, bool gyro, bool accl) {
             Serial.print(sums[1]); Serial.print(" / "); //aY
             Serial.println(sums[2]);                    //aZ
         }
-        delay(1);
+        //delay(1);
     }
 
     if(accl) {

@@ -79,10 +79,15 @@ namespace OLED {
     display.print("verdadeiro");
  }
 
- void print_gap() {
+ void print_gap(bool ver) {
   display.clearLine(1);
-  display.setCursor(center(3), 1);
-  display.print("gap");
+  if(!ver) {
+    display.setCursor(center(3), 1);
+    display.print("gap");
+  } else {
+    display.setCursor(center(14), 1);
+    display.print("gap verdadeiro");
+  }
  }
 
  void print_encru() {

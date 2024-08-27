@@ -54,7 +54,7 @@ bool ver = false;     // O Verifica para os switchs
 Servo serv_esq;
 Servo serv_dir;
 
-#define delay_fre 350 // 350
+#define delay_fre 400 // 350
 #define velocidade_par 300  // 300
 #define delay_re 300 // 300
 #define delay_peq 100 //100
@@ -86,6 +86,22 @@ void ler_sensores(bool* besq, bool* bmesq, bool* bm, bool* bmdir, bool* bdir) {
 }
 
 /*
+  esq:  1.00
+  dir:  1.05
+  verm: 1.10
+*/
+bool verde(int r, int g, int b, float tol = 1.00) { 
+  // Serial.print(g);
+  // Serial.print("/");
+  // Serial.print((r + b + g) / 3);
+  // Serial.print("-");
+  // Serial.print(tol * (r + b + g) / 3);
+  // Serial.print("\t");
+  if ((r + b + g) / 3 >= 2900) return false;
+  return (g >= tol * (r + b + g) / 3);
+}
+
+/*
  * trig == prim
  * echo == segun
  */
@@ -105,73 +121,41 @@ void vel_frente_max() {
   serv_dir.write(0);
 }
 
-/*bool besq = map(analogRead(s_esq), preto_esq, branco_esq, 0, 1023) >= 500 ? 1 : 0;
-  bool bmesq = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 1023) >= 500 ? 1 : 0;
-  bool bm = map(analogRead(s_m), preto_m, branco_m, 0, 1023) >= 500 ? 1 : 0;
-  bool bmdir = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 1023) >= 500 ? 1 : 0;
-  bool bdir = map(analogRead(s_dir), preto_dir, branco_dir, 0, 1023) >= 500 ? 1 : 0;*/
-
 void vel_direita()
 {
-  // serv_esq.write(0);
-  // serv_dir.write(0);
+  serv_esq.write(90);
+  serv_dir.write(60);
 
-  uint8_t ddv = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 90), 0, 90);
-  //ddv = 90 - ddv;
-  Serial.print(ddv);Serial.print("&");
-  serv_esq.write(constrain(90 - ddv, 0, 90));
-  serv_dir.write(constrain(90 - (90 - ddv/2), 0, 90));
+  // uint8_t ddv = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 90), 0, 90);
+  // Serial.print(ddv);Serial.print("&");
+  // serv_esq.write(constrain(90 - ddv, 0, 90));
+  // serv_dir.write(constrain(90 - (90 - ddv/2), 0, 90));
   
   // uint8_t ddv_dir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 90), 0, 90);
   // uint8_t ddv_esq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 90), 0, 90);
-  // Serial.print(ddv_dir); Serial.print("/");Serial.print(ddv_esq);Serial.print("--");
   // ddv_dir = (90 - ddv_dir) /9;
   // ddv_esq = (90 - ddv_esq) /9;
-  // Serial.print(ddv_dir); Serial.print("/");Serial.print(ddv_esq);Serial.print("--");
-
-  // serv_esq.write(90 - (ddv_esq*10));
-  // serv_dir.write(90 - (ddv_dir*10)); //80 
-  
-//   serv_esq.write(serv_esq.read() - ddv_esq);
-//   serv_dir.write(serv_dir.read() - ddv_dir); //80 
-
-
-  // int v = map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 70);
-  // int v2 = map(analogRead(s_mdir), preto_mdir, branco_mdir, 80, 180);
-  // serv_esq.write(v);
-  // serv_dir.write(v2);
+  // serv_esq.write(90 + (ddv_esq*10));
+  // serv_dir.write(90 + (ddv_dir*10)); //80 
 }
 void vel_esquerda()
 {
-  // serv_esq.write(180);
-  // serv_dir.write(180);
+  serv_esq.write(120);
+  serv_dir.write(90);
 
   // uint8_t ddv_dir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 90), 0, 90);
   // uint8_t ddv_esq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 90), 0, 90);
-  // Serial.print(ddv_dir); Serial.print("/");Serial.print(ddv_esq);Serial.print("--");
   // ddv_dir = (90 - ddv_dir) /9;
   // ddv_esq = (90 - ddv_esq) /9;
-  // Serial.print(ddv_dir); Serial.print("/");Serial.print(ddv_esq);Serial.print("--");
+  // serv_esq.write(90 - (ddv_esq*10));
+  // serv_dir.write(90 - (ddv_dir*10));
 
-  // serv_esq.write(90 + (ddv_esq*10));
-  // serv_dir.write(90 + (ddv_dir*10));
-
-  uint8_t ddv = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 90), 0, 90);
-  // ddv /= 100;
-  // ddv = 90 - ddv;
-  Serial.print(ddv);Serial.print("&");
-  serv_esq.write(constrain(90 + ddv, 90, 180));
-  serv_dir.write(constrain(90 + (90 - ddv/2), 90, 180));
-
-//   serv_esq.write(serv_esq.read() + ddv_esq);
-//   serv_dir.write(serv_dir.read() + ddv_dir);
-
-
-  // int v = map(analogRead(s_mesq), preto_mesq, branco_mesq, 80, 180);
-  // int v2 = map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 70);
-  // serv_esq.write(v2);
-  // serv_dir.write(v);
+  // uint8_t ddv = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 90), 0, 90);
+  // Serial.print(ddv);Serial.print("&");
+  // serv_esq.write(constrain(90 + ddv, 90, 180));
+  // serv_dir.write(constrain(90 + (90 - ddv/2), 90, 180));
 }
+
 void vel_re()
 {
   serv_esq.write(60);
@@ -202,96 +186,141 @@ void giro_esq_ang(int angulo) {
   delay(medicoes::esq_giro_ms_max(angulo));
 }
 
+void giro_dir_ang_mpu(int angulo) {
+  int yaw = 0;
+  mpu.reset_yaw();
+  serv_esq.write(180);
+  serv_dir.write(180);
+  while(abs(yaw) < angulo) {
+    mpu.update();
+    yaw = mpu.yaw();
+  }
+}
 
-void esq_90(unsigned long delay_giro = 0) //* 90 esquerda
+void giro_esq_ang_mpu(int angulo) {
+  int yaw = 0;
+  mpu.reset_yaw();
+  serv_esq.write(0);
+  serv_dir.write(0);
+  while(abs(yaw) < angulo) {
+    mpu.update();
+    yaw = mpu.yaw();
+  }
+}
+
+void obstaculo2() {
+  OLED::print_obs();
+  float yaw = 0.00f;
+
+  mpu.reset_yaw();
+  serv_esq.write(180);
+  serv_dir.write(180);
+  while(abs(yaw) < 90.00f) {//-90
+    mpu.update();
+    yaw = mpu.yaw();
+  }
+
+  vel_frente_max();
+  delay(medicoes::frente_ms_max(LARGURA));
+
+  mpu.reset_yaw();
+  yaw = 0;
+  serv_esq.write(90);
+  serv_dir.write(180);
+  while(abs(yaw) < 90.00f) {//-90
+    mpu.update();
+    yaw = mpu.yaw();
+  }
+  vel_parar(5000);
+
+  mpu.reset_yaw();
+  yaw = 0;
+  serv_esq.write(90);
+  serv_dir.write(180);
+  while(abs(yaw) < 90.00f) {//-90
+    mpu.update();
+    yaw = mpu.yaw();
+  }
+  vel_parar(5000);
+}
+
+void obstaculo(bool dir = true) {
+  OLED::print_obs();
+  float yaw = 0.00f;
+
+  mpu.reset_yaw();
+  serv_esq.write(180*dir);
+  serv_dir.write(180*dir);
+  while(abs(mpu.yaw()) < 90.00f) {//-90
+    mpu.update();
+  }
+  yaw = 90.00f + mpu.yaw();
+
+  vel_frente_max();
+  delay(medicoes::frente_ms_max(12));
+
+  mpu.reset_yaw(yaw);
+  serv_esq.write(180 - (180*dir)); 
+  serv_dir.write(180 - (180*dir));
+  while(abs(mpu.yaw()) < 90.00f) {//0
+    mpu.update();
+  }
+  yaw = mpu.yaw() - 90.00f;
+
+  vel_frente_max();
+  delay(medicoes::frente_ms_max(25));
+
+  mpu.reset_yaw(yaw);
+  serv_esq.write(180 - (180*dir)); 
+  serv_dir.write(180 - (180*dir));
+  while(abs(mpu.yaw()) < 90.00f) {//90
+    mpu.update();
+  }
+
+  display.print("/");display.print(yaw);
+  vel_parar(15000);
+
+  vel_frente_max();
+  delay(medicoes::frente_ms_max(6));
+  while(constrain(map(analogRead(s_m)            , preto_m                , branco_m                 , 0, 100), 0, 100)>=65  &&
+        constrain(map(analogRead(dir?s_dir:s_esq), dir?preto_dir:preto_esq, dir?branco_dir:branco_esq, 0, 100), 0, 100)>=50) {}
+  //delay(delay_fre);
+
+  mpu.reset_yaw(yaw/9);
+  serv_esq.write(180*dir); 
+  serv_dir.write(180*dir);
+  while(abs(mpu.yaw()) < 30.00f) { //45
+    mpu.update();
+  }
+
+  delay(1000);
+  while(constrain(map(analogRead(s_m)            , preto_m                , branco_m                 , 0, 100), 0, 100)>=65  &&
+        constrain(map(analogRead(dir?s_dir:s_esq), dir?preto_dir:preto_esq, dir?branco_dir:branco_esq, 0, 100), 0, 100)>=50) {}
+}
+
+void esq_90() //* 90 esquerda
 {
 
   vel_frente();
   delay(delay_fre);
   serv_esq.write(0);
   serv_dir.write(0);
-  delay(delay_giro + delay_peq);
+  delay(delay_peq);
   Serial.println("passo");
-  
-    
-    // for(;;) {
-
-    //   if(constrain(map(analogRead(s_m), preto_m, branco_m, 0, 100), 0, 100) <= 50) {
-    //     break;
-    //   }
-
-    //   if(constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100) <= 50) {
-        // serv_esq.write(80);
-        // serv_dir.write(100);
-        // delay(820);
-
-        // serv_dir.write(90);
-        // serv_esq.write(180);
-        // delay(1800/2);
-
-        // serv_esq.write(100);
-        // serv_dir.write(80);
-        // delay(820/2);
-
-        //* velocidade (medida):  ~16cm/s, largura (medida): 13cm
-        //* velocidade angular (direita): 450º/9s = 360º/7.2s = 50º/s = 1.7453 rad/s
-        //* 16cm--1s / 13/2cm--0.41s
-        //* 450º--9s / 90º--1.8s
-
-    //     break;
-    //   }
-    // }
-    while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50  &&
-          constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {}
-
-    //while(map(analogRead(s_dir), preto_dir, branco_dir, 0, 1023) >= 500) { }
-
-  //vel_re();
-  //delay(delay_re);
+  while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50  &&
+        constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {}
 }
 
-void dir_90(unsigned long delay_giro = 0) //* 90 direita
+void dir_90() //* 90 direita
 {
   vel_frente();
   delay(delay_fre);
-//vel_direita();
   serv_esq.write(180);
   serv_dir.write(180);
-  delay(delay_giro + delay_peq);
+  delay(delay_peq);
   Serial.println("passo");
-
-    // for(;;) {
-      
-    //   if(constrain(map(analogRead(s_m), preto_m, branco_m, 0, 100), 0, 100) <= 50) {
-    //     break;
-    //   }
-
-    //   if(constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100)<=50) {
-        // serv_esq.write(80);
-        // serv_dir.write(100);
-        // delay(820);
-
-        // serv_dir.write(0);
-        // serv_esq.write(90);
-        // delay(1800/2);
-
-        // serv_esq.write(100);
-        // serv_dir.write(80);
-        // delay(820/2);
-
-        //* velocidade (medida):  ~16cm/s, largura (medida): 13cm
-        //* velocidade angular (direita): 450º/9s = 360º/7.2s = 50º/s = 1.7453 rad/s
-        //* 16cm--1s / 13/2cm--0.41s
-        //* 450º--9s / 90º--1.8s
-
-    //     break;
-    //   }
-    // }
 
     while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=65  &&
           constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100)>=20) {}
-
-  //vel_re();
-  //delay(delay_re);
 }
 #endif

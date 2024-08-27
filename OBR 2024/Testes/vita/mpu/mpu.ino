@@ -10,7 +10,7 @@ void setup() {
   // MPU::begin();
 
   // //MPU::mpu.calcOffsets(true, true);
-  mpu.calibrar_offsets(5000);
+  mpu.calibrar_offsets();
   delay(1000);
 
   // MPU::calibrar_offsets();
@@ -24,7 +24,7 @@ void loop() {
   float yaw = mpu.yaw();
   float pit = mpu.pitch();
   float rol = mpu.roll();
-  if(yaw >= (90.0 - (90.0*5.0/100.0)) || yaw <= -90.0 + (90.0*5.0/100.0)) mpu.reset_yaw();
+  //if(yaw >= (90.0 - (90.0*5.0/100.0)) || yaw <= -90.0 + (90.0*5.0/100.0)) mpu.reset_yaw();
 
   // Serial.print("gyro xyz ");
   // Serial.print(MPU::gyroX()); Serial.print("\t");
