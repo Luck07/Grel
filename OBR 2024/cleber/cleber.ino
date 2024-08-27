@@ -44,15 +44,20 @@ void setup() {
   mpu.set_gyro_offsets( 0.95f, -1.66f, 0.54f);
   mpu.set_accl_offsets(-0.08f, -0.01f, 1.00f);
 
-  display.print(mpu.get_gyro_Xoffset()); display.print("/");
-  display.print(mpu.get_gyro_Yoffset()); display.print("/");
+  display.print  (mpu.get_gyro_Xoffset()); display.print("/");
+  display.print  (mpu.get_gyro_Yoffset()); display.print("/");
   display.println(mpu.get_gyro_Zoffset());
-  display.print(mpu.get_accl_Xoffset()); display.print("/");
-  display.print(mpu.get_accl_Yoffset()); display.print("/");
+  display.print  (mpu.get_accl_Xoffset()); display.print("/");
+  display.print  (mpu.get_accl_Yoffset()); display.print("/");
   display.println(mpu.get_accl_Zoffset());
 
-  delay(100);
-  display.clear();
+//   serv_esq.write(0);
+//   serv_dir.write(0);//45ang/s
+//   delay(4100);vel_parar();
+
+// for(;;)
+//   delay(100);
+//   display.clear();
 
   // serv_esq.write(90);
   // serv_dir.write(0);
@@ -130,6 +135,16 @@ void loop() {
   // Serial.print(analogRead(s_mdir)); Serial.print(" / ");
   // Serial.print(analogRead(s_dir)); Serial.println(" / ");
   
+  // display.clear();
+  // display.setCursor(0,2);
+  // display.print(analogRead(s_esq)) ; display.println(" / s_esq ");
+  // display.print(analogRead(s_mesq)); display.println(" / s_mseq");
+  // display.print(analogRead(s_m))   ; display.println(" / s_m   ");
+  // display.print(analogRead(s_mdir)); display.println(" / s_mdir");
+  // display.print(analogRead(s_dir)) ; display.println(" / s_dir ");
+  // delay(100);
+  // return;
+
   // tcs_soft.getRawData(&r1, &g1,&b1,&c1);
   // verde_esq = verde(r1,g1,b1,1.00);
   // tcs_real.getRawData(&r2, &g2, &b2, &c2);
@@ -247,10 +262,10 @@ void loop() {
         Serial.println("Frente");
 
         if(ult <= 9 && ult > 0) {
-          obstaculo2();
+          obstaculo();
         }
 
-        vel_frente_max();
+        vel_frente();
       } else {
         Serial.println("Frente Verdadeiro");
         ver = false;

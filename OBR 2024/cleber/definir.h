@@ -26,24 +26,24 @@ MPU6050 mpu(Wire);
 #define s_mdir A3  // A3
 #define s_dir  A4  // A4
 
-#define branco_esq  967 // 971
-#define branco_mesq 969 // 973
-#define branco_m    972 // 975
-#define branco_mdir 971 // 975
-#define branco_dir  969 // 971
+#define branco_esq  974 // 967
+#define branco_mesq 975 // 969
+#define branco_m    977 // 972
+#define branco_mdir 978 // 971
+#define branco_dir  975 // 969
 
-#define preto_esq  853 // 809
-#define preto_mesq 792 // 719
-#define preto_m    485 // 547
-#define preto_mdir 664 // 600
-#define preto_dir  617 // 622
+#define preto_esq  867 // 853
+#define preto_mesq 822 // 792
+#define preto_m    676 // 485
+#define preto_mdir 679 // 664
+#define preto_dir  594 // 617
 
 //Esquerda sendo branco e direita sendo preto
-#define media_esq (branco_esq + preto_esq) / 2
+#define media_esq  (branco_esq  + preto_esq ) / 2
 #define media_mesq (branco_mesq + preto_mesq) / 2
-#define media_m (branco_m + preto_m) / 2
+#define media_m    (branco_m    + preto_m   ) / 2
 #define media_mdir (branco_mdir + preto_mdir) / 2
-#define media_dir (branco_dir + preto_dir) / 2
+#define media_dir  (branco_dir  + preto_dir ) / 2
 
 bool s_bit = false;
 byte leitura = 0;
@@ -208,94 +208,86 @@ void giro_esq_ang_mpu(int angulo) {
   }
 }
 
-void obstaculo2() {
+void obstaculo() {
   OLED::print_obs();
   float yaw = 0.00f;
 
-  mpu.reset_yaw();
   serv_esq.write(180);
-  serv_dir.write(180);
-  while(abs(yaw) < 90.00f) {//-90
-    mpu.update();
-    yaw = mpu.yaw();
-  }
+  serv_dir.write(180);//45ang/s
+  delay(2000); // 90graus dir
 
+  //8cm/s
   vel_frente_max();
-  delay(medicoes::frente_ms_max(LARGURA));
+  delay(1937);//LARGURA*0.8/8
+  // delay(medicoes::frente_ms_max(LARGURA*0.8));
 
-  mpu.reset_yaw();
-  yaw = 0;
-  serv_esq.write(90);
-  serv_dir.write(180);
-  while(abs(yaw) < 90.00f) {//-90
-    mpu.update();
-    yaw = mpu.yaw();
-  }
-  vel_parar(5000);
+  serv_esq.write(0);
+  serv_dir.write(0);//43.9ang/s
+  delay(2050); //90graus esq
 
-  mpu.reset_yaw();
-  yaw = 0;
-  serv_esq.write(90);
-  serv_dir.write(180);
-  while(abs(yaw) < 90.00f) {//-90
-    mpu.update();
-    yaw = mpu.yaw();
-  }
-  vel_parar(5000);
-}
+  //8cm/s
+  vel_frente_max(); // 8cm/s
+  delay(4375); //35cm
 
-void obstaculo(bool dir = true) {
-  OLED::print_obs();
-  float yaw = 0.00f;
+  serv_esq.write(0);
+  serv_dir.write(0);//43.9ang/s
+  delay(2050); //90graus esq
 
-  mpu.reset_yaw();
-  serv_esq.write(180*dir);
-  serv_dir.write(180*dir);
-  while(abs(mpu.yaw()) < 90.00f) {//-90
-    mpu.update();
-  }
-  yaw = 90.00f + mpu.yaw();
+  vel_frente_max(); //8cm/s
+  delay(1637); //LARGURA*0.8/8 - 300ms
+  while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50) {}
+  vel_frente();
+  delay(delay_re/2);
 
-  vel_frente_max();
-  delay(medicoes::frente_ms_max(12));
 
-  mpu.reset_yaw(yaw);
-  serv_esq.write(180 - (180*dir)); 
-  serv_dir.write(180 - (180*dir));
-  while(abs(mpu.yaw()) < 90.00f) {//0
-    mpu.update();
-  }
-  yaw = mpu.yaw() - 90.00f;
+  serv_esq.write(180);
+  serv_dir.write(180);//45ang/s
+  delay(1333); //60graus dir
 
-  vel_frente_max();
-  delay(medicoes::frente_ms_max(25));
+  while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50  &&
+        constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {}
+  // mpu.reset_yaw();
+  // yaw = 0;
+  // serv_esq.write(90);
+  // serv_dir.write(0);
+  // while(abs(yaw) < 90.00f) {//-90
+  //   mpu.update();
+  //   yaw = mpu.yaw();
+  // }
+  // //vel_parar(100);
 
-  mpu.reset_yaw(yaw);
-  serv_esq.write(180 - (180*dir)); 
-  serv_dir.write(180 - (180*dir));
-  while(abs(mpu.yaw()) < 90.00f) {//90
-    mpu.update();
-  }
+  // vel_frente_max();
+  // delay(medicoes::frente_ms_max(10));
+  // vel_parar(100);
 
-  display.print("/");display.print(yaw);
-  vel_parar(15000);
+  // mpu.reset_yaw();
+  // yaw = 0;
+  // serv_esq.write(90);
+  // serv_dir.write(0);
+  // while(abs(yaw) < 90.00f) {//90
+  //   mpu.update();
+  //   yaw = mpu.yaw();
+  // }
+  // vel_parar(100);
 
-  vel_frente_max();
-  delay(medicoes::frente_ms_max(6));
-  while(constrain(map(analogRead(s_m)            , preto_m                , branco_m                 , 0, 100), 0, 100)>=65  &&
-        constrain(map(analogRead(dir?s_dir:s_esq), dir?preto_dir:preto_esq, dir?branco_dir:branco_esq, 0, 100), 0, 100)>=50) {}
-  //delay(delay_fre);
+  
+  // vel_frente_max();
+  // while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50) {}
+  // vel_re();
+  // delay(delay_re/2);
+  // vel_parar(0);
 
-  mpu.reset_yaw(yaw/9);
-  serv_esq.write(180*dir); 
-  serv_dir.write(180*dir);
-  while(abs(mpu.yaw()) < 30.00f) { //45
-    mpu.update();
-  }
+  // mpu.reset_yaw();
+  // yaw = 0;
+  // serv_esq.write(180);
+  // serv_dir.write(180);
+  // while(abs(yaw) < 60.00f) {//-30
+  //   mpu.update();
+  //   yaw = mpu.yaw();
+  // }
+  // while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50  &&
+  //       constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {}
 
-  delay(1000);
-  while(constrain(map(analogRead(s_m)            , preto_m                , branco_m                 , 0, 100), 0, 100)>=65  &&
-        constrain(map(analogRead(dir?s_dir:s_esq), dir?preto_dir:preto_esq, dir?branco_dir:branco_esq, 0, 100), 0, 100)>=50) {}
 }
 
 void esq_90() //* 90 esquerda
