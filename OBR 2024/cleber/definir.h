@@ -26,17 +26,17 @@ MPU6050 mpu(Wire);
 #define s_mdir A3  // A3
 #define s_dir  A4  // A4
 
-#define branco_esq  974 // 967
-#define branco_mesq 975 // 969
-#define branco_m    977 // 972
-#define branco_mdir 978 // 971
-#define branco_dir  975 // 969
+#define branco_esq  974 // 974
+#define branco_mesq 975 // 975
+#define branco_m    978 // 972
+#define branco_mdir 978 // 978
+#define branco_dir  975 // 975
 
-#define preto_esq  867 // 853
-#define preto_mesq 822 // 792
-#define preto_m    676 // 485
-#define preto_mdir 679 // 664
-#define preto_dir  594 // 617
+#define preto_esq  876 // 853
+#define preto_mesq 738 // 792
+#define preto_m    560 // 485
+#define preto_mdir 623 // 664
+#define preto_dir  633 // 617
 
 //Esquerda sendo branco e direita sendo preto
 #define media_esq  (branco_esq  + preto_esq ) / 2
@@ -57,7 +57,7 @@ Servo serv_dir;
 #define delay_fre 400 // 350
 #define velocidade_par 300  // 300
 #define delay_re 300 // 300
-#define delay_peq 100 //100
+#define delay_peq 600 //100
 
 
 //* Valores para desviar obstaculo
@@ -101,12 +101,21 @@ bool verde(int r, int g, int b, float tol = 1.00) {
   return (g >= tol * (r + b + g) / 3);
 }
 
+bool cinza(int r1, int g1, int b1, float tol1,
+           int r2, int g2, int b2, float tol2 ){
+  float t1 = tol1*(r1+g1+b1)/3;
+  float t2 = tol2*(r2+g2+b2)/3;
+  if(t1<1000 || t2<1000)return false;
+  return (abs(t1 - t2) < 100);
+
+}
+
 /*
  * trig == prim
  * echo == segun
  */
 
-Ultrasonic ultra_sonico(49, 48);
+// Ultrasonic ultra_sonico(49, 48);
 
 
 //* Inicio das funções, para cada caso
@@ -123,8 +132,10 @@ void vel_frente_max() {
 
 void vel_direita()
 {
-  serv_esq.write(90);
-  serv_dir.write(60);
+  //serv_esq.write(90);
+  //serv_dir.write(60);
+  serv_esq.write(60);
+  serv_dir.write(90);
 
   // uint8_t ddv = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 90), 0, 90);
   // Serial.print(ddv);Serial.print("&");
@@ -140,9 +151,10 @@ void vel_direita()
 }
 void vel_esquerda()
 {
-  serv_esq.write(120);
-  serv_dir.write(90);
-
+  // serv_esq.write(120);
+  // serv_dir.write(90);
+  serv_esq.write(90);
+  serv_dir.write(120);
   // uint8_t ddv_dir = constrain(map(analogRead(s_mdir), preto_mdir, branco_mdir, 0, 90), 0, 90);
   // uint8_t ddv_esq = constrain(map(analogRead(s_mesq), preto_mesq, branco_mesq, 0, 90), 0, 90);
   // ddv_dir = (90 - ddv_dir) /9;
@@ -208,44 +220,50 @@ void giro_esq_ang_mpu(int angulo) {
   }
 }
 
-void obstaculo() {
+void obstaculo(bool direita =true) {
   OLED::print_obs();
   float yaw = 0.00f;
+  unsigned dl90 = direita ? 2000 : 2050;
+  
 
-  serv_esq.write(180);
-  serv_dir.write(180);//45ang/s
-  delay(2000); // 90graus dir
+  serv_esq.write(180*direita);
+  serv_dir.write(180*direita);//45ang/s
+  delay(dl90); // 90graus dir
 
   //8cm/s
   vel_frente_max();
   delay(1937);//LARGURA*0.8/8
   // delay(medicoes::frente_ms_max(LARGURA*0.8));
 
-  serv_esq.write(0);
-  serv_dir.write(0);//43.9ang/s
-  delay(2050); //90graus esq
+  serv_esq.write(180-(180*direita));
+  serv_dir.write(180-(180*direita));//43.9ang/s
+  delay(dl90); //90graus esq
 
   //8cm/s
   vel_frente_max(); // 8cm/s
-  delay(4375); //35cm
+  delay(4575); //35cm
 
-  serv_esq.write(0);
-  serv_dir.write(0);//43.9ang/s
-  delay(2050); //90graus esq
+  serv_esq.write(180-(180*direita));
+  serv_dir.write(180-(180*direita));//43.9ang/s
+  delay(dl90); //90graus esq
 
   vel_frente_max(); //8cm/s
   delay(1637); //LARGURA*0.8/8 - 300ms
   while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50) {}
   vel_frente();
-  delay(delay_re/2);
+  delay(delay_re+100);
 
 
-  serv_esq.write(180);
-  serv_dir.write(180);//45ang/s
-  delay(1333); //60graus dir
+  serv_esq.write(180*direita);
+  serv_dir.write(180*direita);//45ang/s
+  delay(1350); //60graus dir
 
-  while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50  &&
-        constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {}
+  if(direita)
+    while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50  &&
+          constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {}
+  else
+    while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50  &&
+          constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100)>=50) {}
   // mpu.reset_yaw();
   // yaw = 0;
   // serv_esq.write(90);

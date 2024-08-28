@@ -176,4 +176,3 @@ void MPU6050::calibrar_offsets(int total, bool print, bool gyro, bool accl) {
     Serial.print(_accl_Yoffset); Serial.print(", ");
     Serial.println(_accl_Zoffset);
 }
-
