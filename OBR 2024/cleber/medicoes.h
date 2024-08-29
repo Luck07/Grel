@@ -16,15 +16,13 @@
 #define DISTANCIA_MINIMA_OBSTACULO 8.69 //cm
 
 #define V_FRENTE     3.96 //cm/s (120,60) 
-// #define V_FRENTE_MAX 5.26 //cm/s (180, 0)
-#define V_FRENTE_MAX 8.00
+#define V_FRENTE_MAX 5.26 //cm/s (180, 0)
 
 #define V_FRENTE_CALC     4.26 //cm/s, calculado ocm v_ang
 #define V_FRENTE_CALC_MAX 5.53 //cm/s, calculado ocm v_ang
 
 #define V_TRAS     4.64 //cm/s (60,120)
-// #define V_TRAS_MAX 6.00 //cm/s ( 0,180)
-#define V_TRAS_MAX 7.90
+#define V_TRAS_MAX 6.00 //cm/s ( 0,180)
 
 #define V_ANG_ESQ     11.76 //ang/s (120, 90) -> 2.05cm/s no raio comprimento/2
 #define V_ANG_ESQ_MAX 15.76 //ang/s (180, 90) -> 2.75cm/s no raio comprimento/2
@@ -33,12 +31,10 @@
 #define V_ANG_DIR_MAX 15.92 //ang/s (90,  0) -> 2.77cm/s no raio comprimento/2
 
 #define V_GIRO_ESQ     30    //ang/s (60,60)
-// #define V_GIRO_ESQ_MAX 35.57 //ang/s ( 0, 0)
-#define V_GIRO_ESQ_MAX 43.90
+#define V_GIRO_ESQ_MAX 35.57 //ang/s ( 0, 0)
 
 #define V_GIRO_DIR     29.5  //ang/s (120,120)
-// #define V_GIRO_DIR_MAX 37.06 //ang/s (180,180)
-#define V_GIRO_DIR_MAX 45.00
+#define V_GIRO_DIR_MAX 37.06 //ang/s (180,180)
 
 namespace medicoes {
  inline unsigned long frente_ms    (int cm) { return (unsigned long)1000*cm/V_FRENTE    ; }

@@ -115,6 +115,12 @@ namespace OLED {
   else
    display.print(".....");
  }
+
+ void print_ult(int ult) {
+  display.clearLine(6);
+  display.setCursor(center((ult<9)?1:2), 6);
+  display.print(ult);
+ }
 }
 
 #endif

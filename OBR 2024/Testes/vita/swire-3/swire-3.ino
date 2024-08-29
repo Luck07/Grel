@@ -23,21 +23,21 @@ void setup(void) {
   sWire.setTimeout_ms(200);
 
   Serial.println("-");
-  Serial.print("(real)");
+  Serial.print("(real)-i2c-");
   while(!i2c_real.begin()) {
     Serial.print(".");
     delay(300);
   }
   Serial.println("found");
 
-  Serial.print("(software)");
+  Serial.print("(software)-i2c-");
   while(!i2c_software.begin()) {
     Serial.print(".");
     delay(300);
   }
   Serial.println("found");
 
-  Serial.print("(soft)");
+  Serial.print("(soft)-i2c-");
   while(!i2c_soft.begin()) {
     Serial.print(".");
     delay(300);
@@ -45,21 +45,22 @@ void setup(void) {
   Serial.println("found");
 
   Serial.println("---");
-  Serial.print("(real)");
+
+  Serial.print("(real)-tcs-");
   while(!tcs_real.begin(&Wire)) {
     Serial.print(".");
     delay(300);
   }
   Serial.println("found");
 
-  // Serial.print("(software)");
-  // while(!tcs_software.begin(&swWire)) {
-  //   Serial.print(".");
-  //   delay(300);
-  // }
-  // Serial.println("found");
+  Serial.print("(software)-tcs-");
+  while(!tcs_software.begin(&swWire)) {
+    Serial.print(".");
+    delay(300);
+  }
+  Serial.println("found");
 
-  Serial.print("(soft)");
+  Serial.print("(soft)-tcs-");
   while(!tcs_soft.begin(&sWire)) {
     Serial.print(".");
     delay(300);

@@ -99,6 +99,7 @@ public:
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.println(F("\tI2CDevice could not write such a large buffer"));
 #endif
+    Serial.print(" [ERR (1)] ");
     return false;
   }
 
@@ -110,6 +111,7 @@ public:
 #ifdef DEBUG_SERIAL
       DEBUG_SERIAL.println(F("\tI2CDevice failed to write"));
 #endif
+      Serial.print(" [ERR (2)] ");
       return false;
     }
   }
@@ -119,6 +121,7 @@ public:
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.println(F("\tI2CDevice failed to write"));
 #endif
+    Serial.print(" [ERR (3)] ");
     return false;
   }
 
@@ -153,11 +156,13 @@ public:
     DEBUG_SERIAL.println();
     // DEBUG_SERIAL.println("Sent!");
 #endif
+    Serial.print(" [TRUE (1)] ");
     return true;
   } else {
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.println("\tFailed to send!");
 #endif
+    Serial.print(" [ERR (4)] ");
     return false;
   }
   }

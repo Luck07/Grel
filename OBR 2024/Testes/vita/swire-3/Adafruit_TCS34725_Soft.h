@@ -510,7 +510,9 @@ public:
   */
   uint8_t read8(uint8_t reg) {
     uint8_t buffer[1] = {(uint8_t)(TCS34725_COMMAND_BIT | reg)};
+    Serial.print("BUFFER[0]=");Serial.print(buffer[0]);Serial.print("/BUFFER[1]=");Serial.print(buffer[1]);Serial.print(" / ");
     i2c_dev->write_then_read(buffer, 1, buffer, 1);
+    Serial.print("BUFFER[0]=");Serial.print(buffer[0]);Serial.print("/BUFFER[1]=");Serial.print(buffer[1]);Serial.print(" / ");
     return buffer[0];
   }
 

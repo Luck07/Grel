@@ -39,10 +39,10 @@ void setup() {
 
   mpu.begin();
   display.println("calibrando mpu");
-  // mpu.calibrar_offsets(3000);
+  // mpu.calibrar_offsets();
 
-  mpu.set_gyro_offsets( 0.95f, -1.66f, 0.54f);
-  mpu.set_accl_offsets(-0.08f, -0.01f, 1.00f);
+  mpu.set_gyro_offsets( 0.97f, -1.68f, 0.55f);
+  mpu.set_accl_offsets(-0.04f, -0.03f, 1.00f);
 
   display.print  (mpu.get_gyro_Xoffset()); display.print("/");
   display.print  (mpu.get_gyro_Yoffset()); display.print("/");
@@ -50,12 +50,11 @@ void setup() {
   display.print  (mpu.get_accl_Xoffset()); display.print("/");
   display.print  (mpu.get_accl_Yoffset()); display.print("/");
   display.println(mpu.get_accl_Zoffset());
-  delay(100);
+  // for(;;)delay(1000);
   display.clear();
-
 //   serv_esq.write(0);
-//   serv_dir.write(180);//45ang/s
-//   delay(5000);vel_parar();
+//   serv_dir.write(0);//45ang/s
+//   delay(4100);vel_parar();
 
 // for(;;)
 //   delay(100);
@@ -91,6 +90,8 @@ void setup() {
   // display.printLong(__m);display.println("/");
 }
 
+int yaw = 0;
+
 void loop() {
   bool besq, bmesq, bm, bmdir, bdir;
   ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
@@ -106,8 +107,7 @@ void loop() {
   uint16_t r2, g2, b2, c2; //dir, real
   bool verde_esq = false;
   bool verde_dir = false;
-  // int ult = ultra_sonico.read();
-  int ult = 0;
+  int ult = ultra_sonico.read();
 
   Serial.print(besq);
   Serial.print(bmesq);
@@ -115,73 +115,25 @@ void loop() {
   Serial.print(bmdir);
   Serial.print(bdir);
   Serial.print("\t");
-
-  //display.clear();
-
-  // display.setCursor(W/2 - (2*lw), 0);
-  // display.print(besq);
-  // display.print(bmesq);
-  // display.print(bm);
-  // display.print(bmdir);
-  // display.print(bdir);
-
-  // Serial.print(" / ");
-  // Serial.print(esq);  Serial.print("-"); Serial.print(besq);  Serial.print(" / ");
-  // Serial.print(mesq); Serial.print("-"); Serial.print(bmesq); Serial.print(" / ");
-  // Serial.print(m);    Serial.print("-"); Serial.print(bm);    Serial.print(" / ");
-  // Serial.print(mdir); Serial.print("-"); Serial.print(bmdir); Serial.print(" / ");
-  // Serial.print(dir);  Serial.print("-"); Serial.print(bdir);  Serial.println(" / ");
-
-  // Serial.print(analogRead(s_esq)); Serial.print(" / ");
-  // Serial.print(analogRead(s_mesq)); Serial.print(" / ");
-  // Serial.print(analogRead(s_m)); Serial.print(" / ");
-  // Serial.print(analogRead(s_mdir)); Serial.print(" / ");
-  // Serial.print(analogRead(s_dir)); Serial.println(" / ");
   
-  // display.setCursor(0,2);
-  // display.print(analogRead(s_esq)) ; display.println(" / s_esq ");
-  // display.print(analogRead(s_mesq)); display.println(" / s_mseq");
-  // display.print(analogRead(s_m))   ; display.println(" / s_m   ");
-  // display.print(analogRead(s_mdir)); display.println(" / s_mdir");
-  // display.print(analogRead(s_dir)) ; display.println(" / s_dir ");
-  // delay(500);
 
-  // display.clear();return;
-
-  // tcs_soft.getRawData(&r1, &g1, &b1, &c1);
-  // tcs_real.getRawData(&r2, &g2, &b2, &c2);
-
-  // display.setCursor(0, 3);
-  // display.print(verde(r1, g1, b1, 1.00));
-  // display.print("/");
-  // display.println(verde(r2, g2, b2, 1.05));
-
-  // display.print(verde(g1, r1, b1, 1.00));
-  // display.print("/");
-  // display.println(verde(g2, r2, b2, 1.05));
-
-  // display.print(cinza(r1, g1, b1, 1.00,
-  //                     r2, g2, b2, 1.05));delay(500);return;
-
-  // OLED::print_sens(besq, bmesq, bm, bmdir, bdir);display.clear();
-  // display.setCursor(0, 3);
-  // tcs_soft.getRawData(&r1, &g1, &b1, &c1);
-  // tcs_real.getRawData(&r2, &g2, &b2, &c2);
-  // display.print(r1);display.print(";");
-  // display.print(g1);display.print(";");
-  // display.println(b1);
-  // display.print(r2);display.print(";");
-  // display.print(g2);display.print(";");
-  // display.println(b2);delay(200);return;
-  // display.clear();
-  //3592 3120 2696 3136 147
-  //3050 2922 2568 2846
-
-  //2924 2519 2209 2550 51
-  //2545 2429 2168 2380
-
-  //796 659 543  666
-  //601 604 527 577 
+  #ifdef calpb
+  Serial.print(analogRead(s_esq)); Serial.print(" / ");
+  Serial.print(analogRead(s_mesq)); Serial.print(" / ");
+  Serial.print(analogRead(s_m)); Serial.print(" / ");
+  Serial.print(analogRead(s_mdir)); Serial.print(" / ");
+  Serial.print(analogRead(s_dir)); Serial.println(" / ");
+  
+  display.clear();
+  display.setCursor(0,2);
+  display.print(analogRead(s_esq)) ; display.println(" / s_esq ");
+  display.print(analogRead(s_mesq)); display.println(" / s_mseq");
+  display.print(analogRead(s_m))   ; display.println(" / s_m   ");
+  display.print(analogRead(s_mdir)); display.println(" / s_mdir");
+  display.print(analogRead(s_dir)) ; display.println(" / s_dir ");
+  delay(100);
+  return;
+  #endif
 
   // tcs_soft.getRawData(&r1, &g1,&b1,&c1);
   // verde_esq = verde(r1,g1,b1,1.00);
@@ -192,9 +144,13 @@ void loop() {
 
   OLED::print_sens(besq, bmesq, bm, bmdir, bdir);
   OLED::print_verdes(verde_esq, verde_dir);
-  display.clearLine(6);
-  display.setCursor(OLED::center((ult<9)?1:2), 6);
-  display.print(ult);
+  OLED::print_ult(ult);
+  display.clearLine(5);
+  display.setCursor(OLED::center(2),5);
+  display.print(yaw);
+  // display.print(analogRead(s_esq));
+  // display.print(" / ");
+  // display.print(analogRead(s_dir));
   Serial.print("(ultrasonico=");
   Serial.print(ult);
   Serial.println(") ");
@@ -231,19 +187,36 @@ void loop() {
           ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
           if(!(besq || bmesq || bm || bmdir || bdir)) {
             vel_re_max();
-            delay(medicoes::tras_ms_max(FITA_LARGURA * 1.55));
-            // giro_esq_ang_mpu(45);
-            giro_esq_ang(45);
-            esq_90();
+            delay(medicoes::tras_ms_max(FITA_LARGURA * 1.5));
+            // esq_90();
             // serv_esq.write(0);
             // serv_dir.write(0);
-            // delay(delay_peq);
-            // Serial.println("passo");
-            // while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50  &&
-            //       constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {}
+            // delay(medicoes::esq_giro_ms_max(60));
+            // giro_esq_ang(60);
+            // while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=20  &&
+            //       constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=60) {}
+
+            giro_esq_ang(60);
+            while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=20 ) {
+              if( constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=60) {
+                giro_dir_ang(30);
+                break;
+              }
+            }
+            // if(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=20  ||
+            //    constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=60) {
+            //   esq_90();
+            // } else {
+            //   while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=20  &&
+            //         constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=60) {}
+            // }
+
+            vel_re_max();
+            delay(delay_re/2);
           }
         }
       }
+      mpu.reset_yaw();yaw=0;
       break;
 
     case 0b00001:
@@ -277,36 +250,54 @@ void loop() {
           ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
           if(!(besq || bmesq || bm || bmdir || bdir)) {
             vel_re_max();
-            delay(medicoes::tras_ms_max(FITA_LARGURA * 1.55));
-            giro_dir_ang(45);
-            dir_90();
+            delay(medicoes::tras_ms_max(FITA_LARGURA * 1.5));
+            // dir_90();
             // serv_esq.write(180);
             // serv_dir.write(180);
-            // delay(delay_peq);
-            // Serial.println("passo");
-            //   while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=65  &&
-            //         constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100)>=20) {}
+            // giro_dir_ang(60);
+              // while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=20  &&
+              //       constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100)>=60) {}
+            
+            giro_dir_ang(60);
+            while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=20) {
+              if(constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100)>=60) {
+                giro_esq_ang(30);
+                break;
+              }
+            }
+
+            // if(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=20  ||
+            //    constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100)>=60) {
+            //   esq_90();
+            // } else {
+            //   while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=20  &&
+            //         constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100)>=60) {}
+            // }
+
+            vel_re_max();
+            delay(delay_re/2);
           }
         }
       }
+        mpu.reset_yaw();yaw=0;
       break;
 
     // case 0b01000:
     // case 0b00010:
+    case 0b00100:mpu.reset_yaw();yaw=0;
     case 0b01100:
     case 0b00110:
-    case 0b00100:
     case 0b01110:
     case 0b01010: //-----------------------frente-------------------------
       OLED::print_frente(ver);
       if (!ver) {
         Serial.println("Frente");
 
-        // if(ult <= 9 && ult > 0) {
-        //   obstaculo(true);
-        // } 
-        
-        
+        mpu.update();yaw = mpu.yaw();
+
+        if(ult <= 9 && ult > 0) {
+          obstaculo();
+        }
 
         vel_frente();
       } else {
@@ -324,7 +315,7 @@ void loop() {
         Serial.println("micro esq");
         vel_direita();
       } else {
-        Serial.println("micro esq Verdadeiro");
+        Serial.println("micro esq Verdadeiro");mpu.update();yaw = mpu.yaw();
         ver = false;
         vel_re();
         delay(delay_re/2);
@@ -335,7 +326,7 @@ void loop() {
     //case 0b00110:
       OLED::print_micro(true, ver);
       if (!ver) {
-        Serial.println("micro dir");
+        Serial.println("micro dir");mpu.update();yaw = mpu.yaw();
         vel_esquerda();
       } else {
         Serial.println("micro dir Verdadeiro");
@@ -354,14 +345,34 @@ void loop() {
         delay(delay_re);
       } else {
         Serial.println("frente (gap)");
-        // display.clearLine(3);
+        mpu.update();yaw=mpu.yaw();
+
+        if(yaw > 10) {
+          serv_esq.write(90);
+          serv_dir.write(120);
+          delay(350);
+        }else if(yaw < -15) {
+          serv_esq.write(60);
+          serv_dir.write(90);
+          delay(350);
+        }mpu.reset_yaw();yaw=0;
+
+        // if(abs(yaw) >= 5) {
+        //   bool a = (yaw>1)?0:1;
+        //   serv_esq.write(90 - (30*a));
+        //   serv_dir.write(90 + (30*a));
+        //   if(abs(yaw) >= 10) {
+        //     delay(200);
+        //   }
+        //   delay(200);
+        //   mpu.reset_yaw();
+        //   yaw=0;
+        // }
+
         vel_frente_max();
         
         tcs_soft.getRawData(&r1, &g1, &b1, &c1);
         if(verde(g1, r1, b1, 1.1)) {
-          // display.setCursor(0, 3);
-          // display.print("1ver--");
-          // vel_parar(2000);
           tcs_real.getRawData(&r2, &g2, &b2, &c2);
           if(verde(g2, r2, b2, 1.1)) {
             vel_parar();
@@ -373,34 +384,12 @@ void loop() {
               delay(500);
               display.invertDisplay(false);
               delay(500);
-            } 
-          }//else if(cinza(r1,g1,b1,1.00, r2,g2,b2,1.05)) {
-
-          //     display.setCursor(0, 3);
-          //     display.print("cinza");
-          //     // vel_parar(5000);
-
-
-          //     serv_esq.write(180);
-          //     serv_dir.write(180);//45ang/s
-          //     delay(1000); // 45graus dir
-
-          //     vel_frente_max();
-          //     delay(6250);
-          //     while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50) {}
-              
-          //     serv_esq.write(0);
-          //     serv_dir.write(0);
-          //     delay(1025);
-          //     while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50  &&
-          //           constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {}
-
-          //     vel_frente();
-          //   }
+            }
+          }
         }
       }
-      break;
 
+      break;
     case 0b11111:
     case 0b10001:
     case 0b10011:
@@ -420,36 +409,37 @@ void loop() {
       verde_dir = verde(r2, g2, b2, 1.05);
       OLED::print_verdes(verde_esq, verde_dir);
       
-      display.clearLine(3);
-      display.setCursor(OLED::center(12), 3);
-      display.print("encru -> ");
+      // display.clearLine(3);
+      // display.setCursor(OLED::center(12), 3);
+      // display.print("encru -> ");
       if (verde_esq && verde_dir) {
-        display.print("180");
+        // display.print("180");
         Serial.print("tudo verd");
         giro_esq_ang(135);
         while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50  &&
               constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {}
       } else if (verde_esq && !verde_dir) {
-        display.print("esq");
+        // display.print("esq");
         Serial.print("esq verde");
         // giro_esq_ang(30);
         giro_esq_ang_mpu(30);
         esq_90();
       } else if (!verde_esq && verde_dir) {
-        display.print("dir");
+        // display.print("dir");
         Serial.print("dir verde");
         //giro_dir_ang(30);
         giro_dir_ang_mpu(30);
         dir_90();
       } else {
-        display.print("nad");
+        // display.print("nad");
         Serial.print("NADa verde");
         vel_frente_max();
         delay(medicoes::frente_ms_max(2));
         vel_frente();
       }
-      Serial.println("");
       display.clearLine(3);
+      Serial.println("");
+      mpu.reset_yaw();yaw=0;
       break;
     default: Serial.print("."); break;
   }
