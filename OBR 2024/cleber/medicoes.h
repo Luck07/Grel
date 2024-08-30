@@ -4,7 +4,7 @@
 #define COMPRIMENTO 21 //cm
 #define LARGURA     15.5 //cm
 #define FITA_LARGURA 2 //cm
-
+#define LADRILHO 30 //cm
 
 /*
   funcao de trajetoria = f(t) = sqrt(l*l - t*t) + t
