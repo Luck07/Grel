@@ -7,14 +7,15 @@
 #define W OLED_W/lw
 #define H OLED_H/lh
 
-// SEL 3
-// AU  4
-// AD  5
+// SELE 3
+// CIMA  4
+// BAIX  5
 // testar ^
 
-#define SEL 2
-#define AU  3
-#define AD  4
+#define BTN_SELE 2
+#define BTN_CIMA 3
+#define BTN_BAIX 4
+#define BTN_COOLDOWN 200 // ms
 
 LCD_SSD1306 display;
 
@@ -33,9 +34,9 @@ void setup() {
   display.setFontSize(FONT_SIZE_SMALL);
   display.clear();
 
-  pinMode(2, INPUT_PULLUP);
-  pinMode(3, INPUT_PULLUP);
-  pinMode(4, INPUT_PULLUP);
+  pinMode(BTN_SELE, INPUT_PULLUP);
+  pinMode(BTN_CIMA, INPUT_PULLUP);
+  pinMode(BTN_BAIX, INPUT_PULLUP);
 
   pinMode(5, OUTPUT);
   pinMode(6, OUTPUT);
@@ -47,12 +48,12 @@ unsigned long mil = millis();
 int center(int strlen) { return (W - strlen) * (lw/2); }
 
 void loop() {
-  bool cim = !digitalRead(AU);
-  bool bai = !digitalRead(AD);
-  bool sel = !digitalRead(SEL);
-  digitalWrite(5, digitalRead(SEL));
-  digitalWrite(6, digitalRead(AU));
-  digitalWrite(7, digitalRead(AD));
+  bool cim = !digitalRead(BTN_CIMA);
+  bool bai = !digitalRead(BTN_BAIX);
+  bool sel = !digitalRead(BTN_SELE);
+  digitalWrite(5, digitalRead(BTN_SELE));
+  digitalWrite(6, digitalRead(BTN_CIMA));
+  digitalWrite(7, digitalRead(BTN_BAIX));
 
   Serial.print(pos);Serial.print(" ");
 
@@ -67,11 +68,25 @@ void loop() {
 
   Serial.print(scr); Serial.print(" ");
   Serial.println(btn_mil);
-  if((cim || bai || sel) && btn_mil>200) {
+  if((cim || bai || sel) && btn_mil>BTN_COOLDOWN) {
     mil = millis();
-    if((pos>1 && cim) || (pos<lims[scr] && bai)) {
+
+    // sem loop de cima/baixo
+    // if((pos>1 && cim) || (pos<lims[scr] && bai)) {
+    //   display.clearLine(pos);
+    //   pos += (bai - cim);
+    //   display.clearLine(pos);
+    // }
+
+    // com loop
+    if(cim) {
       display.clearLine(pos);
-      pos += (bai - cim);
+      pos = (pos>1) ? pos-1 : lims[scr];
+      display.clearLine(pos);
+    }
+    if(bai) {
+      display.clearLine(pos);
+      pos = (pos<lims[scr]) ? pos+1 : 1;
       display.clearLine(pos);
     }
   }
@@ -87,7 +102,7 @@ void loop() {
       display.setCursor(7, 3); display.print("resulktados");
       display.setCursor(7, 4); display.print("dansa");
       
-      if(sel && btn_mil>200) {
+      if(sel && btn_mil>BTN_COOLDOWN) {
         display.clear();
         switch(pos) {
           case 1: scr = segue; break;
@@ -102,7 +117,7 @@ void loop() {
       display.setCursor(center(5), 0);
       display.print("segue");
       display.setCursor(0, 1); display.print("sigo");
-      if(sel && btn_mil>200) {
+      if(sel && btn_mil>BTN_COOLDOWN) {
         display.clear();
         scr = inicio;
         pos = 1;
@@ -118,7 +133,7 @@ void loop() {
       display.setCursor(7, 3); display.print("velocidade");
       display.setCursor(7, 4); display.print("voltar");
       
-      if(sel && btn_mil>200) {
+      if(sel && btn_mil>BTN_COOLDOWN) {
         display.clear();
         switch(pos) {
           case 1: scr = cal_infra; break;
@@ -139,7 +154,7 @@ void loop() {
       display.setCursor(7, 3); display.print("velocidade");
       display.setCursor(7, 4); display.print("voltar");
 
-      if(sel && btn_mil>200) {
+      if(sel && btn_mil>BTN_COOLDOWN) {
         display.clear();
         switch(pos) {
           case 1: scr = res_infra; break;
@@ -153,7 +168,7 @@ void loop() {
     case dansa:
       display.setCursor(center(11), 4);
       display.print("EM BREVE...");
-      if(sel && btn_mil>200) {
+      if(sel && btn_mil>BTN_COOLDOWN) {
         display.clear();
         scr = inicio;
         pos = 1;
@@ -165,7 +180,7 @@ void loop() {
 
       display.setCursor(0, 1);
       display.print("calibra mesmo");
-      if(sel && btn_mil>200) {
+      if(sel && btn_mil>BTN_COOLDOWN) {
         display.clear();
         scr = calibra;
         pos = 1;
@@ -177,7 +192,7 @@ void loop() {
 
       display.setCursor(0, 1);
       display.print("calibra mesmo");
-      if(sel && btn_mil>200) {
+      if(sel && btn_mil>BTN_COOLDOWN) {
         display.clear();
         scr = calibra;
         pos = 1;
@@ -189,7 +204,7 @@ void loop() {
 
       display.setCursor(0, 1);
       display.print("calibra mesmo");
-      if(sel && btn_mil>200) {
+      if(sel && btn_mil>BTN_COOLDOWN) {
         display.clear();
         scr = calibra;
         pos = 1;
@@ -201,7 +216,7 @@ void loop() {
 
       display.setCursor(0, 1);
       display.print("ve mesmo");
-      if(sel && btn_mil>200) {
+      if(sel && btn_mil>BTN_COOLDOWN) {
         display.clear();
         scr = resultados;
         pos = 1;
@@ -213,7 +228,7 @@ void loop() {
 
       display.setCursor(0, 1);
       display.print("ve mesmo");
-      if(sel && btn_mil>200) {
+      if(sel && btn_mil>BTN_COOLDOWN) {
         display.clear();
         scr = resultados;
         pos = 1;
@@ -225,7 +240,7 @@ void loop() {
 
       display.setCursor(0, 1);
       display.print("ve mesmo");
-      if(sel && btn_mil>200) {
+      if(sel && btn_mil>BTN_COOLDOWN) {
         display.clear();
         scr = resultados;
         pos = 1;
