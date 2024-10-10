@@ -7,6 +7,11 @@
 #define W OLED_W/lw
 #define H OLED_H/lh
 
+// SEL 3
+// AU  4
+// AD  5
+// testar ^
+
 #define SEL 2
 #define AU  3
 #define AD  4
