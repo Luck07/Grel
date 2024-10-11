@@ -65,8 +65,8 @@ bool s_bit = false;
 byte leitura = 0;
 bool ver = false;     // O Verifica para os switchs
 
-#define servo_esquerda 11
-#define servo_direita 12
+#define servo_esquerda 10
+#define servo_direita 11
 Servo serv_esq;
 Servo serv_dir;
 
