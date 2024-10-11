@@ -19,12 +19,13 @@ MPU6050 mpu(Wire);
 #include <Servo.h>
 // mpu6050 i2c = 0x68
 
-//* Definindo as portas dos sensores
-#define s_esq  A15 // A15
-#define s_mesq A2  // A2
-#define s_m    A0  // A0
-#define s_mdir A3  // A3
-#define s_dir  A4  // A4
+/* Definindo as portas dos sensores
+                      Antes*/                     
+#define s_esq  A2 //  A15
+#define s_mesq A1  //  A2
+#define s_m    A4  //  A0
+#define s_mdir A0  //  A3
+#define s_dir  A3  //  A4
 
 // #define calpb
 // #define caltcs
