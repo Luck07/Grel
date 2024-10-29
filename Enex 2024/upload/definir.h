@@ -151,7 +151,7 @@ bool cinza(int r1, int g1, int b1,
  * echo == segun
  */
 
-Ultrasonic ultra_sonico(49, 48);
+Ultrasonic ultra_sonico(6, 12);
 
 
 //* Inicio das funções, para cada caso
