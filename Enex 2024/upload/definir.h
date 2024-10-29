@@ -27,7 +27,7 @@ MPU6050 mpu(Wire);
 #define s_mdir A0  //  A3
 #define s_dir  A3  //  A4
 
-// #define calpb
+//#define calpb
 // #define caltcs
 
 // #define branco_esq  971 // 967
@@ -42,17 +42,17 @@ MPU6050 mpu(Wire);
 // #define preto_mdir 634 // 664
 // #define preto_dir  616 // 617
 
-#define branco_esq  975 // 967
-#define branco_mesq 976 // 969
-#define branco_m    979 // 972
-#define branco_mdir 978 // 971
-#define branco_dir  976 // 969
+#define branco_esq  975  // 975 // 967
+#define branco_mesq 976  // 976 // 969
+#define branco_m    979  // 979 // 972
+#define branco_mdir 979  // 978 // 971
+#define branco_dir  974  // 976 // 969
 
-#define preto_esq  835 // 853
-#define preto_mesq 741 // 792
-#define preto_m    504 // 485
-#define preto_mdir 629 // 664
-#define preto_dir  615 // 617
+#define preto_esq  799 // 853
+#define preto_mesq 646 // 792
+#define preto_m    525 // 485
+#define preto_mdir 800 // 664
+#define preto_dir  571 // 617
 
 //Esquerda sendo branco e direita sendo preto
 #define media_esq  (branco_esq  + preto_esq ) / 2
@@ -151,7 +151,7 @@ bool cinza(int r1, int g1, int b1,
  * echo == segun
  */
 
-Ultrasonic ultra_sonico(6, 12);
+Ultrasonic ultra_sonico(49, 48);
 
 
 //* Inicio das funções, para cada caso
