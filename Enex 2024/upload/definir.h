@@ -27,8 +27,8 @@ MPU6050 mpu(Wire);
 #define s_mdir A0  //  A3
 #define s_dir  A3  //  A4
 
-//#define calpb
-// #define caltcs
+// #define calpb
+#define caltcs
 
 // #define branco_esq  971 // 967
 // #define branco_mesq 975 // 969
@@ -50,7 +50,7 @@ MPU6050 mpu(Wire);
 
 #define preto_esq  799 // 853
 #define preto_mesq 646 // 792
-#define preto_m    525 // 485
+#define preto_m    610 // 485
 #define preto_mdir 800 // 664
 #define preto_dir  571 // 617
 
@@ -105,10 +105,13 @@ void ler_sensores(bool* besq, bool* bmesq, bool* bm, bool* bmdir, bool* bdir) {
   esq:  1.00
   dir:  1.05
   verm: 1.10
+
+  r1, g1, b1 = esquerda
+  r2, g2, b2 = direita
 */
 
-#define ESQ_VERDE_TOL 1.00 //07
-#define DIR_VERDE_TOL 1.05 
+#define ESQ_VERDE_TOL 1.22 // 1.025
+#define DIR_VERDE_TOL 1.15 // 0.98
 bool verde(int r, int g, int b, float tol) { 
   // Serial.print(g);
   // Serial.print("/");
@@ -116,8 +119,9 @@ bool verde(int r, int g, int b, float tol) {
   // Serial.print("-");
   // Serial.print(tol * (r + b + g) / 3);
   // Serial.print("\t");
-  if ((r + b + g) / 3 >= 2900) return false;
-  return (g >= tol * (r + b + g) / 3);
+  if ((r + b + g) / 3 >= 1900) return false;
+  //return (g >= tol * (r + g + b) / 3);
+  return (g >= tol * b);
 }
 
 /**
@@ -307,7 +311,6 @@ void obstaculo(bool dir = true) {
 
 void esq_90() //* 90 esquerda
 {
-
   vel_frente();
   delay(delay_fre);
   serv_esq.write(0);
@@ -315,7 +318,12 @@ void esq_90() //* 90 esquerda
   delay(delay_peq);
   Serial.println("passo");
   while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50  &&
-        constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {}
+        constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {
+          display.clear();
+          display.setCursor(0,0);
+
+          display.println(analogRead(s_m));
+        }
 }
 
 void dir_90() //* 90 direita
