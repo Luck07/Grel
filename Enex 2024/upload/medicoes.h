@@ -15,8 +15,8 @@
 */
 #define DISTANCIA_MINIMA_OBSTACULO 8.69 //cm
 
-#define V_FRENTE     3.96 //cm/s (120,60) 
-#define V_FRENTE_MAX 5.26 //cm/s (180, 0)
+#define V_FRENTE     8.5  //cm/s (120,60) 
+#define V_FRENTE_MAX 11.8 //cm/s (180, 0)
 
 #define V_FRENTE_CALC     4.26 //cm/s, calculado ocm v_ang
 #define V_FRENTE_CALC_MAX 5.53 //cm/s, calculado ocm v_ang
@@ -31,10 +31,10 @@
 #define V_ANG_DIR_MAX 15.92 //ang/s (90,  0) -> 2.77cm/s no raio comprimento/2
 
 #define V_GIRO_ESQ     30    //ang/s (60,60)
-#define V_GIRO_ESQ_MAX 35.57 //ang/s ( 0, 0)
+#define V_GIRO_ESQ_MAX 49.95 //ang/s ( 0, 0)
 
 #define V_GIRO_DIR     29.5  //ang/s (120,120)
-#define V_GIRO_DIR_MAX 37.06 //ang/s (180,180)
+#define V_GIRO_DIR_MAX 57.04 //ang/s (180,180)
 
 namespace medicoes {
  inline unsigned long frente_ms    (int cm) { return (unsigned long)1000*cm/V_FRENTE    ; }
@@ -50,12 +50,5 @@ namespace medicoes {
  inline unsigned long dir_giro_ms    (int angulo) { return (unsigned long)1000*angulo/V_GIRO_DIR    ; }
  inline unsigned long dir_giro_ms_max(int angulo) { return (unsigned long)1000*angulo/V_GIRO_DIR_MAX; }
 
- // inline unsigned long giro180_ms() {
- // #if (V_GIRO_DIR_MAX >= V_GIRO_ESQ_MAX)
- //  return dir_giro_ms_max(180);
- // #else
- //  return esq_giro_ms_max(180);
- // #endif
- // }
 }
 #endif

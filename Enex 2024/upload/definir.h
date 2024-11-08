@@ -11,8 +11,8 @@
 
 SoftwareWire sWire(A6, A5);
  
-Adafruit_TCS34725_SWwire tcs_real = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIONTIME_180MS, TCS34725_GAIN_16X); //direita
-Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIONTIME_180MS, TCS34725_GAIN_16X); //esquerda
+Adafruit_TCS34725_SWwire tcs_real = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIONTIME_199MS, TCS34725_GAIN_60X); //direita
+Adafruit_TCS34725_SWwire tcs_soft = Adafruit_TCS34725_SWwire(TCS34725_INTEGRATIONTIME_199MS, TCS34725_GAIN_60X); //esquerda
 MPU6050 mpu(Wire);
 
 
@@ -28,7 +28,7 @@ MPU6050 mpu(Wire);
 #define s_dir  A3  //  A4
 
 // #define calpb
-#define caltcs
+// #define caltcs
 
 // #define branco_esq  971 // 967
 // #define branco_mesq 975 // 969
@@ -48,11 +48,11 @@ MPU6050 mpu(Wire);
 #define branco_mdir 979  // 978 // 971
 #define branco_dir  974  // 976 // 969
 
-#define preto_esq  799 // 853
-#define preto_mesq 646 // 792
-#define preto_m    610 // 485
-#define preto_mdir 800 // 664
-#define preto_dir  571 // 617
+#define preto_esq  800// 799 // 853
+#define preto_mesq 722//646 // 792
+#define preto_m    560//610 // 485
+#define preto_mdir 592//800 // 664
+#define preto_dir  562//571 // 617
 
 //Esquerda sendo branco e direita sendo preto
 #define media_esq  (branco_esq  + preto_esq ) / 2
@@ -108,10 +108,13 @@ void ler_sensores(bool* besq, bool* bmesq, bool* bm, bool* bmdir, bool* bdir) {
 
   r1, g1, b1 = esquerda
   r2, g2, b2 = direita
+
+  dir 1.17 azul 1.067 total
+  esq 1.13 azul 1.096 total
 */
 
-#define ESQ_VERDE_TOL 1.22 // 1.025
-#define DIR_VERDE_TOL 1.15 // 0.98
+#define ESQ_VERDE_TOL 1.035//1.115 // 1.22 // 1.025
+#define DIR_VERDE_TOL 1.09//1.12  // 1.15 // 0.98
 bool verde(int r, int g, int b, float tol) { 
   // Serial.print(g);
   // Serial.print("/");
@@ -119,9 +122,10 @@ bool verde(int r, int g, int b, float tol) {
   // Serial.print("-");
   // Serial.print(tol * (r + b + g) / 3);
   // Serial.print("\t");
-  if ((r + b + g) / 3 >= 1900) return false;
-  //return (g >= tol * (r + g + b) / 3);
-  return (g >= tol * b);
+  // if ((r + b + g) / 3 >= 1900) return false;
+  if ((r + b + g) / 3 >= 8100) return false;
+  return (g >= tol * (r + g + b) / 3);
+  // return (g >= tol * b);
 }
 
 /**
@@ -155,7 +159,7 @@ bool cinza(int r1, int g1, int b1,
  * echo == segun
  */
 
-Ultrasonic ultra_sonico(49, 48);
+Ultrasonic ultra_sonico(6, 12);
 
 
 //* Inicio das funções, para cada caso
@@ -241,25 +245,25 @@ void giro_esq_ang(int angulo) {
 }
 
 void giro_dir_ang_mpu(int angulo) {
-  int yaw = 0;
-  mpu.reset_yaw();
-  serv_esq.write(180);
-  serv_dir.write(180);
-  while(abs(yaw) < angulo) {
-    mpu.update();
-    yaw = mpu.yaw();
-  }
+  // int yaw = 0;
+  // mpu.reset_yaw();
+  // serv_esq.write(180);
+  // serv_dir.write(180);
+  // while(abs(yaw) < angulo) {
+  //   mpu.update();
+  //   yaw = mpu.yaw();
+  // }
 }
 
 void giro_esq_ang_mpu(int angulo) {
-  int yaw = 0;
-  mpu.reset_yaw();
-  serv_esq.write(0);
-  serv_dir.write(0);
-  while(abs(yaw) < angulo) {
-    mpu.update();
-    yaw = mpu.yaw();
-  }
+  // int yaw = 0;
+  // mpu.reset_yaw();
+  // serv_esq.write(0);
+  // serv_dir.write(0);
+  // while(abs(yaw) < angulo) {
+  //   mpu.update();
+  //   yaw = mpu.yaw();
+  // }
 }
 
 void obstaculo(bool dir = true) {

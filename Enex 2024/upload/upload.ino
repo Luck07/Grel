@@ -1,10 +1,12 @@
 // Switch
 #include "definir.h"  // Dando include nas variaveis e funções
+#include "imu.h"
 // #include <Adafruit_GFX.h>
 // #include <Adafruit_SSD1306.h>
 
 // Usando array para colocar todos os pinos, coloquei os sensores em uma certa posição por causa do BitSwift em baixo
 const int pinos[] = { s_esq, s_mesq, s_m, s_mdir, s_dir };
+euler_t ypr;
 
 void setup() {
   Serial.begin(9600);
@@ -14,7 +16,7 @@ void setup() {
   display.clear();
   // display.print("oi");
 
-  if (!tcs_real.begin(&Wire)) {
+  if (!tcs_real.begin(&sWire)) {
     Serial.println("tcs real n");
     display.println("tcs real n");
   } else {
@@ -22,13 +24,22 @@ void setup() {
     display.println("tcs real");
   }
 
-  if (!tcs_soft.begin(&sWire)) {
+  if (!tcs_soft.begin(&Wire)) {
     Serial.println("tcs soft n");
     display.println("tcs soft n");
   } else {
     Serial.println("tcs soft passou");
     display.println("tcs soft");
   }
+
+  if (!imu.begin_I2C()) {
+    //if (!bno08x.begin_UART(&Serial1)) {  // Requires a device with > 300 byte UART buffer!
+    //if (!bno08x.begin_SPI(BNO08X_CS, BNO08X_INT)) {
+    Serial.println("Failed to find BNO08x chip");
+    while (1) { delay(10); }
+  }
+  Serial.println("BNO08x Found!");
+  setReports(reportType, reportIntervalUs);
 
   // Colocando os sensores como INPUT, e o resto como OUTPUT, tudo isso pelo array
   for (int i = 0; i < 5; i++)  // Usando o array para fazer os pinmode como input
@@ -60,45 +71,39 @@ void setup() {
   //   serv_dir.write(0);//45ang/s
   //   delay(4100);vel_parar();
 
-  // for(;;)
-  //   delay(100);
-  //   display.clear();
-
-  // serv_esq.write(90);
+  // update_imu(&ypr);
+  // float yaw = ypr.yaw;
   // serv_dir.write(0);
-  // delay(9000);
-  // vel_parar();
+  // serv_esq.write(0);
+  // unsigned long m = millis();
+  // Serial.println(yaw);
+  // delay(100);
 
-  // unsigned long mmm = 0;
-  // int yaw = 0;
+  // if(yaw == 0.0) yaw = 179.0;
 
-  // mpu.reset_yaw();
-  // serv_esq.write(180);
-  // serv_dir.write(180);
-  // unsigned long __m = millis();
-  // for(;abs(yaw) < 90;) {
-  //   mmm = millis();
-  //   mpu.update();
-  //   yaw = mpu.yaw();
-  //   // display.clear();
-  //   // display.printLong(mmm - __m);
+  // while(ypr.yaw >= -yaw) {
+  //   update_imu(&ypr);
+  //   Serial.println(ypr.yaw);
   // }
   // vel_parar();
   // unsigned long _m = millis();
-  // display.println(yaw);
-  // //display.print(__m - _m);display.print("/");display.println(__m - mmm);
-  // display.println(_m - __m);
-  // display.println(mmm - __m);
-  // display.printLong(mmm); display.println("/");
-  // display.printLong(_m);display.println("/");
-  // display.printLong(__m);display.println("/");
+  // display.clear();
+  // display.setCursor(1, 1);
+  // display.println(_m);
+  // display.println(m);
+  // display.println(_m - m);
+
+  serv_esq.write(180);
+  serv_dir.write(0);
+  delay(10000);
+  vel_parar();
 }
 
-int yaw = 0;
-unsigned long mil = 0;
-bool invert = false;
 
-void loop() {
+unsigned long mil = 0;
+
+
+void loop() {return;
   bool besq, bmesq, bm, bmdir, bdir;
   ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
 
@@ -109,8 +114,8 @@ void loop() {
   b_sens |= bmdir << 1;
   b_sens |= bdir;
 
-  uint16_t r1, g1, b1, c1;  //esq, soft
-  uint16_t r2, g2, b2, c2;  //dir, real
+  uint16_t r1, g1, b1, c1;  //esq, real
+  uint16_t r2, g2, b2, c2;  //dir, soft
   bool verde_esq = false;
   bool verde_dir = false;
   int ult = ultra_sonico.read();
@@ -155,6 +160,7 @@ void loop() {
   display.setCursor(0, 0);
   tcs_soft.getRawData(&r1, &g1, &b1, &c1);
   tcs_real.getRawData(&r2, &g2, &b2, &c2);
+  display.clear();
   Serial.print(r1);
   Serial.print("/");
   Serial.print(g1);
@@ -165,20 +171,25 @@ void loop() {
   Serial.print("/");
   Serial.print(g2);
   Serial.print("/");
-  Serial.println(b2);
+  Serial.print(b2);
+  Serial.print("\t");
+  Serial.print(verde(r1, g1, b1, ESQ_VERDE_TOL) ? "esq_s" : "esq_n");
+  Serial.print(" / ");
+  Serial.println(verde(r2, g2, b2, DIR_VERDE_TOL) ? "dir_s" : "dir_n");
 
   display.print(r1);
   display.print("/");
   display.print(g1);
   display.print("/");
   display.println(b1);
+  
   display.print(r2);
   display.print("/");
   display.print(g2);
   display.print("/");
   display.println(b2);
   delay(200);
-  display.clear();
+  
   return;
 #endif
 
@@ -193,14 +204,20 @@ void loop() {
   OLED::print_verdes(verde_esq, verde_dir);
   OLED::print_ult(ult);
   display.clearLine(5);
-  display.setCursor(OLED::center(3), 5);
-  display.print(mpu.pitch());
   // display.print(analogRead(s_esq));
   // display.print(" / ");
   // display.print(analogRead(s_dir));
   Serial.print("(ultrasonico=");
   Serial.print(ult);
-  Serial.println(") ");
+  Serial.print(") ");
+
+  update_imu(&ypr);
+  Serial.print("\t");
+  Serial.print(ypr.yaw);
+  Serial.print(" , ");
+  Serial.print(ypr.pitch);
+  Serial.print(" , ");
+  Serial.println(ypr.roll);
 
   switch (b_sens) {
     case 0b10000:
@@ -225,7 +242,8 @@ void loop() {
         OLED::print_verdes(verde_esq, verde_dir);
         if (verde_esq) {
           Serial.println("90 esq verde");
-          giro_esq_ang_mpu(45);
+          // giro_esq_ang_mpu(45);
+          giro_esq_ang_imu(45, &ypr);
           esq_90();
         } else {
           vel_frente_max();
@@ -263,9 +281,6 @@ void loop() {
           }
         }
       }
-      mpu.reset_yaw();
-      mpu.reset_pitch();display.invertDisplay(false);
-      yaw = 0;
       break;
 
     case 0b00001:
@@ -290,7 +305,8 @@ void loop() {
         OLED::print_verdes(verde_esq, verde_dir);
         if (verde_dir) {
           Serial.println("90 dir verde");
-          giro_dir_ang_mpu(45);
+          // giro_dir_ang_mpu(45);
+          giro_dir_ang_imu(45, &ypr);
           dir_90();
         } else {
           vel_frente_max();
@@ -328,14 +344,11 @@ void loop() {
           }
         }
       }
-      mpu.reset_yaw();
-      mpu.reset_pitch();display.invertDisplay(false);
-      yaw = 0;
       break;
 
     // case 0b01000:
     // case 0b00010:
-    case 0b00100: mpu.reset_yaw(); yaw = 0;
+    case 0b00100:
     case 0b01100:
     case 0b00110:
     case 0b01110:
@@ -344,19 +357,16 @@ void loop() {
       if (!ver) {
         Serial.println("Frente");
 
-        mpu.update();
-        yaw = mpu.yaw();
-
-        if(mpu.pitch() >= 20) {
-          display.invertDisplay(invert);
-          invert = !invert;
-        }
-
         if (ult <= 9 && ult > 0) {
           obstaculo(false);
         }
 
         vel_frente();
+
+        if (millis() - mil >= 2000) {
+
+        }
+
       } else {
         Serial.println("Frente Verdadeiro");
         ver = false;
@@ -373,8 +383,6 @@ void loop() {
         vel_direita();
       } else {
         Serial.println("micro esq Verdadeiro");
-        mpu.update();
-        yaw = mpu.yaw();
         ver = false;
         vel_re();
         delay(delay_re / 2);
@@ -386,8 +394,6 @@ void loop() {
       OLED::print_micro(true, ver);
       if (!ver) {
         Serial.println("micro dir");
-        mpu.update();
-        yaw = mpu.yaw();
         vel_esquerda();
       } else {
         Serial.println("micro dir Verdadeiro");
@@ -406,20 +412,16 @@ void loop() {
         delay(delay_re);
       } else {
         Serial.println("frente (gap)");
-        mpu.update();
-        yaw = mpu.yaw();
 
-        if (yaw > 10) {
-          serv_esq.write(90);
-          serv_dir.write(120);
-          delay(400);
-        } else if (yaw < -15) {
-          serv_esq.write(60);
-          serv_dir.write(90);
-          delay(400);
-        }
-        mpu.reset_yaw();
-        yaw = 0;
+        // if (yaw > 10) {
+        //   serv_esq.write(90);
+        //   serv_dir.write(120);
+        //   delay(400);
+        // } else if (yaw < -15) {
+        //   serv_esq.write(60);
+        //   serv_dir.write(90);
+        //   delay(400);
+        // }
 
         vel_frente_max();
 
@@ -436,73 +438,6 @@ void loop() {
               delay(500);
               display.invertDisplay(false);
               delay(500);
-            }
-          }
-        }
-
-        if (millis() - mil >= 5625) {
-          display.setCursor(0, 3);
-          display.print("cinza");
-
-          // vel_frente_max();
-          // delay(5625);
-
-          serv_esq.write(180);
-          serv_dir.write(180);  //45ang/s
-          delay(2000);          // 90graus dir
-
-          vel_re_max();
-          delay(900);
-
-          serv_esq.write(60);
-          serv_dir.write(90);
-          delay(1000);
-
-          // vel_frente_max();
-          serv_esq.write(130);
-          serv_dir.write(0);
-          ult = ultra_sonico.read();
-          while (ult != 0 && ult >= 9) {
-            ult = ultra_sonico.read();
-            OLED::print_ult(ult);
-          }
-
-          serv_esq.write(0);
-          serv_dir.write(0);  //43.9ang/s
-          delay(1900);        //90graus esq
-
-          //vel_frente_max();
-          serv_esq.write(130);
-          serv_dir.write(0);
-          delay(1000);
-
-          // ult = ultra_sonico.read();
-          // if (ult != 0 && ult <= 9) {
-          //   ult = ultra_sonico.read();
-          //   OLED::print_ult(ult);
-          // }
-
-          // serv_esq.write(0);
-          // serv_dir.write(0);  //43.9ang/s
-          // delay(1000);        //90graus esq
-
-          // vel_frente_max();
-          while (constrain(map(analogRead(s_m), preto_m, branco_m, 0, 100), 0, 100) >= 50) {}
-
-          vel_frente();
-          delay(400);
-          serv_esq.write(0);
-          serv_dir.write(0);
-          delay(500);
-
-        
-          while (constrain(map(analogRead(s_m), preto_m, branco_m, 0, 100), 0, 100) >= 30) {
-            if (constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100) >= 50) {
-              giro_esq_ang(30);
-              break;
-            } else if (constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100) >= 50) {
-              giro_dir_ang(30);
-              break;
             }
           }
         }
@@ -542,13 +477,13 @@ void loop() {
         // display.print("esq");
         Serial.print("esq verde");
         // giro_esq_ang(30);
-        giro_esq_ang_mpu(30);
+        giro_esq_ang_imu(30, &ypr);
         esq_90();
       } else if (!verde_esq && verde_dir) {
         // display.print("dir");
         Serial.print("dir verde");
-        //giro_dir_ang(30);
-        giro_dir_ang_mpu(30);
+        // giro_dir_ang(30);
+        giro_dir_ang_imu(30, &ypr);
         dir_90();
       } else {
         // display.print("nad");
@@ -559,12 +494,9 @@ void loop() {
       }
       display.clearLine(3);
       Serial.println("");
-      mpu.reset_yaw();
-      mpu.reset_pitch();display.invertDisplay(false);
-      yaw = 0;
       break;
     default: Serial.print("."); break;
   }
 
-  if (b_sens != 0b00000) mil = millis();
+  if (bm == 1 || (bmesq == 1 && bmdir == 1)) mil = millis();
 }

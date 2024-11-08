@@ -47,7 +47,7 @@ namespace OLED {
     if(ver)
       display.print("verdadeiro");
     else
-    display.print("falso");
+      display.print("falso");
  }
 
  void print_frente(bool ver) {
