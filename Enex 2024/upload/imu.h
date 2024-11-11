@@ -76,7 +76,7 @@ void giro_dir_ang_imu(int angulo, euler_t* ypr) {
  
  serv_esq.write(180);
  serv_dir.write(180);
- while(ypr->yaw < yaw - angulo) {
+ while(ypr->yaw > yaw - angulo) {
   update_imu(ypr);
  }
 }
