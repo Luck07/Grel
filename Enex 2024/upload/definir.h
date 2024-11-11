@@ -28,7 +28,7 @@ MPU6050 mpu(Wire);
 #define s_dir  A3  //  A4
 
 // #define calpb
-// #define caltcs
+//#define caltcs
 
 // #define branco_esq  971 // 967
 // #define branco_mesq 975 // 969
@@ -114,7 +114,7 @@ void ler_sensores(bool* besq, bool* bmesq, bool* bm, bool* bmdir, bool* bdir) {
 */
 
 #define ESQ_VERDE_TOL 1.035//1.115 // 1.22 // 1.025
-#define DIR_VERDE_TOL 1.09//1.12  // 1.15 // 0.98
+#define DIR_VERDE_TOL 1.04//1.12  // 1.15 // 0.98
 bool verde(int r, int g, int b, float tol) { 
   // Serial.print(g);
   // Serial.print("/");
