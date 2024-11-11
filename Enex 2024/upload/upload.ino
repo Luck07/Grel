@@ -48,62 +48,62 @@ void setup() {
   serv_esq.attach(servo_esquerda);
   serv_dir.attach(servo_direita);
 
-  mpu.begin();
-  display.println("calibrando mpu");
-  // mpu.calibrar_offsets();
+ mpu.begin();
+ display.println("calibrando mpu");
+  mpu.calibrar_offsets();
 
-  mpu.set_gyro_offsets(0.97f, -1.68f, 0.55f);
+ mpu.set_gyro_offsets(0.97f, -1.68f, 0.55f);
   mpu.set_accl_offsets(-0.04f, -0.03f, 1.00f);
 
-  display.print(mpu.get_gyro_Xoffset());
-  display.print("/");
-  display.print(mpu.get_gyro_Yoffset());
-  display.print("/");
-  display.println(mpu.get_gyro_Zoffset());
-  display.print(mpu.get_accl_Xoffset());
-  display.print("/");
-  display.print(mpu.get_accl_Yoffset());
-  display.print("/");
-  display.println(mpu.get_accl_Zoffset());
-  // for(;;)delay(1000);
-  display.clear();
-  //   serv_esq.write(0);
-  //   serv_dir.write(0);//45ang/s
-  //   delay(4100);vel_parar();
-
-  // update_imu(&ypr);
-  // float yaw = ypr.yaw;
-  // serv_dir.write(0);
-  // serv_esq.write(0);
-  // unsigned long m = millis();
-  // Serial.println(yaw);
-  // delay(100);
-
-  // if(yaw == 0.0) yaw = 179.0;
-
-  // while(ypr.yaw >= -yaw) {
-  //   update_imu(&ypr);
-  //   Serial.println(ypr.yaw);
-  // }
-  // vel_parar();
-  // unsigned long _m = millis();
+  // display.print(mpu.get_gyro_Xoffset());
+  // display.print("/");
+  // display.print(mpu.get_gyro_Yoffset());
+  // display.print("/");
+  // display.println(mpu.get_gyro_Zoffset());
+  // display.print(mpu.get_accl_Xoffset());
+  // display.print("/");
+  // display.print(mpu.get_accl_Yoffset());
+  // display.print("/");
+  // display.println(mpu.get_accl_Zoffset());
+  // // for(;;)delay(1000);
   // display.clear();
-  // display.setCursor(1, 1);
-  // display.println(_m);
-  // display.println(m);
-  // display.println(_m - m);
+  // //   serv_esq.write(0);
+  // //   serv_dir.write(0);//45ang/s
+  // //   delay(4100);vel_parar();
 
-  serv_esq.write(180);
-  serv_dir.write(0);
-  delay(10000);
-  vel_parar();
+  // // update_imu(&ypr);
+  // // float yaw = ypr.yaw;
+  // // serv_dir.write(0);
+  // // serv_esq.write(0);
+  // // unsigned long m = millis();
+  // // Serial.println(yaw);
+  // // delay(100);
+
+  // // if(yaw == 0.0) yaw = 179.0;
+
+  // // while(ypr.yaw >= -yaw) {
+  // //   update_imu(&ypr);
+  // //   Serial.println(ypr.yaw);
+  // // }
+  // // vel_parar();
+  // // unsigned long _m = millis();
+  // // display.clear();
+  // // display.setCursor(1, 1);
+  // // display.println(_m);
+  // // display.println(m);
+  // // display.println(_m - m);
+
+  // serv_esq.write(180);
+  // serv_dir.write(0);
+  // delay(10000);
+  // vel_parar();  
 }
 
 
 unsigned long mil = 0;
 
 
-void loop() {return;
+void loop() {
   bool besq, bmesq, bm, bmdir, bdir;
   ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
 
@@ -172,6 +172,10 @@ void loop() {return;
   Serial.print(g2);
   Serial.print("/");
   Serial.print(b2);
+  Serial.print("\t");
+  Serial.print(ESQ_VERDE_TOL * (r1 + g1 + b1) / 3);
+  Serial.print("/");
+  Serial.print(DIR_VERDE_TOL * (r2 + g2 + b2) / 3);
   Serial.print("\t");
   Serial.print(verde(r1, g1, b1, ESQ_VERDE_TOL) ? "esq_s" : "esq_n");
   Serial.print(" / ");
@@ -423,24 +427,24 @@ void loop() {return;
         //   delay(400);
         // }
 
-        vel_frente_max();
+        //vel_frente_max();
 
-        tcs_soft.getRawData(&r1, &g1, &b1, &c1);
-        if (verde(g1, r1, b1, 1.1)) {
-          tcs_real.getRawData(&r2, &g2, &b2, &c2);
-          if (verde(g2, r2, b2, 1.1)) {
-            vel_parar();
+        // tcs_soft.getRawData(&r1, &g1, &b1, &c1);
+        // if (verde(g1, r1, b1, 1.1)) {
+        //   tcs_real.getRawData(&r2, &g2, &b2, &c2);
+        //   if (verde(g2, r2, b2, 1.1)) {
+        //     vel_parar();
 
-            display.clear();
-            display.print("ola");
-            for (;;) {
-              display.invertDisplay(true);
-              delay(500);
-              display.invertDisplay(false);
-              delay(500);
-            }
-          }
-        }
+        //     display.clear();
+        //     display.print("ola");
+        //     for (;;) {
+        //       display.invertDisplay(true);
+        //       delay(500);
+        //       display.invertDisplay(false);
+        //       delay(500);
+        //     }
+        //   }
+        // }
 
         vel_frente();
       }
@@ -477,13 +481,13 @@ void loop() {return;
         // display.print("esq");
         Serial.print("esq verde");
         // giro_esq_ang(30);
-        giro_esq_ang_imu(30, &ypr);
+        giro_esq_ang_imu(60, &ypr);
         esq_90();
       } else if (!verde_esq && verde_dir) {
         // display.print("dir");
         Serial.print("dir verde");
         // giro_dir_ang(30);
-        giro_dir_ang_imu(30, &ypr);
+        giro_dir_ang_imu(60, &ypr);
         dir_90();
       } else {
         // display.print("nad");
