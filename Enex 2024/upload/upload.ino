@@ -251,12 +251,12 @@ void loop() {
           esq_90();
         } else {
           vel_frente_max();
-          delay(medicoes::frente_ms_max(FITA_LARGURA * 1.5));
+          delay(medicoes::frente_ms_max(FITA_LARGURA * 2));
 
           ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
           if (!(besq || bmesq || bm || bmdir || bdir)) {
             vel_re_max();
-            delay(medicoes::tras_ms_max(FITA_LARGURA * 1.5));
+            delay(medicoes::tras_ms_max(FITA_LARGURA * 0.7));
             // esq_90();
             // serv_esq.write(0);
             // serv_dir.write(0);
@@ -267,10 +267,10 @@ void loop() {
 
             giro_esq_ang(60);
             while (constrain(map(analogRead(s_m), preto_m, branco_m, 0, 100), 0, 100) >= 60) {
-              if (constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100) >= 60) {
-                giro_dir_ang(30);
-                break;
-              }
+              // if (constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100) >= 60) {
+              //   giro_dir_ang(30);
+              //   break;
+              // }
             }
             // if(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=20  ||
             //    constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=60) {
@@ -314,12 +314,12 @@ void loop() {
           dir_90();
         } else {
           vel_frente_max();
-          delay(medicoes::frente_ms_max(FITA_LARGURA * 1.5));
+          delay(medicoes::frente_ms_max(FITA_LARGURA * 3));
 
           ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
           if (!(besq || bmesq || bm || bmdir || bdir)) {
             vel_re_max();
-            delay(medicoes::tras_ms_max(FITA_LARGURA * 1.5));
+            delay(medicoes::tras_ms_max(FITA_LARGURA * 0.7));
             // dir_90();
             // serv_esq.write(180);
             // serv_dir.write(180);
@@ -329,10 +329,10 @@ void loop() {
 
             giro_dir_ang(60);
             while (constrain(map(analogRead(s_m), preto_m, branco_m, 0, 100), 0, 100) >= 60) {
-              if (constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100) >= 60) {
-                giro_esq_ang(30);
-                break;
-              }
+              // if (constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100) >= 90) {
+              //   giro_esq_ang(30);
+              //   break;
+              // }
             }
 
             // if(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=20  ||
@@ -488,6 +488,7 @@ void loop() {
         Serial.print("dir verde");
         // giro_dir_ang(30);
         giro_dir_ang_imu(60, &ypr);
+        Serial.println("passei");
         dir_90();
       } else {
         // display.print("nad");
