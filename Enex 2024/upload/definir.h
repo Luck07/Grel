@@ -72,7 +72,7 @@ Servo serv_dir;
 
 #define delay_fre 400 // 350
 #define velocidade_par 300  // 300
-#define delay_re 300 // 300
+#define delay_re 100 // 300
 #define delay_peq 100 //100
 
 
