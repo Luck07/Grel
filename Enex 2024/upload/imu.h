@@ -86,6 +86,44 @@ void giro_dir_ang_imu(int angulo, euler_t* ypr) {
  }
 }
 
+// void giro_dir_ang_imu(int angulo, euler_t* ypr) {
+//   update_imu(ypr);
+//   float yaw = ypr->yaw;
+//   float dest = (yaw - angulo < -180) ? 180 - abs(angulo) + 180 - abs(yaw) : yaw - angulo; 
+ 
+//  serv_esq.write(180);
+//  serv_dir.write(180);
+//  //while(ypr->yaw > dest) {
+//   if(dest < 0) {
+//     while(ypr->yaw > dest) {
+//       update_imu(ypr);
+//       //if(ypr->yaw - yaw > angulo)
+//         //break;
+//       display.clearLine(5);
+//       display.setCursor(0, 5);
+//       display.print(ypr->yaw);
+//     }
+//   } else {
+//     while(ypr->yaw > 0 && ypr->yaw < dest) {
+
+//       update_imu(ypr);
+
+//       //if(ypr->yaw - yaw > angulo)
+//         //break;
+//       display.clearLine(5);
+//       display.setCursor(0, 5);
+//       display.print(ypr->yaw);
+//     }
+//   }
+//   // while(dest<0 && ypr->yaw > dest || dest>0 && ypr->yaw < dest) {
+//   // update_imu(ypr);
+//   // //if(ypr->yaw - yaw > angulo)
+//   //   //break;
+//   // display.clearLine(5);
+//   // display.setCursor(0, 5);
+//   // display.print(ypr->yaw);
+// }
+
 void giro_esq_ang_imu(int angulo, euler_t* ypr) {
   update_imu(ypr);
   float yaw = ypr->yaw;
@@ -98,5 +136,19 @@ void giro_esq_ang_imu(int angulo, euler_t* ypr) {
     break;
  }
 }
+
+// void giro_esq_ang_imu(int angulo, euler_t* ypr) {
+//   update_imu(ypr);
+//   float yaw = ypr->yaw;
+//   float dest = yaw - angulo > 180 ? 180 - abs(angulo) + 180 - abs(yaw) : yaw - angulo; 
+
+//  serv_esq.write(0);
+//  serv_dir.write(0);
+//  while(ypr->yaw < dest) {
+//   update_imu(ypr);
+//   if(ypr->yaw - yaw > 110)
+//     break;
+//  }
+// }
 
 #endif
