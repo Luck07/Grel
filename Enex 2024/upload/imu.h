@@ -78,6 +78,11 @@ void giro_dir_ang_imu(int angulo, euler_t* ypr) {
  serv_dir.write(180);
  while(ypr->yaw > yaw - angulo) {
   update_imu(ypr);
+  if(ypr->yaw - yaw > angulo)
+    break;
+  // display.clearLine(5);
+  // display.setCursor(0, 5);
+  // display.print(ypr->yaw);
  }
 }
 
@@ -89,6 +94,8 @@ void giro_esq_ang_imu(int angulo, euler_t* ypr) {
  serv_dir.write(0);
  while(ypr->yaw < yaw + angulo) {
   update_imu(ypr);
+  if(ypr->yaw - yaw > 110)
+    break;
  }
 }
 
