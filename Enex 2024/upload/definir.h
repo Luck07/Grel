@@ -113,7 +113,7 @@ void ler_sensores(bool* besq, bool* bmesq, bool* bm, bool* bmdir, bool* bdir) {
   esq 1.13 azul 1.096 total
 */
 
-#define ESQ_VERDE_TOL 1.035//1.115 // 1.22 // 1.025
+#define ESQ_VERDE_TOL 1.029//1.115 // 1.22 // 1.025
 #define DIR_VERDE_TOL 1.04//1.12  // 1.15 // 0.98
 bool verde(int r, int g, int b, float tol) { 
   // Serial.print(g);
@@ -266,9 +266,9 @@ void giro_esq_ang_mpu(int angulo) {
   // }
 }
 
-void obstaculo(bool dir = true) {
+void obstaculo(bool dir = true) { // true = direita / false = esquerda
   OLED::print_obs();
-  unsigned dl90 = (dir) ? 2000: 2050;
+  int dl90 = (dir) ? 1450: 1700;
 
   serv_esq.write(180*dir);
   serv_dir.write(180*dir);//45ang/s
@@ -276,20 +276,23 @@ void obstaculo(bool dir = true) {
 
   //8cm/s
   vel_frente_max();
-  delay(2400);//LARGURA*0.8/8
+  delay(2200);//LARGURA*0.8/8//LARGURA*0.8/8
   // delay(medicoes::frente_ms_max(LARGURA*0.8));
 
   serv_esq.write(180 - (180*dir));
   serv_dir.write(180 - (180*dir));//43.9ang/s
-  delay(1800); //90graus esq
+  //      direita             esquerda
+  if(dir)delay(1800); else delay(1450);//LARGURA*0.8/8delay(1450); //90graus esq
 
   //8cm/s
   vel_frente_max(); // 8cm/s
-  delay(4850); //35cm
+  //      direita             esquerda
+  if(dir)delay(3000); else delay(3200); //35cm
 
   serv_esq.write(180 - (180*dir));
   serv_dir.write(180 - (180*dir));//43.9ang/s
-  delay(1600); //90graus esq
+  //      direita             esquerda
+  if(dir)delay(1600); else delay(1200);//90graus esq
 
   vel_frente_max(); //8cm/s
   delay(700); //LARGURA*0.8/8 - 300ms

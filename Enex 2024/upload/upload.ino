@@ -157,10 +157,8 @@ void loop() {
 #endif
 
 #ifdef caltcs
-  display.setCursor(0, 0);
   tcs_soft.getRawData(&r1, &g1, &b1, &c1);
   tcs_real.getRawData(&r2, &g2, &b2, &c2);
-  display.clear();
   Serial.print(r1);
   Serial.print("/");
   Serial.print(g1);
@@ -181,17 +179,30 @@ void loop() {
   Serial.print(" / ");
   Serial.println(verde(r2, g2, b2, DIR_VERDE_TOL) ? "dir_s" : "dir_n");
 
+  display.setCursor(0, 0);
+  display.clear();
+
+  display.print("Esq: ");
   display.print(r1);
   display.print("/");
   display.print(g1);
   display.print("/");
   display.println(b1);
   
+  display.print("Dir: ");
   display.print(r2);
   display.print("/");
   display.print(g2);
   display.print("/");
   display.println(b2);
+
+  display.print(ESQ_VERDE_TOL * (r1 + g1 + b1) / 3);
+  display.print("/");
+  display.println(DIR_VERDE_TOL * (r2 + g2 + b2) / 3);
+  
+  display.print(verde(r1, g1, b1, ESQ_VERDE_TOL) ? "esq_s" : "esq_n");
+  display.print(" / ");
+  display.println(verde(r2, g2, b2, DIR_VERDE_TOL) ? "dir_s" : "dir_n");
   delay(200);
   
   return;
@@ -314,7 +325,7 @@ void loop() {
           dir_90();
         } else {
           vel_frente_max();
-          delay(medicoes::frente_ms_max(FITA_LARGURA * 3));
+          delay(medicoes::frente_ms_max(FITA_LARGURA * 2));
 
           ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
           if (!(besq || bmesq || bm || bmdir || bdir)) {
@@ -362,7 +373,7 @@ void loop() {
         Serial.println("Frente");
 
         if (ult <= 9 && ult > 0) {
-          obstaculo(false);
+          obstaculo(true);
         }
 
         vel_frente();
