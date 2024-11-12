@@ -149,6 +149,105 @@ void giro_esq_ang_imu(int angulo, euler_t* ypr) {
 //   if(ypr->yaw - yaw > 110)
 //     break;
 //  }
-// }
+
+
+//
+// alguuns testes q eu fiz e fui refatorando aos poucos
+//******************************** VERSAO 1
+/*
+
+float clamp_yaw(float ang) {
+  if(ang >  180) return ang - 360;
+  if(ang < -180) return ang + 360;
+  return ang;
+  //return (ang>180)?ang-360:((ang<-180)?ang+360:ang);
+}
+
+void giro_dir(int angulo, euler_t* ypr) {
+  update_imu(ypr);
+  float yaw  = ypr->yaw;
+  float dest = clamp_yaw(yaw - angulo);
+  
+  if(yaw - angulo > -180) {
+    while(ypr->yaw > dest) { update_imu(ypr); }
+  } else {
+    while(ypr->yaw <= 0 || ypr->yaw > dest) { update_imu(ypr); }
+  }
+}
+
+void giro_esq(int angulo, euler_t* ypr) {
+  update_imu(ypr);
+  float yaw  = ypr->yaw;
+  float dest = clamp_yaw(yaw + angulo);
+  
+  if(yaw + angulo < 180) {
+    while(ypr->yaw < dest) { update_imu(ypr); }
+  } else {
+    while(ypr->yaw >= 0 || ypr->yaw < dest) { update_imu(ypr); }
+  }
+}
+
+*/
+//********************************
+
+//******************************** VERSAO 2
+/*
+
+void giro_dir(int angulo, euler_t* ypr) {
+  update_imu(ypr);
+  float yaw  = ypr->yaw;
+  float dest = yaw - angulo;
+
+  if(dest < -180) {
+    dest += 360;
+    while(ypr->yaw <= 0 || ypr->yaw > dest) { update_imu(ypr); }
+  } else {
+    while(ypr->yaw > dest) { update_imu(ypr); }
+  }
+}
+
+void giro_esq(int angulo, euler_t* ypr) {
+  update_imu(ypr);
+  float yaw  = ypr->yaw;
+  float dest = yaw + angulo;
+  
+  if(dest > 180) {
+    dest -= 360;
+    while(ypr->yaw >= 0 || ypr->yaw < dest) { update_imu(ypr); }
+  } else {
+    while(ypr->yaw < dest) { update_imu(ypr); }
+  }
+}
+
+*/
+//********************************
+
+//******************************** VERSAO 3
+/*
+
+void giro_dir(int angulo, euler_t* ypr) {
+  update_imu(ypr);
+  float yaw  = ypr->yaw;
+  float dest = yaw - angulo;
+  
+  if(dest < -180)
+    dest += 360;
+
+  while((ypr->yaw <= 0 && yaw - angulo < -180) || ypr->yaw > dest) { update_imu(ypr); }
+}
+
+void giro_esq(int angulo, euler_t* ypr) {
+  update_imu(ypr);
+  float yaw  = ypr->yaw;
+  float dest = yaw + angulo;
+
+  if(dest > 180)
+    dest -= 360;
+
+  while((ypr->yaw >= 0 && yaw + angulo > 180) || ypr->yaw < dest) { update_imu(ypr); }
+}
+
+*/
+//******************************** VERSAO 2
 
 #endif
