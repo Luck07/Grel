@@ -27,7 +27,7 @@ MPU6050 mpu(Wire);
 #define s_mdir A0  //  A3
 #define s_dir  A3  //  A4
 
-// #define calpb
+ //#define calpb
 //#define caltcs
 
 // #define branco_esq  971 // 967
@@ -42,17 +42,17 @@ MPU6050 mpu(Wire);
 // #define preto_mdir 634 // 664
 // #define preto_dir  616 // 617
 
-#define branco_esq  975  // 975 // 967
-#define branco_mesq 976  // 976 // 969
-#define branco_m    979  // 979 // 972
-#define branco_mdir 979  // 978 // 971
-#define branco_dir  974  // 976 // 969
+#define branco_esq  981  // 975 // 967
+#define branco_mesq 981  // 976 // 969
+#define branco_m    985  // 979 // 972
+#define branco_mdir 985  // 978 // 971
+#define branco_dir  985  // 976 // 969
 
-#define preto_esq  800// 799 // 853
-#define preto_mesq 722//646 // 792
-#define preto_m    560//610 // 485
-#define preto_mdir 592//800 // 664
-#define preto_dir  562//571 // 617
+#define preto_esq  836// 799 // 853
+#define preto_mesq 680//646 // 792
+#define preto_m    566//610 // 485
+#define preto_mdir 611//800 // 664
+#define preto_dir  698//571 // 617
 
 //Esquerda sendo branco e direita sendo preto
 #define media_esq  (branco_esq  + preto_esq ) / 2
@@ -95,9 +95,9 @@ void ler_sensores(bool* besq, bool* bmesq, bool* bm, bool* bmdir, bool* bdir) {
 
   const uint8_t max = 50;
   *besq  = esq  <= (max+30);
-  *bmesq = mesq <= (max*2);
+  *bmesq = mesq <= ((max*2) - 0);
   *bm    = m    <= (max+15);
-  *bmdir = mdir <= (max*2);
+  *bmdir = mdir <= ((max*2) - 0);
   *bdir  = dir  <= (max+10);
 }
 
@@ -318,31 +318,42 @@ void obstaculo(bool dir = true) { // true = direita / false = esquerda
 
 void esq_90() //* 90 esquerda
 {
-  vel_frente();
-  delay(delay_fre);
-  serv_esq.write(0);
-  serv_dir.write(0);
-  delay(delay_peq);
-  Serial.println("passo");
-  while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50  &&
-        constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {
-          display.clear();
-          display.setCursor(0,0);
+  // vel_frente();
+  // delay(delay_fre);
+  // ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
+  // if (!(besq || bmesq || bm || bmdir || bdir)) {
+  // serv_esq.write(0);
+  // serv_dir.write(0);
+  // delay(delay_peq);
+  // Serial.println("passo");
+  // while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50  &&
+  //       constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {
+  //         display.clear();
+  //         display.setCursor(0,0);
 
-          display.println(analogRead(s_m));
-        }
+  //         display.println(analogRead(s_m));
+  //       }
+  // vel_re_max();
+  // delay(delay_re / 2);
+  // }
 }
 
 void dir_90() //* 90 direita
 {
-  vel_frente();
-  delay(delay_fre);
-  serv_esq.write(180);
-  serv_dir.write(180);
-  delay(delay_peq);
-  Serial.println("passo");
+  // vel_frente();
+  // delay(delay_fre);
 
-    while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=65  &&
-          constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100)>=20) {}
+  // ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
+  // if (!(besq || bmesq || bm || bmdir || bdir)) {
+  // serv_esq.write(180);
+  // serv_dir.write(180);
+  // delay(delay_peq);
+  // Serial.println("passo");
+
+  //   while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=65  &&
+  //         constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100)>=20) {}
+  // vel_re_max();
+  // delay(delay_re / 2);
+  // }
 }
 #endif
