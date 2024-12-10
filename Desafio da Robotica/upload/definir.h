@@ -27,7 +27,7 @@ MPU6050 mpu(Wire);
 #define s_mdir A0  //  A3
 #define s_dir  A3  //  A4
 
- //#define calpb
+//#define calpb
 //#define caltcs
 
 // #define branco_esq  971 // 967
@@ -42,17 +42,17 @@ MPU6050 mpu(Wire);
 // #define preto_mdir 634 // 664
 // #define preto_dir  616 // 617
 
-#define branco_esq  981  // 975 // 967
-#define branco_mesq 981  // 976 // 969
-#define branco_m    985  // 979 // 972
-#define branco_mdir 985  // 978 // 971
-#define branco_dir  985  // 976 // 969
+#define branco_esq  977 // 981  // 975 // 967
+#define branco_mesq 977 // 981  // 976 // 969
+#define branco_m    982 // 985  // 979 // 972
+#define branco_mdir 982 // 985  // 978 // 971
+#define branco_dir  982 // 985  // 976 // 969
 
-#define preto_esq  836// 799 // 853
-#define preto_mesq 680//646 // 792
-#define preto_m    566//610 // 485
-#define preto_mdir 611//800 // 664
-#define preto_dir  698//571 // 617
+#define preto_esq  736 // 836// 799 // 853
+#define preto_mesq 587 // 680//646 // 792
+#define preto_m    601 // 566//610 // 485
+#define preto_mdir 626 // 611//800 // 664
+#define preto_dir  742 // 698//571 // 617
 
 //Esquerda sendo branco e direita sendo preto
 #define media_esq  (branco_esq  + preto_esq ) / 2
@@ -165,8 +165,8 @@ Ultrasonic ultra_sonico(6, 12);
 //* Inicio das funções, para cada caso
 void vel_frente()
 {
-  serv_esq.write(120);
-  serv_dir.write(60);
+  serv_esq.write(140);
+  serv_dir.write(65);
 }
 
 void vel_frente_max() {
