@@ -70,7 +70,7 @@ bool ver = false;     // O Verifica para os switchs
 Servo serv_esq;
 Servo serv_dir;
 
-#define delay_fre 400 // 350
+#define delay_fre 500 // 350
 #define velocidade_par 300  // 300
 #define delay_re 100 // 300
 #define delay_peq 100 //100
@@ -159,7 +159,7 @@ bool cinza(int r1, int g1, int b1,
  * echo == segun
  */
 
-Ultrasonic ultra_sonico(6, 12);
+Ultrasonic ultra_sonico(12, 6);
 
 
 //* Inicio das funções, para cada caso
@@ -216,7 +216,7 @@ void vel_esquerda()
 
 void vel_re()
 {
-  serv_esq.write(60);
+  serv_esq.write(30);
   serv_dir.write(120);
 }
 
@@ -318,8 +318,16 @@ void obstaculo(bool dir = true) { // true = direita / false = esquerda
 
 void esq_90() //* 90 esquerda
 {
-  // vel_frente();
-  // delay(delay_fre);
+  vel_frente();
+  delay(delay_fre);
+  serv_esq.write(0);
+  serv_dir.write(0);
+  while (constrain(map(analogRead(s_m), preto_m, branco_m, 0, 100), 0, 100) >= 65 && constrain(map(analogRead(s_dir), preto_esq, branco_esq, 0, 100), 0, 100) >= 20) {}
+  vel_re_max();
+  delay(delay_re);
+  
+
+
   // ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
   // if (!(besq || bmesq || bm || bmdir || bdir)) {
   // serv_esq.write(0);
@@ -340,9 +348,15 @@ void esq_90() //* 90 esquerda
 
 void dir_90() //* 90 direita
 {
-  // vel_frente();
-  // delay(delay_fre);
-
+  vel_frente();
+  delay(delay_fre);
+  serv_esq.write(180);
+  serv_dir.write(180);
+  while (constrain(map(analogRead(s_m), preto_m, branco_m, 0, 100), 0, 100) >= 65 && constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100) >= 20) {}
+  vel_re_max();
+  delay(delay_re);
+  
+  
   // ler_sensores(&besq, &bmesq, &bm, &bmdir, &bdir);
   // if (!(besq || bmesq || bm || bmdir || bdir)) {
   // serv_esq.write(180);
