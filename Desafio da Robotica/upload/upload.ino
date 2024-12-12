@@ -7,6 +7,7 @@
 // Usando array para colocar todos os pinos, coloquei os sensores em uma certa posição por causa do BitSwift em baixo
 const int pinos[] = { s_esq, s_mesq, s_m, s_mdir, s_dir };
 euler_t ypr;
+float real_yaw;
 
 void setup() {
   Serial.begin(9600);
@@ -36,6 +37,7 @@ void setup() {
     //if (!bno08x.begin_UART(&Serial1)) {  // Requires a device with > 300 byte UART buffer!
     //if (!bno08x.begin_SPI(BNO08X_CS, BNO08X_INT)) {
     Serial.println("Failed to find BNO08x chip");
+    display.println("IMU nao iniciou");
     while (1) { delay(10); }
   }
   Serial.println("BNO08x Found!");
@@ -48,12 +50,41 @@ void setup() {
   serv_esq.attach(servo_esquerda);
   serv_dir.attach(servo_direita);
 
-  mpu.begin();
-  display.println("calibrando mpu");
-  mpu.calibrar_offsets();
+  // mpu.begin();
+  // display.println("calibrando mpu");
+  // mpu.calibrar_offsets();
 
-  mpu.set_gyro_offsets(0.97f, -1.68f, 0.55f);
-  mpu.set_accl_offsets(-0.04f, -0.03f, 1.00f);
+  display.println("iniciando imu");
+  vel_parar();
+  update_imu(&ypr);
+  delay(1000);
+  update_imu(&ypr);
+  delay(500);
+  real_yaw = ypr.yaw;
+
+  // mpu.set_gyro_offsets(0.97f, -1.68f, 0.55f);
+  // mpu.set_accl_offsets(-0.04f, -0.03f, 1.00f);
+
+  // update_imu(&ypr);
+  // Serial.print("\t");
+  // Serial.print(ypr.yaw);
+  // Serial.print(" , ");
+  // Serial.print(ypr.pitch);
+  // Serial.print(" , ");
+  // Serial.println(ypr.roll);
+
+  // delay(1000);
+  // update_imu(&ypr);
+  // delay(1000);
+
+  // giro_dir(90, &ypr);
+  // vel_parar(300);
+  // giro_esq(90, &ypr);
+  // vel_parar(300);
+  // giro_dir(45, &ypr);
+  // vel_parar(300);
+  // giro_esq(45, &ypr);
+  // vel_parar(300);
 
   // display.print(mpu.get_gyro_Xoffset());
   // display.print("/");
@@ -94,9 +125,7 @@ void setup() {
   // // display.println(_m - m);
 }
 
-
 unsigned long mil = 0;
-
 
 void loop() {
   bool besq, bmesq, bm, bmdir, bdir;
@@ -214,7 +243,6 @@ void loop() {
   OLED::print_sens(besq, bmesq, bm, bmdir, bdir);
   //OLED::print_verdes(verde_esq, verde_dir);
   OLED::print_ult(ult);
-  display.clearLine(5);
   // display.print(analogRead(s_esq));
   // display.print(" / ");
   // display.print(analogRead(s_dir));
@@ -223,6 +251,7 @@ void loop() {
   Serial.print(") ");
 
   update_imu(&ypr);
+  OLED::print_refyaw(real_yaw);
   Serial.print("\t");
   Serial.print(ypr.yaw);
   Serial.print(" , ");
@@ -248,8 +277,8 @@ void loop() {
         Serial.println("90 esq Verdadeiro");
         ver = false;
         esq_90();
-
-
+        update_imu(&ypr);
+        real_yaw = ypr.yaw;
 
         // vel_frente_max();
         // delay(medicoes::frente_ms_max(FITA_LARGURA * 2));
@@ -335,6 +364,9 @@ void loop() {
         Serial.println("90 dir Verdadeiro");
         ver = false;
         dir_90();
+        update_imu(&ypr);
+        real_yaw = ypr.yaw;
+
         // vel_frente();
         // delay(300);
 
@@ -407,11 +439,13 @@ void loop() {
       if (!ver) {
         Serial.println("Frente");
 
-        if (ult <= 9 && ult > 0) {
-          obstaculo(true);
+        if (ult <= 8 && ult > 0) {
+          obstaculo(true, &ypr);
         }
 
         vel_frente();
+        update_imu(&ypr);
+        real_yaw = ypr.yaw;
 
         // if (millis() - mil >= 2000) {
 
@@ -460,7 +494,66 @@ void loop() {
       OLED::print_gap(ver);
       if (!ver) {
         Serial.println("frente (gap)");
+
+        update_imu(&ypr);
+
+        // float a = atan2(real_yaw - ypr.yaw, 1);
+        // float a = (real_yaw-ypr.yaw > 180)?real_yaw-ypr.yaw-360:((real_yaw-ypr.yaw<-180)?real_yaw-ypr.yaw+360:real_yaw-ypr.yaw);
+
+        float a = real_yaw - ypr.yaw;
+        if(a >  180) a -= 360;
+        if(a < -180) a += 360;
+
+        if(a<-8) {
+          serv_esq.write(90);
+          serv_dir.write(120);
+          delay(200);
+        } else if(a>8) {
+          serv_esq.write(40);
+          serv_dir.write(90);
+          delay(200);
+        }
+
+        // if(a < -180) {
+        //   a += 360;
+        //   giro_dir(abs(a), &ypr);
+        // } else if(a > 180) {
+        //   a -= 360;
+        //   giro_esq(abs(a), &ypr);
+        // } else {
+        //   if(a > 10) {
+        //     giro_esq(abs(a), &ypr);
+        //   } else if(a < -10) {
+        //     giro_dir(abs(a), &ypr);
+        //   }
+        // }
+
+        // if(a > 10.0) {
+        //   giro_esq(a, &ypr);
+        //   // serv_esq.write(40);
+        //   // serv_dir.write(90);
+        //   // delay(500);
+        // } else if(a < -10.0) {
+        //   giro_dir(abs(a), &ypr);
+        //   // serv_esq.write(90);
+        //   // serv_dir.write(120);
+        //   // delay(500);
+        // }
+
+        // if(real_yaw - ypr.yaw > 10.0) {
+        //   // serv_esq.write(90);
+        //   // serv_dir.write(120);
+        //   // delay(500);
+        //   giro_dir(abs(real_yaw - ypr.yaw), &ypr);
+        // } else if(real_yaw - ypr.yaw < -10.0) {
+        //   // serv_esq.write(40);
+        //   // serv_dir.write(90);
+        //   // delay(500);
+        //   giro_esq(abs(real_yaw - ypr.yaw), &ypr);
+        // }
+
         vel_frente();
+
       } else {
         Serial.println("gap Verdadeiro");
         ver = false;

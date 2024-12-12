@@ -121,6 +121,20 @@ namespace OLED {
   display.setCursor(center((ult<9)?1:2), 6);
   display.print(ult);
  }
+
+  void print_refyaw(float yaw) {
+  display.clearLine(5);
+  display.setCursor(center(18), 5);//11+7
+  display.print("yaw (ref): ");
+  display.print(yaw);
+  }
+
+ void print_yaw(float yaw) {
+  display.clearLine(4);
+  display.setCursor(center(18), 4);
+  display.print("yaw      : ");
+  display.print(yaw);
+ }
 }
 
 #endif

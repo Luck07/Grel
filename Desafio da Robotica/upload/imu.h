@@ -68,23 +68,26 @@ void update_imu(euler_t* ypr) {
          break;
      }
  }
+
+ OLED::print_yaw(ypr->yaw);
 }
 
-void giro_dir_ang_imu(int angulo, euler_t* ypr) {
- update_imu(ypr);
-  float yaw = ypr->yaw;
+// O mais proximo
+// void giro_dir_ang_imu(int angulo, euler_t* ypr) {
+//  update_imu(ypr);
+//   float yaw = ypr->yaw;
  
- serv_esq.write(180);
- serv_dir.write(180);
- while(ypr->yaw > yaw - angulo) {
-  update_imu(ypr);
-  if(ypr->yaw - yaw > angulo)
-    break;
-  // display.clearLine(5);
-  // display.setCursor(0, 5);
-  // display.print(ypr->yaw);
- }
-}
+//  serv_esq.write(180);
+//  serv_dir.write(180);
+//  while(ypr->yaw > yaw - angulo) {
+//   update_imu(ypr);
+//   if(ypr->yaw - yaw > angulo)
+//     break;
+//   // display.clearLine(5);
+//   // display.setCursor(0, 5);
+//   // display.print(ypr->yaw);
+//  }
+// }
 
 // void giro_dir_ang_imu(int angulo, euler_t* ypr) {
 //   update_imu(ypr);
@@ -124,18 +127,19 @@ void giro_dir_ang_imu(int angulo, euler_t* ypr) {
 //   // display.print(ypr->yaw);
 // }
 
-void giro_esq_ang_imu(int angulo, euler_t* ypr) {
-  update_imu(ypr);
-  float yaw = ypr->yaw;
+// O mais proximo
+// void giro_esq_ang_imu(int angulo, euler_t* ypr) {
+//   update_imu(ypr);
+//   float yaw = ypr->yaw;
   
- serv_esq.write(0);
- serv_dir.write(0);
- while(ypr->yaw < yaw + angulo) {
-  update_imu(ypr);
-  if(ypr->yaw - yaw > 110)
-    break;
- }
-}
+//  serv_esq.write(0);
+//  serv_dir.write(0);
+//  while(ypr->yaw < yaw + angulo) {
+//   update_imu(ypr);
+//   if(ypr->yaw - yaw > 110)
+//     break;
+//  }
+// }
 
 // void giro_esq_ang_imu(int angulo, euler_t* ypr) {
 //   update_imu(ypr);
@@ -168,10 +172,12 @@ void giro_dir(int angulo, euler_t* ypr) {
   float yaw  = ypr->yaw;
   float dest = clamp_yaw(yaw - angulo);
   
+  serv_esq.write(0);
+  serv_dir.write(0);
   if(yaw - angulo > -180) {
-    while(ypr->yaw > dest) { update_imu(ypr); }
+    while(ypr->yaw > dest) { update_imu(ypr); Serial.println(ypr->yaw); }
   } else {
-    while(ypr->yaw <= 0 || ypr->yaw > dest) { update_imu(ypr); }
+    while(ypr->yaw <= 0 || ypr->yaw > dest) { update_imu(ypr); Serial.println(ypr->yaw); }
   }
 }
 
@@ -180,10 +186,12 @@ void giro_esq(int angulo, euler_t* ypr) {
   float yaw  = ypr->yaw;
   float dest = clamp_yaw(yaw + angulo);
   
+  serv_esq.write(180);
+  serv_dir.write(180);
   if(yaw + angulo < 180) {
-    while(ypr->yaw < dest) { update_imu(ypr); }
+    while(ypr->yaw < dest) { update_imu(ypr); Serial.println(ypr->yaw); }
   } else {
-    while(ypr->yaw >= 0 || ypr->yaw < dest) { update_imu(ypr); }
+    while(ypr->yaw >= 0 || ypr->yaw < dest) { update_imu(ypr); Serial.println(ypr->yaw); }
   }
 }
 
@@ -198,6 +206,8 @@ void giro_dir(int angulo, euler_t* ypr) {
   float yaw  = ypr->yaw;
   float dest = yaw - angulo;
 
+  serv_esq.write(180);
+  serv_dir.write(180);
   if(dest < -180) {
     dest += 360;
     while(ypr->yaw <= 0 || ypr->yaw > dest) { update_imu(ypr); }
@@ -211,6 +221,8 @@ void giro_esq(int angulo, euler_t* ypr) {
   float yaw  = ypr->yaw;
   float dest = yaw + angulo;
   
+  serv_esq.write(180);
+  serv_dir.write(180);
   if(dest > 180) {
     dest -= 360;
     while(ypr->yaw >= 0 || ypr->yaw < dest) { update_imu(ypr); }
@@ -223,7 +235,7 @@ void giro_esq(int angulo, euler_t* ypr) {
 //********************************
 
 //******************************** VERSAO 3
-/*
+
 
 void giro_dir(int angulo, euler_t* ypr) {
   update_imu(ypr);
@@ -232,7 +244,8 @@ void giro_dir(int angulo, euler_t* ypr) {
   
   if(dest < -180)
     dest += 360;
-
+  serv_esq.write(140);
+  serv_dir.write(115);
   while((ypr->yaw <= 0 && yaw - angulo < -180) || ypr->yaw > dest) { update_imu(ypr); }
 }
 
@@ -243,11 +256,88 @@ void giro_esq(int angulo, euler_t* ypr) {
 
   if(dest > 180)
     dest -= 360;
-
+  serv_esq.write(40);
+  serv_dir.write(65);
   while((ypr->yaw >= 0 && yaw + angulo > 180) || ypr->yaw < dest) { update_imu(ypr); }
 }
 
-*/
+
 //********************************
+
+void obstaculo(bool dir, euler_t* ypr) { // true = direita / false = esquerda
+  OLED::print_obs();
+  update_imu(ypr);
+  // int dl90 = (dir) ? 1450: 1700;
+
+  // serv_esq.write(180*dir);
+  // serv_dir.write(180*dir);//45ang/s
+  // delay(dl90); // 90graus dir
+
+  if(dir)
+    giro_dir(90, ypr);
+  else
+    giro_esq(90, ypr);
+
+  //8cm/s
+  vel_frente();//6cm/s
+  delay(3600);//LARGURA*0.8/8//LARGURA*0.8/8
+  // delay(medicoes::frente_ms_max(LARGURA*0.8));
+
+  // serv_esq.write(180 - (180*dir));
+  // serv_dir.write(180 - (180*dir));//43.9ang/s
+  // //      direita             esquerda
+  // if(dir)delay(1800); else delay(1450);//LARGURA*0.8/8delay(1450); //90graus esq
+
+  if(dir)
+    giro_esq(90, ypr);
+  else
+    giro_dir(90, ypr);
+
+  //8cm/s
+  vel_frente();//6cm/s
+  delay(6450);//LARGURA*0.8/8//LARGURA*0.8/8
+  // vel_frente_max(); // 8cm/s
+  //      direita             esquerda
+  // if(dir)delay(3000); else delay(3200); //35cm
+
+  if(dir)
+    giro_esq(90, ypr);
+  else
+    giro_dir(90, ypr);
+
+  vel_frente();//6cm/s
+  delay(3600);//LARGURA*0.8/8//LARGURA*0.8/8
+
+  if(dir)
+    giro_dir(90, ypr);
+  else
+    giro_esq(90, ypr);
+
+  // serv_esq.write(180 - (180*dir));
+  // serv_dir.write(180 - (180*dir));//43.9ang/s
+  // //      direita             esquerda
+  // if(dir)delay(1600); else delay(1200);//90graus esq
+
+  // vel_frente_max(); //8cm/s
+  // delay(200); //LARGURA*0.8/8 - 300ms
+  // while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50) {}
+  // vel_frente();
+  // delay(225);
+
+
+  // serv_esq.write(180*dir);
+  // serv_dir.write(180*dir);//45ang/s
+  // delay(1333); //60graus dir
+
+  // while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=30) {
+  //     if(constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {
+  //       giro_esq_ang(30);
+  //       break;
+  //     }
+  // }
+
+  // vel_re_max();
+  // delay(125);
+}
 
 #endif

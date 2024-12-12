@@ -159,7 +159,7 @@ bool cinza(int r1, int g1, int b1,
  * echo == segun
  */
 
-Ultrasonic ultra_sonico(12, 6);
+Ultrasonic ultra_sonico(6, 12);
 
 
 //* Inicio das funções, para cada caso
@@ -266,55 +266,6 @@ void giro_esq_ang_mpu(int angulo) {
   // }
 }
 
-void obstaculo(bool dir = true) { // true = direita / false = esquerda
-  OLED::print_obs();
-  int dl90 = (dir) ? 1450: 1700;
-
-  serv_esq.write(180*dir);
-  serv_dir.write(180*dir);//45ang/s
-  delay(dl90); // 90graus dir
-
-  //8cm/s
-  vel_frente_max();
-  delay(2200);//LARGURA*0.8/8//LARGURA*0.8/8
-  // delay(medicoes::frente_ms_max(LARGURA*0.8));
-
-  serv_esq.write(180 - (180*dir));
-  serv_dir.write(180 - (180*dir));//43.9ang/s
-  //      direita             esquerda
-  if(dir)delay(1800); else delay(1450);//LARGURA*0.8/8delay(1450); //90graus esq
-
-  //8cm/s
-  vel_frente_max(); // 8cm/s
-  //      direita             esquerda
-  if(dir)delay(3000); else delay(3200); //35cm
-
-  serv_esq.write(180 - (180*dir));
-  serv_dir.write(180 - (180*dir));//43.9ang/s
-  //      direita             esquerda
-  if(dir)delay(1600); else delay(1200);//90graus esq
-
-  vel_frente_max(); //8cm/s
-  delay(700); //LARGURA*0.8/8 - 300ms
-  while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=50) {}
-  vel_frente();
-  delay(225);
-
-
-  serv_esq.write(180*dir);
-  serv_dir.write(180*dir);//45ang/s
-  delay(1333); //60graus dir
-
-  while(constrain(map(analogRead(s_m)  , preto_m  , branco_m  , 0, 100), 0, 100)>=30) {
-      if(constrain(map(analogRead(s_dir), preto_dir, branco_dir, 0, 100), 0, 100)>=50) {
-        giro_esq_ang(30);
-        break;
-      }
-  }
-
-  vel_re_max();
-  delay(125);
-}
 
 void esq_90() //* 90 esquerda
 {
