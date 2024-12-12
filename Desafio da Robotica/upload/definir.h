@@ -323,6 +323,9 @@ void esq_90() //* 90 esquerda
   serv_esq.write(0);
   serv_dir.write(0);
   while (constrain(map(analogRead(s_m), preto_m, branco_m, 0, 100), 0, 100) >= 65 && constrain(map(analogRead(s_dir), preto_esq, branco_esq, 0, 100), 0, 100) >= 20) {}
+  // while (constrain(map(analogRead(s_m), preto_m, branco_m, 0, 100), 0, 100) >= 65)
+  //   if(constrain(map(analogRead(s_dir), preto_esq, branco_esq, 0, 100), 0, 100) >= 20)
+  //     imu
   vel_re_max();
   delay(delay_re);
   
@@ -353,6 +356,9 @@ void dir_90() //* 90 direita
   serv_esq.write(180);
   serv_dir.write(180);
   while (constrain(map(analogRead(s_m), preto_m, branco_m, 0, 100), 0, 100) >= 65 && constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100) >= 20) {}
+  // while (constrain(map(analogRead(s_m), preto_m, branco_m, 0, 100), 0, 100) >= 65)
+  //   if(constrain(map(analogRead(s_esq), preto_esq, branco_esq, 0, 100), 0, 100) >= 20)
+  //     imu 
   vel_re_max();
   delay(delay_re);
   

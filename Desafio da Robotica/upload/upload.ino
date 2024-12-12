@@ -16,21 +16,21 @@ void setup() {
   display.clear();
   // display.print("oi");
 
-  if (!tcs_real.begin(&sWire)) {
-    Serial.println("tcs real n");
-    display.println("tcs real n");
-  } else {
-    Serial.println("tcs real passou");
-    display.println("tcs real");
-  }
+  // if (!tcs_real.begin(&sWire)) {
+  //   Serial.println("tcs real n");
+  //   display.println("tcs real n");
+  // } else {
+  //   Serial.println("tcs real passou");
+  //   display.println("tcs real");
+  // }
 
-  if (!tcs_soft.begin(&Wire)) {
-    Serial.println("tcs soft n");
-    display.println("tcs soft n");
-  } else {
-    Serial.println("tcs soft passou");
-    display.println("tcs soft");
-  }
+  // if (!tcs_soft.begin(&Wire)) {
+  //   Serial.println("tcs soft n");
+  //   display.println("tcs soft n");
+  // } else {
+  //   Serial.println("tcs soft passou");
+  //   display.println("tcs soft");
+  // }
 
   if (!imu.begin_I2C()) {
     //if (!bno08x.begin_UART(&Serial1)) {  // Requires a device with > 300 byte UART buffer!
@@ -92,11 +92,6 @@ void setup() {
   // // display.println(_m);
   // // display.println(m);
   // // display.println(_m - m);
-
-  // serv_esq.write(180);
-  // serv_dir.write(0);
-  // delay(10000);
-  // vel_parar();
 }
 
 
@@ -115,10 +110,10 @@ void loop() {
   b_sens |= bmdir << 1;
   b_sens |= bdir;
 
-  uint16_t r1, g1, b1, c1;  //esq, real
-  uint16_t r2, g2, b2, c2;  //dir, soft
-  bool verde_esq = false;
-  bool verde_dir = false;
+  // uint16_t r1, g1, b1, c1;  //esq, real
+  // uint16_t r2, g2, b2, c2;  //dir, soft
+  // bool verde_esq = false;
+  // bool verde_dir = false;
   int ult = ultra_sonico.read();
 
   Serial.print(besq);
@@ -217,7 +212,7 @@ void loop() {
   // return;
 
   OLED::print_sens(besq, bmesq, bm, bmdir, bdir);
-  OLED::print_verdes(verde_esq, verde_dir);
+  //OLED::print_verdes(verde_esq, verde_dir);
   OLED::print_ult(ult);
   display.clearLine(5);
   // display.print(analogRead(s_esq));
@@ -412,9 +407,9 @@ void loop() {
       if (!ver) {
         Serial.println("Frente");
 
-        // if (ult <= 9 && ult > 0) {
-        //   obstaculo(true);
-        // }
+        if (ult <= 9 && ult > 0) {
+          obstaculo(true);
+        }
 
         vel_frente();
 
